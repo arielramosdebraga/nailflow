@@ -39,7 +39,7 @@
   "devDependencies": {
     "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.15",
-    "eslint": "^10.4.0",
+    "eslint": "^9.39.4",
     "eslint-config-expo": "^56.0.4",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
@@ -50,7 +50,12 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "expo lint",
+    "format": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "echo \"Maestro E2E ainda nao configurado\" && exit 1"
   },
   "private": true
 }
