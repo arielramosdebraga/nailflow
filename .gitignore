@@ -45,3 +45,10 @@ yarn-error.*
 nailflow-8776c-firebase-adminsdk-fbsvc-1cce5d58ea.json
 .expo-start*.log
 expo-go-qr*.png
+
+# local logs and temporary diagnostics
+logs/
+expo-dev*.log
+
+# local secrets
+secrets/
