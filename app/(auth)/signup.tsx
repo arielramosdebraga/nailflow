@@ -53,7 +53,7 @@ export default function SignUpScreen() {
   return (
     <AuthScreenShell
       title="Criar nova conta"
-      subtitle="Cadastro inicial para manicure, dono do salao ou super admin."
+      subtitle="Cadastro inicial para profissional de unhas, dono do salão ou superadministrador."
     >
       <View className="gap-4">
         <Controller
@@ -101,7 +101,7 @@ export default function SignUpScreen() {
               label="Senha"
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="Minimo 6 caracteres"
+              placeholder="Mínimo 6 caracteres"
               secureTextEntry
               value={field.value}
               error={fieldState.error?.message}
@@ -139,7 +139,7 @@ export default function SignUpScreen() {
 
         <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
           <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
-            Ja tenho conta
+            Já tenho conta
           </Text>
         </Pressable>
       </View>

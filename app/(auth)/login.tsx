@@ -44,7 +44,7 @@ export default function LoginScreen() {
   return (
     <AuthScreenShell
       title="Entrar na conta"
-      subtitle="Acesse sua agenda, clientes e o painel do salao no NailFlow."
+      subtitle="Acesse sua agenda, clientes e o painel do salão no NailFlow."
     >
       <View className="gap-4">
         <Controller

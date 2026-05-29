@@ -32,15 +32,15 @@ export default function RecoverScreen() {
     try {
       await authSession.sendRecoverEmail(parsed.data.email);
       form.reset(parsed.data);
-      form.setError('root', { message: 'Se o e-mail existir, enviaremos as instrucoes de recuperacao.' });
+      form.setError('root', { message: 'Se o e-mail existir, enviaremos as instruções de recuperação.' });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Falha ao solicitar recuperacao.';
+      const message = error instanceof Error ? error.message : 'Falha ao solicitar recuperação.';
       form.setError('root', { message });
     }
   }
 
   return (
-    <AuthScreenShell title="Recuperar senha" subtitle="Informe seu e-mail para receber o link de redefinicao.">
+    <AuthScreenShell title="Recuperar senha" subtitle="Informe seu e-mail para receber o link de redefinição.">
       <View className="gap-4">
         <Controller
           control={form.control}

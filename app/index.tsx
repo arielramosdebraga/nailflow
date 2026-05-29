@@ -22,5 +22,5 @@ export default function IndexScreen() {
     return <Redirect href="/owner/dashboard" />;
   }
 
-  return <Redirect href="/manicure/agenda" />;
+  return <Redirect href="/nail-technician/agenda" />;
 }
