@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
@@ -14,21 +15,34 @@ export function useGoogleAuth() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signIn = useSessionStore((state) => state.signIn);
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-  });
-
-  const canSignInWithGoogle = useMemo(
-    () =>
-      Boolean(
-        process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ||
-          process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ||
-          process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
-      ),
+  const googleClientIds = useMemo(
+    () => ({
+      android: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+      ios: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      web: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    }),
     []
   );
+
+  const platformClientId = useMemo(() => {
+    if (Platform.OS === 'android') {
+      return googleClientIds.android;
+    }
+
+    if (Platform.OS === 'ios') {
+      return googleClientIds.ios;
+    }
+
+    return googleClientIds.web;
+  }, [googleClientIds.android, googleClientIds.ios, googleClientIds.web]);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: googleClientIds.android ?? '',
+    iosClientId: googleClientIds.ios ?? '',
+    webClientId: googleClientIds.web ?? '',
+  });
+
+  const canSignInWithGoogle = Boolean(platformClientId);
 
   useEffect(() => {
     const authInstance = auth;
@@ -86,6 +100,16 @@ export function useGoogleAuth() {
     googleRequestReady: Boolean(request),
     googleError: error,
     googleLoading: isLoading,
-    promptGoogleSignIn: promptAsync,
+    promptGoogleSignIn: async () => {
+      if (!canSignInWithGoogle) {
+        setError(
+          'Login com Google indisponivel. Configure EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ou EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID.'
+        );
+        return { type: 'dismiss' } as const;
+      }
+
+      setError(null);
+      return promptAsync();
+    },
   };
 }

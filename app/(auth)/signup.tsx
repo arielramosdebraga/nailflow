@@ -1,6 +1,6 @@
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { AuthScreenShell } from '@/components/features/auth/AuthScreenShell';
 import { Button } from '@/components/ui/Button';
@@ -137,9 +137,11 @@ export default function SignUpScreen() {
           disabled={authSession.isLoading}
         />
 
-        <Link href="/login" className="text-center text-sm font-medium text-zinc-700 dark:text-zinc-200">
-          Ja tenho conta
-        </Link>
+        <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
+          <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+            Ja tenho conta
+          </Text>
+        </Pressable>
       </View>
     </AuthScreenShell>
   );

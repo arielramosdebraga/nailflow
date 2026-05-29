@@ -41,3 +41,7 @@ yarn-error.*
 /android
 
 .env
+*firebase-adminsdk*.json
+nailflow-8776c-firebase-adminsdk-fbsvc-1cce5d58ea.json
+.expo-start*.log
+expo-go-qr*.png

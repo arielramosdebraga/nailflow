@@ -1,6 +1,6 @@
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { AuthScreenShell } from '@/components/features/auth/AuthScreenShell';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +9,7 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { RecoverFormSchema, type RecoverFormInput } from '@/schemas/auth/recover-form.schema';
 
 export default function RecoverScreen() {
+  const router = useRouter();
   const authSession = useAuthSession();
   const form = useForm<RecoverFormInput>({
     defaultValues: {
@@ -69,9 +70,11 @@ export default function RecoverScreen() {
           disabled={authSession.isLoading}
         />
 
-        <Link href="/login" className="text-center text-sm font-medium text-zinc-700 dark:text-zinc-200">
-          Voltar para login
-        </Link>
+        <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
+          <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+            Voltar para login
+          </Text>
+        </Pressable>
       </View>
     </AuthScreenShell>
   );

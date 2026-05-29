@@ -1,6 +1,6 @@
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { AuthScreenShell } from '@/components/features/auth/AuthScreenShell';
 import { Button } from '@/components/ui/Button';
@@ -105,12 +105,16 @@ export default function LoginScreen() {
         {googleAuth.googleError ? <Text className="text-sm text-error">{googleAuth.googleError}</Text> : null}
 
         <View className="gap-2">
-          <Link href="/recover" className="text-center text-sm font-medium text-primary">
-            Esqueci minha senha
-          </Link>
-          <Link href="/signup" className="text-center text-sm font-medium text-zinc-700 dark:text-zinc-200">
-            Criar conta
-          </Link>
+          <Pressable onPress={() => router.push('/recover')} accessibilityRole="button">
+            <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+              Esqueci minha senha
+            </Text>
+          </Pressable>
+          <Pressable onPress={() => router.push('/signup')} accessibilityRole="button">
+            <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+              Criar conta
+            </Text>
+          </Pressable>
         </View>
       </View>
     </AuthScreenShell>

@@ -10,6 +10,7 @@
     "@react-native-firebase/messaging": "^24.0.0",
     "@react-native-firebase/storage": "^24.0.0",
     "@tanstack/react-query": "^5.100.14",
+    "babel-preset-expo": "~56.0.13",
     "date-fns": "^4.3.0",
     "expo": "~56.0.6",
     "expo-auth-session": "^56.0.12",
@@ -29,14 +30,17 @@
     "react-hook-form": "^7.76.1",
     "react-native": "0.85.3",
     "react-native-calendars": "^1.1314.0",
+    "react-native-css-interop": "^0.2.4",
     "react-native-reanimated": "^4.4.0",
     "react-native-safe-area-context": "^5.8.0",
     "react-native-screens": "^4.25.2",
+    "react-native-worklets": "0.8.3",
     "tailwindcss": "^3.4.19",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.29.7",
     "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.15",
     "eslint": "^9.39.4",
@@ -55,7 +59,8 @@
     "format": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "echo \"Maestro E2E ainda nao configurado\" && exit 1"
+    "test:e2e": "echo \"Maestro E2E ainda nao configurado\" && exit 1",
+    "seed:test-accounts": "node scripts/seed-test-accounts.mjs"
   },
   "private": true
 }
