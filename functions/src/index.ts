@@ -1,0 +1,32 @@
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * import {onCall} from "firebase-functions/v2/https";
+ * import {onDocumentWritten} from "firebase-functions/v2/firestore";
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
+import {initializeApp} from "firebase-admin/app";
+import {setGlobalOptions} from "firebase-functions";
+import {onRequest} from "firebase-functions/https";
+import * as logger from "firebase-functions/logger";
+import {onUserCreated} from "./auth/on-user-created";
+
+setGlobalOptions({
+  maxInstances: 10,
+  region: "southamerica-east1",
+});
+
+initializeApp();
+
+export const health = onRequest((request, response) => {
+  logger.info("Health check request", {path: request.path});
+  response.status(200).json({
+    ok: true,
+    service: "nailflow-functions",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+export {onUserCreated};

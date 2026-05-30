@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "NailFlow",
+    "slug": "nailflow",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "nailflow",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-notifications"
+    ],
+    "web": {
+      "bundler": "metro"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

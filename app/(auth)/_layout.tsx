@@ -1,0 +1,13 @@
+import { Redirect, Stack } from 'expo-router';
+
+import { useSessionStore } from '@/stores/sessionStore';
+
+export default function AuthLayout() {
+  const status = useSessionStore((state) => state.status);
+
+  if (status === 'authenticated') {
+    return <Redirect href="/" />;
+  }
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
