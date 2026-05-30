@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NailFlow - Gestão para Manicures</title>
+
+  <style>
+    :root {
+      --primary: #8b13a8;
+      --primary-dark: #6f0f88;
+      --secondary: #ec4899;
+      --pink: #f472b6;
+      --soft-pink: #fdf2f8;
+      --soft-purple: #faf5ff;
+      --white: #ffffff;
+      --text: #3f3150;
+      --muted: #6f607a;
+      --border: #f0c9f8;
+      --shadow: 0 20px 50px rgba(139, 19, 168, 0.12);
+      --radius: 24px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background:
+        radial-gradient(circle at top left, rgba(236, 72, 153, 0.07), transparent 30%),
+        radial-gradient(circle at top right, rgba(192, 38, 211, 0.08), transparent 28%),
+        linear-gradient(180deg, #fffafd 0%, #ffffff 45%, #fdf4ff 100%);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    /* HERO */
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 0 58px;
+      background:
+        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.16), transparent 18%),
+        linear-gradient(135deg, #c12ec1 0%, #d334a9 48%, #e453a4 100%);
+      color: var(--white);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: 18%;
+      bottom: -80px;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(4px);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      max-width: 620px;
+      font-size: clamp(40px, 6vw, 68px);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+      font-weight: 900;
+    }
+
+    .hero p {
+      max-width: 700px;
+      font-size: 20px;
+      line-height: 1.55;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.94);
+      margin-bottom: 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 800;
+      border: 1px solid transparent;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(255, 255, 255, 0.24);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .hero-card-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-card {
+      width: min(430px, 100%);
+      padding: 24px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 30px 80px rgba(80, 0, 90, 0.25);
+      backdrop-filter: blur(14px);
+    }
+
+    .mockup {
+      overflow: hidden;
+      border-radius: 22px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .mockup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #f7effb;
+    }
+
+    .mockup-header strong {
+      color: var(--primary);
+      font-size: 17px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f7a2cd;
+    }
+
+    .appointment-list {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .appointment {
+      padding: 15px;
+      border-radius: 18px;
+      border: 1px solid #efc7fb;
+      background: #fffafd;
+    }
+
+    .appointment strong {
+      display: block;
+      color: var(--primary);
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+
+    .appointment span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* NAV */
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(240, 201, 248, 0.8);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      overflow-x: auto;
+      padding: 16px 0;
+      scrollbar-width: none;
+    }
+
+    .nav-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      font-size: 15px;
+      color: var(--primary-dark);
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    .nav a:hover {
+      color: var(--secondary);
+    }
+
+    /* STATS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+      margin-bottom: 56px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card {
+      padding: 24px 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .stat-card span {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* SECTIONS */
+
+    section {
+      padding: 48px 0;
+    }
+
+    .section-kicker {
+      display: block;
+      color: var(--secondary);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      color: var(--primary);
+      font-size: clamp(34px, 4vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .section-description {
+      max-width: 820px;
+      color: #5d4f6e;
+      font-size: 17px;
+      margin-bottom: 30px;
+    }
+
+    .highlight-box {
+      padding: 28px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--border);
+      border-left: 7px solid #d333d1;
+      box-shadow: var(--shadow);
+    }
+
+    .highlight-box h3 {
+      color: var(--primary);
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .highlight-box p {
+      color: #594c66;
+      font-size: 17px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      right: -22px;
+      top: -22px;
+      border-radius: 50%;
+      background: rgba(192, 38, 211, 0.08);
+    }
+
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: #fae8ff;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+
+    .card h3 {
+      color: var(--primary);
+      font-size: 22px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card p {
+      color: #5b4e68;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card ul {
+      padding-left: 20px;
+      color: #5b4e68;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card li {
+      margin-bottom: 8px;
+    }
+
+    /* TABLE */
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 18px;
+      text-align: left;
+      border-bottom: 1px solid #f3d9fa;
+    }
+
+    th {
+      background: #fbebff;
+      color: var(--primary);
+      font-size: 15px;
+    }
+
+    td {
+      color: #574b63;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    /* FLOW */
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .flow-step {
+      padding: 24px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .step-number {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c12ec1, #ec4899);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .flow-step h3 {
+      color: var(--primary);
+      font-size: 19px;
+      margin-bottom: 8px;
+    }
+
+    .flow-step p {
+      color: #5f526b;
+      font-size: 15px;
+    }
+
+    /* PRICING */
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .price-card {
+      padding: 30px;
+      border-radius: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .price-card.featured {
+      transform: translateY(-10px);
+      border: 2px solid #d333d1;
+      background: linear-gradient(180deg, #fff 0%, #fff7fd 100%);
+    }
+
+    .price-card h3 {
+      color: var(--primary);
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .price {
+      color: var(--secondary);
+      font-size: 34px;
+      font-weight: 900;
+      margin: 16px 0;
+    }
+
+    .price small {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .price-card ul {
+      padding-left: 20px;
+      color: #5b4e68;
+      margin-bottom: 22px;
+    }
+
+    .price-card li {
+      margin-bottom: 8px;
+    }
+
+    /* CTA */
+
+    .cta {
+      margin: 40px 0 70px;
+      padding: 48px;
+      border-radius: 30px;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(135deg, #8b13a8 0%, #d333d1 50%, #ec4899 100%);
+      box-shadow: 0 28px 70px rgba(139, 19, 168, 0.24);
+    }
+
+    .cta h2 {
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .cta p {
+      max-width: 720px;
+      margin: 0 auto 26px;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 18px;
+    }
+
+    footer {
+      padding: 28px 0;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid rgba(240, 201, 248, 0.8);
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 960px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .hero-card-wrap {
+        justify-content: flex-start;
+      }
+
+      .stats,
+      .grid,
+      .pricing,
+      .flow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .price-card.featured {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .container {
+        width: min(100% - 32px, 1120px);
+      }
+
+      .hero {
+        padding: 28px 0 46px;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+        letter-spacing: -1.2px;
+      }
+
+      .hero p {
+        font-size: 17px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .stats,
+      .grid,
+      .mini-grid,
+      .pricing,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        margin-top: 24px;
+      }
+
+      section {
+        padding: 38px 0;
+      }
+
+      .card,
+      .highlight-box,
+      .cta {
+        padding: 24px;
+      }
+
+      .nav-inner {
+        gap: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero" id="topo">
+    <div class="container hero-content">
+      <div>
+        <div class="badge">💅 Sistema para salão de beleza focado em manicure</div>
+
+        <h1>NailFlow gestão bonita e simples</h1>
+
+        <p>
+          Uma agenda inteligente para manicures, nail designers e salões de beleza.
+          Controle clientes, serviços, financeiro, estoque, fotos das unhas e lembretes
+          automáticos pelo WhatsApp.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#funcionalidades" class="btn btn-primary">Ver funcionalidades</a>
+          <a href="#mvp" class="btn btn-outline">Conhecer MVP</a>
+        </div>
+      </div>
+
+      <div class="hero-card-wrap">
+        <div class="hero-card">
+          <div class="mockup">
+            <div class="mockup-header">
+              <strong>Agenda de hoje</strong>
+              <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <div class="appointment-list">
+              <div class="appointment">
+                <strong>09:00 - Ana Paula</strong>
+                <span>Manicure + Pedicure · R$ 80</span>
+              </div>
+
+              <div class="appointment">
+                <strong>10:30 - Camila</strong>
+                <span>Manutenção em gel · R$ 120</span>
+              </div>
+
+              <div class="appointment">
+                <strong>14:00 - Juliana</strong>
+                <span>Alongamento em gel · R$ 180</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#ideia">Ideia</a>
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#diferenciais">Diferenciais</a>
+      <a href="#mvp">MVP</a>
+      <a href="#fluxo">Fluxo</a>
+      <a href="#tela">Tela principal</a>
+      <a href="#monetizacao">Monetização</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <div class="stats">
+        <div class="stat-card">
+          <strong>6</strong>
+          <span>Módulos principais</span>
+        </div>
+
+        <div class="stat-card">
+          <strong>24h</strong>
+          <span>Agenda organizada</span>
+        </div>
+
+        <div class="stat-card">
+          <strong>WhatsApp</strong>
+          <span>Lembretes e confirmações</span>
+        </div>
+
+        <div class="stat-card">
+          <strong>Online</strong>
+          <span>Catálogo e agendamento</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="ideia">
+      <div class="container">
+        <span class="section-kicker">Visão geral</span>
+        <h2>Ideia principal</h2>
+
+        <p class="section-description">
+          O NailFlow é um sistema de gestão criado especialmente para manicures,
+          nail designers e salões de beleza que trabalham com serviços de unhas.
+        </p>
+
+        <div class="highlight-box">
+          <h3>Objetivo do sistema</h3>
+          <p>
+            Ajudar profissionais a organizar a agenda, reduzir faltas, controlar clientes,
+            registrar histórico de atendimentos, gerenciar pagamentos, acompanhar estoque
+            e aumentar o retorno das clientes por meio de lembretes automáticos.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="funcionalidades">
+      <div class="container">
+        <span class="section-kicker">Recursos</span>
+        <h2>Funcionalidades principais</h2>
+
+        <p class="section-description">
+          O sistema foi pensado para resolver as dores reais de uma manicure:
+          agenda bagunçada, esquecimentos, controle financeiro e relacionamento com clientes.
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-icon">🗓️</div>
+            <h3>Agenda inteligente</h3>
+            <p>A agenda é o centro do sistema.</p>
+            <ul>
+              <li>Horários livres e ocupados</li>
+              <li>Cliente agendada</li>
+              <li>Tipo de serviço</li>
+              <li>Duração estimada</li>
+              <li>Valor do atendimento</li>
+              <li>Status do atendimento</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">👩</div>
+            <h3>Cadastro de clientes</h3>
+            <p>Cada cliente possui uma ficha completa.</p>
+            <ul>
+              <li>Nome</li>
+              <li>Telefone e WhatsApp</li>
+              <li>Data de aniversário</li>
+              <li>Preferência de cores</li>
+              <li>Alergias ou observações</li>
+              <li>Histórico de atendimentos</li>
+              <li>Frequência de retorno</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📸</div>
+            <h3>Histórico com fotos</h3>
+            <p>A manicure pode registrar fotos do antes e depois.</p>
+            <ul>
+              <li>Acompanhar evolução das unhas</li>
+              <li>Repetir modelos favoritos</li>
+              <li>Criar portfólio</li>
+              <li>Usar fotos para Instagram</li>
+              <li>Mostrar referências futuras</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">💬</div>
+            <h3>WhatsApp</h3>
+            <p>Envio de mensagens prontas para clientes.</p>
+            <ul>
+              <li>Confirmação de agendamento</li>
+              <li>Lembrete um dia antes</li>
+              <li>Aviso de retorno</li>
+              <li>Mensagem de aniversário</li>
+              <li>Promoções personalizadas</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">💰</div>
+            <h3>Financeiro</h3>
+            <p>Controle simples das entradas do salão ou profissional.</p>
+            <ul>
+              <li>Valor recebido por atendimento</li>
+              <li>Forma de pagamento</li>
+              <li>Comissões</li>
+              <li>Relatório diário</li>
+              <li>Relatório mensal</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🧴</div>
+            <h3>Estoque</h3>
+            <p>Controle de materiais usados na rotina da manicure.</p>
+            <ul>
+              <li>Esmaltes</li>
+              <li>Gel</li>
+              <li>Cabines</li>
+              <li>Algodão</li>
+              <li>Lixas</li>
+              <li>Removedores</li>
+              <li>Alertas de reposição</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="servicos">
+      <div class="container">
+        <span class="section-kicker">Catálogo</span>
+        <h2>Serviços cadastrados</h2>
+
+        <p class="section-description">
+          Cada serviço pode ter nome, preço, duração média, descrição e regras de retorno.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Serviço</th>
+                <th>Duração média</th>
+                <th>Valor sugerido</th>
+                <th>Retorno sugerido</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Manicure simples</td>
+                <td>40 minutos</td>
+                <td>R$ 35</td>
+                <td>7 a 10 dias</td>
+              </tr>
+              <tr>
+                <td>Pedicure</td>
+                <td>50 minutos</td>
+                <td>R$ 45</td>
+                <td>15 dias</td>
+              </tr>
+              <tr>
+                <td>Manicure + Pedicure</td>
+                <td>1h30</td>
+                <td>R$ 80</td>
+                <td>15 dias</td>
+              </tr>
+              <tr>
+                <td>Banho de gel</td>
+                <td>1h30</td>
+                <td>R$ 100</td>
+                <td>15 a 20 dias</td>
+              </tr>
+              <tr>
+                <td>Alongamento em gel</td>
+                <td>2h30</td>
+                <td>R$ 180</td>
+                <td>20 dias</td>
+              </tr>
+              <tr>
+                <td>Manutenção em gel</td>
+                <td>2h</td>
+                <td>R$ 120</td>
+                <td>20 dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="diferenciais">
+      <div class="container">
+        <span class="section-kicker">Diferenciais</span>
+        <h2>Por que o NailFlow se destaca?</h2>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-icon">🎯</div>
+            <h3>Foco em manicure</h3>
+            <p>
+              Diferente de sistemas genéricos para salão, ele é pensado especificamente
+              para a rotina de unhas.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🔁</div>
+            <h3>Retorno automático</h3>
+            <p>
+              O sistema calcula quando a cliente provavelmente deve voltar e ajuda
+              a profissional a vender mais.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📲</div>
+            <h3>Relacionamento via WhatsApp</h3>
+            <p>
+              Facilita confirmações, lembretes e mensagens personalizadas sem trabalho manual.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mvp">
+      <div class="container">
+        <span class="section-kicker">Primeira versão</span>
+        <h2>MVP inicial</h2>
+
+        <p class="section-description">
+          A primeira versão pode ser enxuta, validando as principais necessidades do mercado.
+        </p>
+
+        <div class="mini-grid">
+          <div class="card">
+            <h3>Módulos essenciais</h3>
+            <ul>
+              <li>Cadastro de clientes</li>
+              <li>Cadastro de serviços</li>
+              <li>Agenda com horários</li>
+              <li>Registro de pagamento</li>
+              <li>Envio de lembretes pelo WhatsApp</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Objetivo do MVP</h3>
+            <p>
+              Testar se manicures pagariam por uma ferramenta simples que organiza
+              agenda, clientes e lembretes, reduzindo faltas e aumentando recorrência.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fluxo">
+      <div class="container">
+        <span class="section-kicker">Uso diário</span>
+        <h2>Fluxo de funcionamento</h2>
+
+        <div class="flow">
+          <div class="flow-step">
+            <div class="step-number">1</div>
+            <h3>Cliente agenda</h3>
+            <p>A profissional registra cliente, serviço, horário e valor.</p>
+          </div>
+
+          <div class="flow-step">
+            <div class="step-number">2</div>
+            <h3>Sistema organiza</h3>
+            <p>A agenda calcula duração e evita conflitos de horário.</p>
+          </div>
+
+          <div class="flow-step">
+            <div class="step-number">3</div>
+            <h3>Atendimento acontece</h3>
+            <p>A manicure registra pagamento, observações e fotos do resultado.</p>
+          </div>
+
+          <div class="flow-step">
+            <div class="step-number">4</div>
+            <h3>Cliente retorna</h3>
+            <p>O sistema envia lembretes e ajuda a trazer a cliente de volta.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tela">
+      <div class="container">
+        <span class="section-kicker">Interface</span>
+        <h2>Tela principal do sistema</h2>
+
+        <p class="section-description">
+          A tela inicial pode mostrar os dados mais importantes para a profissional
+          tomar decisões rapidamente.
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-icon">📅</div>
+            <h3>Agenda do dia</h3>
+            <p>Lista de atendimentos com horários, clientes, serviços e status.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">💵</div>
+            <h3>Resumo financeiro</h3>
+            <p>Total recebido no dia, formas de pagamento e previsão mensal.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🔔</div>
+            <h3>Lembretes</h3>
+            <p>Clientes que precisam confirmar presença ou retornar para manutenção.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="monetizacao">
+      <div class="container">
+        <span class="section-kicker">Modelo de negócio</span>
+        <h2>Monetização</h2>
+
+        <p class="section-description">
+          O NailFlow pode funcionar como um SaaS com assinatura mensal para manicures
+          individuais e salões com equipe.
+        </p>
+
+        <div class="pricing">
+          <div class="price-card">
+            <h3>Individual</h3>
+            <p>Para manicures autônomas.</p>
+            <div class="price">R$ 29 <small>/mês</small></div>
+            <ul>
+              <li>Agenda</li>
+              <li>Clientes</li>
+              <li>Serviços</li>
+              <li>Financeiro básico</li>
+              <li>Lembretes manuais</li>
+            </ul>
+            <a href="#topo" class="btn btn-primary">Começar</a>
+          </div>
+
+          <div class="price-card featured">
+            <h3>Salão</h3>
+            <p>Para equipes pequenas.</p>
+            <div class="price">R$ 79 <small>/mês</small></div>
+            <ul>
+              <li>Várias profissionais</li>
+              <li>Agenda por colaboradora</li>
+              <li>Controle de comissões</li>
+              <li>Relatórios do salão</li>
+              <li>Cadastro completo de clientes</li>
+            </ul>
+            <a href="#topo" class="btn btn-primary">Mais popular</a>
+          </div>
+
+          <div class="price-card">
+            <h3>Premium</h3>
+            <p>Para quem quer automação.</p>
+            <div class="price">R$ 149 <small>/mês</small></div>
+            <ul>
+              <li>Automações avançadas</li>
+              <li>WhatsApp integrado</li>
+              <li>Campanhas de retorno</li>
+              <li>Catálogo online</li>
+              <li>Relatórios completos</li>
+            </ul>
+            <a href="#topo" class="btn btn-primary">Conhecer</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="cta">
+        <h2>Transforme a rotina da manicure em uma gestão simples</h2>
+        <p>
+          O NailFlow organiza agenda, clientes, financeiro e relacionamento em um só lugar,
+          ajudando profissionais de beleza a venderem mais e atenderem melhor.
+        </p>
+        <a href="#topo" class="btn btn-primary">Voltar ao início</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>NailFlow © 2026 — Sistema de gestão para manicures, nail designers e salões de beleza.</p>
+    </div>
+  </footer>
+</body>
+</html>

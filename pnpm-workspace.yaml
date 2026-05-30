@@ -6,3 +6,5 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - expo-modules-autolinking@56.0.14
   - expo@56.0.6
+strictDepBuilds: false
+verifyDepsBeforeRun: false

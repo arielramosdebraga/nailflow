@@ -1,18 +1,98 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 6, 27);
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function userRef() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userRole() {
+      return userRef().data.role;
+    }
+
+    function userSalonId() {
+      return userRef().data.salonId;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && userRole() == 'super_admin';
+    }
+
+    function isSalonOwner() {
+      return isAuthenticated() && userRole() == 'salon_owner';
+    }
+
+    function isManicure() {
+      return isAuthenticated() && userRole() == 'manicure';
+    }
+
+    function belongsToSalon(salonId) {
+      return isAuthenticated() && userSalonId() == salonId;
+    }
+
+    match /salons/{salonId} {
+      allow read: if isSuperAdmin() || belongsToSalon(salonId);
+      allow create, update, delete: if isSuperAdmin() || (isSalonOwner() && belongsToSalon(salonId));
+    }
+
+    match /users/{userId} {
+      allow read: if isSuperAdmin()
+        || (isAuthenticated() && request.auth.uid == userId)
+        || (isSalonOwner() && resource.data.salonId == userSalonId());
+
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isSuperAdmin()
+        || (isAuthenticated() && request.auth.uid == userId)
+        || (isSalonOwner() && resource.data.salonId == userSalonId());
+      allow delete: if isSuperAdmin();
+    }
+
+    match /clients/{clientId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && belongsToSalon(resource.data.salonId));
+      allow create: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(request.resource.data.salonId));
+      allow update, delete: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(resource.data.salonId));
+    }
+
+    match /appointments/{appointmentId} {
+      allow read: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(resource.data.salonId))
+        || (isManicure() && resource.data.manicureId == request.auth.uid);
+
+      allow create: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(request.resource.data.salonId));
+
+      allow update, delete: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(resource.data.salonId))
+        || (isManicure() && resource.data.manicureId == request.auth.uid);
+    }
+
+    match /commands/{commandId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && belongsToSalon(resource.data.salonId));
+      allow create: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(request.resource.data.salonId));
+      allow update, delete: if isSuperAdmin()
+        || (isAuthenticated() && belongsToSalon(resource.data.salonId));
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSuperAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isSuperAdmin();
+      allow write: if false;
+    }
+
+    match /syncQueue/{taskId} {
+      allow read, write: if false;
     }
   }
 }
