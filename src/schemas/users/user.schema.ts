@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export const UserRoleSchema = z.enum(['super_admin', 'salon_owner', 'manicure']);
+export const PersistedUserRoleSchema = z.enum([
+  'super_admin',
+  'salon_owner',
+  'nail_technician',
+  'manicure',
+]);
+export const UserRoleSchema = z.enum(['super_admin', 'salon_owner', 'nail_technician']);
+
+export function normalizeUserRole(role: z.infer<typeof PersistedUserRoleSchema>) {
+  return role === 'manicure' ? 'nail_technician' : role;
+}
 
 export const NotificationPreferencesSchema = z.object({
   newAppointment: z.boolean().default(true),
@@ -24,7 +34,7 @@ export const UserSchema = z.object({
   uid: z.string().min(1),
   email: z.string().email(),
   displayName: z.string().min(2),
-  role: UserRoleSchema,
+  role: PersistedUserRoleSchema.transform(normalizeUserRole),
   salonId: z.string().nullable(),
   phone: z.string().optional(),
   photoURL: z.string().url().optional(),
@@ -42,4 +52,5 @@ export const UserSchema = z.object({
 });
 
 export type UserRole = z.infer<typeof UserRoleSchema>;
+export type PersistedUserRole = z.infer<typeof PersistedUserRoleSchema>;
 export type User = z.infer<typeof UserSchema>;

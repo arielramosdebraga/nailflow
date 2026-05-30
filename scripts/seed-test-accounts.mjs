@@ -82,7 +82,7 @@ async function main() {
     {
       email: 'manicure.teste@nailflow.app',
       password: defaultPassword,
-      role: 'manicure',
+      role: 'nail_technician',
       displayName: 'Manicure Teste',
       salonId,
     },

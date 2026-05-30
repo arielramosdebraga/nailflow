@@ -26,8 +26,41 @@ service cloud.firestore {
       return isAuthenticated() && userRole() == 'salon_owner';
     }
 
-    function isManicure() {
-      return isAuthenticated() && userRole() == 'manicure';
+    function isNailTechnician() {
+      return isAuthenticated() && (userRole() == 'nail_technician' || userRole() == 'manicure');
+    }
+
+    function isSelf(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function canReadUserFromSameSalon() {
+      return isSalonOwner()
+        && resource.data.salonId == userSalonId()
+        && (resource.data.role == 'nail_technician' || resource.data.role == 'manicure');
+    }
+
+    function selfUserUpdateHasNoSensitiveFieldChange() {
+      return !request.resource.data
+        .diff(resource.data)
+        .affectedKeys()
+        .hasAny([
+          'uid',
+          'email',
+          'role',
+          'salonId',
+          'twoFactor',
+          'createdAt',
+          'updatedAt',
+        ]);
+    }
+
+    function selfUserCreateIsSafe(userId) {
+      return isSelf(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.role == 'nail_technician'
+        && request.resource.data.salonId == null
+        && !request.resource.data.keys().hasAny(['twoFactor']);
     }
 
     function belongsToSalon(salonId) {
@@ -41,13 +74,12 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSuperAdmin()
-        || (isAuthenticated() && request.auth.uid == userId)
-        || (isSalonOwner() && resource.data.salonId == userSalonId());
+        || isSelf(userId)
+        || canReadUserFromSameSalon();
 
-      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if selfUserCreateIsSafe(userId);
       allow update: if isSuperAdmin()
-        || (isAuthenticated() && request.auth.uid == userId)
-        || (isSalonOwner() && resource.data.salonId == userSalonId());
+        || (isSelf(userId) && selfUserUpdateHasNoSensitiveFieldChange());
       allow delete: if isSuperAdmin();
     }
 
@@ -62,14 +94,14 @@ service cloud.firestore {
     match /appointments/{appointmentId} {
       allow read: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(resource.data.salonId))
-        || (isManicure() && resource.data.manicureId == request.auth.uid);
+        || (isNailTechnician() && resource.data.manicureId == request.auth.uid);
 
       allow create: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(request.resource.data.salonId));
 
       allow update, delete: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(resource.data.salonId))
-        || (isManicure() && resource.data.manicureId == request.auth.uid);
+        || (isNailTechnician() && resource.data.manicureId == request.auth.uid);
     }
 
     match /commands/{commandId} {
