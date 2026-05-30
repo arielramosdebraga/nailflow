@@ -52,3 +52,7 @@ expo-dev*.log
 
 # local secrets
 secrets/
+
+# local tooling metadata
+.claude/
+CLAUDE.md
