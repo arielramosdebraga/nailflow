@@ -12,6 +12,13 @@ import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 import {onUserCreated} from "./auth/on-user-created";
+import {
+  beginTotpEnrollment,
+  confirmTotpEnrollment,
+  getTotpStatus,
+  verifyTotpCode,
+} from "./auth/totp-callables";
+import {createSalon} from "./salons/create-salon";
 
 setGlobalOptions({
   maxInstances: 10,
@@ -30,3 +37,10 @@ export const health = onRequest((request, response) => {
 });
 
 export {onUserCreated};
+export {
+  createSalon,
+  getTotpStatus,
+  beginTotpEnrollment,
+  confirmTotpEnrollment,
+  verifyTotpCode,
+};
