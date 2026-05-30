@@ -28,7 +28,7 @@ export function useAuthSession() {
             throw new Error('Perfil do usuario nao encontrado. Contate o suporte.');
           }
 
-          session.signIn({ userId: identity.uid, role: profile.role });
+          session.signIn({ userId: identity.uid, role: profile.role, salonId: profile.salonId });
         } finally {
           setIsLoading(false);
         }
@@ -43,7 +43,7 @@ export function useAuthSession() {
             displayName: params.displayName,
             role: 'manicure',
           });
-          session.signIn({ userId: identity.uid, role: 'manicure' });
+          session.signIn({ userId: identity.uid, role: 'manicure', salonId: null });
         } finally {
           setIsLoading(false);
         }

@@ -54,7 +54,7 @@ export function AppProviders({ children }: PropsWithChildren) {
           throw new Error('Falha ao carregar perfil do usuario.');
         }
 
-        signIn({ userId: user.uid, role: profile.role });
+        signIn({ userId: user.uid, role: profile.role, salonId: profile.salonId });
       } catch {
         signOut();
       }

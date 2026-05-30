@@ -84,6 +84,7 @@ export function useGoogleAuth() {
         signIn({
           userId: result.user.uid,
           role: profile.role,
+          salonId: profile.salonId,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Falha no login com Google.');

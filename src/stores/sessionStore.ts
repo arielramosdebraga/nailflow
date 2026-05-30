@@ -8,8 +8,9 @@ interface SessionState {
   status: AuthStatus;
   userId: string | null;
   role: UserRole | null;
+  salonId: string | null;
   setLoading: () => void;
-  signIn: (params: { userId: string; role: UserRole }) => void;
+  signIn: (params: { userId: string; role: UserRole; salonId: string | null }) => void;
   signOut: () => void;
 }
 
@@ -17,14 +18,16 @@ export const useSessionStore = create<SessionState>((set) => ({
   status: 'anonymous',
   userId: null,
   role: null,
+  salonId: null,
   setLoading: () => {
     set({ status: 'loading' });
   },
-  signIn: ({ userId, role }) => {
+  signIn: ({ userId, role, salonId }) => {
     set({
       status: 'authenticated',
       userId,
       role,
+      salonId,
     });
   },
   signOut: () => {
@@ -32,6 +35,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       status: 'anonymous',
       userId: null,
       role: null,
+      salonId: null,
     });
   },
 }));
