@@ -2,7 +2,7 @@ import { Redirect, Stack } from 'expo-router';
 
 import { useSessionStore } from '@/stores/sessionStore';
 
-export default function ManicureLayout() {
+export default function NailTechnicianLayout() {
   const status = useSessionStore((state) => state.status);
   const role = useSessionStore((state) => state.role);
 
