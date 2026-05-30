@@ -18,6 +18,10 @@ export function useAuthSession() {
       isLoading,
       status: session.status,
       role: session.role,
+      secondFactorRequired: session.secondFactorRequired,
+      secondFactorVerified: session.secondFactorVerified,
+      isSecondFactorPending: session.status === 'pending_2fa',
+      completeSecondFactor: session.completeSecondFactor,
       async signIn(params: { email: string; password: string }) {
         setIsLoading(true);
         try {
@@ -41,9 +45,9 @@ export function useAuthSession() {
             uid: identity.uid,
             email: identity.email,
             displayName: params.displayName,
-            role: 'manicure',
+            role: 'nail_technician',
           });
-          session.signIn({ userId: identity.uid, role: 'manicure', salonId: null });
+          session.signIn({ userId: identity.uid, role: 'nail_technician', salonId: null });
         } finally {
           setIsLoading(false);
         }

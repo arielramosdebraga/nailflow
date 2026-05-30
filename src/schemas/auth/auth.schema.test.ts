@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { LoginFormSchema } from '@/schemas/auth/login-form.schema';
 import { RecoverFormSchema } from '@/schemas/auth/recover-form.schema';
 import { SignUpFormSchema } from '@/schemas/auth/signup-form.schema';
+import { TotpCodeSchema } from '@/schemas/auth/totp.schema';
 
 describe('Auth Schemas', () => {
   it('accepts valid login payload', () => {
@@ -29,6 +30,18 @@ describe('Auth Schemas', () => {
     const result = RecoverFormSchema.safeParse({
       email: 'email-invalido',
     });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts valid TOTP code', () => {
+    const result = TotpCodeSchema.safeParse('123456');
+
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects invalid TOTP code format', () => {
+    const result = TotpCodeSchema.safeParse('12A45');
 
     expect(result.success).toBe(false);
   });
