@@ -11,12 +11,15 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
 
 ## Status atual do projeto
 
-- Sprint 0: concluída com pendências técnicas realocadas
-- Sprint 1: concluída com pendência de 2FA realocada
-- Sprint 2: replanejada para incluir:
+- Sprint 0: concluída
+- Sprint 1: concluída
+- Sprint 2: concluída
   - modelagem e CRUD de clientes
   - 2FA (TOTP) para `super_admin` e `salon_owner`
-  - pendências de setup (FCM/Storage, Husky/lint-staged, CI)
+  - Cloud Function `createSalon`
+  - setup funcional básico de FCM/Storage
+  - Husky + lint-staged + CI (lint/typecheck/test)
+- Próxima etapa: Sprint 3 (agenda e atendimentos)
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)
@@ -56,6 +59,7 @@ EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
 EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
 EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_EAS_PROJECT_ID=
 ```
 
 Observações:

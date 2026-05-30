@@ -144,6 +144,34 @@
 - 2FA bloqueia acesso administrativo sem TOTP válido
 - Pipeline CI executa lint, typecheck e testes automaticamente
 
+### Status de execução (atualizado em 29/05/2026)
+- ✅ 2.0 Implementar 2FA (TOTP) para super_admin e salon_owner — concluído
+- ✅ 2.1 Criar coleções Firestore (schemas Zod) — concluído
+- ✅ 2.2 Índices compostos — concluído
+- ✅ 2.3 clientsService (CRUD + queries) — concluído
+- ✅ 2.4 Hooks useClients, useClient — concluído
+- ✅ 2.5 Tela Lista de Clientes — concluído
+- ✅ 2.6 Tela Detalhe do Cliente — concluído
+- ✅ 2.7 Tela Criar/Editar Cliente — concluído
+- ✅ 2.8 Regras Firestore para clients — concluído
+- ✅ 2.9 Cloud Function criar salão — concluído
+- ✅ 2.10 Componentes UI: Button, Input, Card, Avatar, Tag — concluído
+- ✅ 2.11 Concluir setup Firebase para FCM e Storage com fluxo funcional básico — concluído
+- ✅ 2.12 Configurar Husky + lint-staged no fluxo de commit local — concluído
+- ✅ 2.13 Configurar CI básico (lint + typecheck + test) — concluído
+
+### Evidências de fechamento da Sprint 2
+- ✅ Validações locais executadas com sucesso:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `npm run lint` (em `functions/`)
+  - `npm run build` (em `functions/`)
+- ✅ Fluxo de autenticação com 2FA TOTP ativo para perfis administrativos.
+- ✅ CRUD de clientes implementado com service + hooks + telas.
+- ✅ Setup inicial de push token (FCM via Expo) e Storage implementado.
+- ✅ Pipeline de qualidade ativo no GitHub Actions e pre-commit local.
+
 ---
 
 ## 📅 Sprint 3 — Agenda e Atendimentos
@@ -357,9 +385,9 @@
 ## 🎯 Próximos Passos
 
 1. Validar este plano com Ariel (PO)
-2. Executar Sprint 2 replanejada (Modelagem + Clientes + pendências S0/S1)
-3. Validar fechamento completo das pendências técnicas herdadas
-4. Iniciar Sprint 3 (Agenda e Atendimentos) após critérios de sucesso da Sprint 2
+2. Iniciar Sprint 3 (Agenda e Atendimentos)
+3. Executar modelagem e fluxo completo de appointments (service + hook + telas)
+4. Validar conflito de horários e estados de atendimento no app
 5. Manter status por sprint atualizado neste documento ao fim de cada entrega
 
 ---
