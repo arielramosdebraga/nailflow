@@ -24,8 +24,12 @@ export default function AdminDashboardScreen() {
           />
         </View>
         <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Estrutura inicial pronta para auditoria, lista de permissões e controles globais na Sprint 5.
+          Governança global do NailFlow com auditoria, permissões e monitoramento operacional.
         </Text>
+        <View className="pt-2">
+          <Button label="Abrir logs de auditoria" onPress={() => router.push('./logs')} />
+        </View>
+        <Button label="Central de notificações" variant="secondary" onPress={() => router.push('./notifications')} />
       </View>
 
       <Button

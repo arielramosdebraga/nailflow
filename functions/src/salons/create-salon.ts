@@ -1,12 +1,14 @@
 /* eslint-disable require-jsdoc */
 import {getAuth} from "firebase-admin/auth";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
+import * as logger from "firebase-functions/logger";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {
   getUserProfile,
   requireAuthenticatedUid,
   type UserProfile,
 } from "../shared/user-context";
+import {writeAuditLog} from "../audit";
 import {ensureValidIanaTimeZoneOrThrow} from "../shared/timezone";
 
 interface CreateSalonInput {
@@ -209,6 +211,38 @@ export const createSalon = onCall(async (request) => {
     await auth.setCustomUserClaims(ownerUid, {
       ...existingClaims,
       role: "salon_owner",
+    });
+  }
+
+  try {
+    const forwardedForHeader = request.rawRequest.headers["x-forwarded-for"];
+    const forwardedFor =
+      typeof forwardedForHeader === "string" ?
+        forwardedForHeader.split(",")[0]?.trim() ?? null :
+        null;
+    const ipAddress = forwardedFor ?? request.rawRequest.ip ?? null;
+
+    await writeAuditLog({
+      userId: callerUid,
+      actorRole: callerProfile.role,
+      action: "salon.create",
+      targetType: "salon",
+      targetId: salonRef.id,
+      salonId: salonRef.id,
+      source: "callable",
+      ipAddress,
+      metadata: {
+        ownerId: ownerUid,
+        active: input.active,
+        timezone: input.settings.timezone,
+        currency: input.settings.currency,
+      },
+    });
+  } catch (error) {
+    logger.warn("Failed to persist audit log for createSalon", {
+      callerUid,
+      salonId: salonRef.id,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 
