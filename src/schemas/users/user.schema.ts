@@ -19,6 +19,10 @@ export const NotificationPreferencesSchema = z.object({
   preReminder: z.boolean().default(true),
   syncError: z.boolean().default(true),
   googleExpired: z.boolean().default(true),
+  quietHoursEnabled: z.boolean().default(false),
+  quietHoursStart: z.string().default('22:00'),
+  quietHoursEnd: z.string().default('07:00'),
+  preReminderMinutes: z.number().int().min(5).max(1440).default(60),
 });
 
 export const GoogleCalendarSchema = z.object({
@@ -62,6 +66,10 @@ export const UserSchema = z.object({
     preReminder: true,
     syncError: true,
     googleExpired: true,
+    quietHoursEnabled: false,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '07:00',
+    preReminderMinutes: 60,
   }),
   fcmTokens: z.array(z.string()).default([]),
   createdAt: z.string(),
