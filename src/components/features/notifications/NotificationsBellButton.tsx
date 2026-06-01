@@ -19,16 +19,27 @@ export function NotificationsBellButton({
   unreadCount,
   onPress,
 }: NotificationsBellButtonProps) {
+  const hasUnread = unreadCount > 0;
+
   return (
     <Pressable
       onPress={onPress}
       className="relative h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
       accessibilityRole="button"
       accessibilityLabel="Abrir central de notificacoes"
+      accessibilityHint="Abre a lista de notificacoes e permite marcar como lida."
+      accessibilityValue={{
+        text: hasUnread
+          ? `${unreadCount} notificacoes nao lidas`
+          : 'Sem notificacoes nao lidas',
+      }}
     >
       <Bell size={20} color="#27272a" />
-      {unreadCount > 0 ? (
-        <View className="absolute -right-1 -top-1 min-h-5 min-w-5 items-center justify-center rounded-full bg-error px-1">
+      {hasUnread ? (
+        <View
+          className="absolute -right-1 -top-1 min-h-5 min-w-5 items-center justify-center rounded-full bg-error px-1"
+          importantForAccessibility="no-hide-descendants"
+        >
           <Text className="text-[10px] font-bold text-white">{formatUnreadCount(unreadCount)}</Text>
         </View>
       ) : null}

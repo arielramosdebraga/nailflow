@@ -44,6 +44,11 @@ const TOGGLE_ITEMS: PreferenceToggleItem[] = [
   },
 ];
 
+const STATE_MESSAGES = {
+  loading: 'Carregando preferencias de notificacao...',
+  error: 'Nao foi possivel carregar ou salvar as preferencias de notificacao.',
+};
+
 function parseMinutes(value: string, fallback: number): number {
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed)) {
@@ -122,13 +127,20 @@ export function NotificationPreferencesForm({
 
       {preferencesQuery.errorMessage ? (
         <Card>
-          <Text className="text-sm text-error">{preferencesQuery.errorMessage}</Text>
+          <Text className="text-sm text-error" accessibilityLiveRegion="polite">
+            {`${STATE_MESSAGES.error} ${preferencesQuery.errorMessage}`}
+          </Text>
         </Card>
       ) : null}
 
       {preferencesQuery.isLoading ? (
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando preferencias...</Text>
+        <Card accessible accessibilityLabel={STATE_MESSAGES.loading}>
+          <Text
+            className="text-sm text-zinc-600 dark:text-zinc-300"
+            accessibilityLiveRegion="polite"
+          >
+            {STATE_MESSAGES.loading}
+          </Text>
         </Card>
       ) : null}
 
@@ -159,6 +171,10 @@ export function NotificationPreferencesForm({
                     className={`rounded-full px-3 py-2 ${
                       item.enabled ? 'bg-primary' : 'bg-zinc-200 dark:bg-zinc-700'
                     } ${isBusy ? 'opacity-60' : 'active:opacity-90'}`}
+                    accessibilityRole="switch"
+                    accessibilityLabel={item.label}
+                    accessibilityHint={item.description}
+                    accessibilityState={{ checked: item.enabled, disabled: isBusy }}
                   >
                     <Text className={`text-xs font-semibold ${item.enabled ? 'text-white' : 'text-zinc-800 dark:text-zinc-100'}`}>
                       {item.enabled ? 'Ativado' : 'Desativado'}
@@ -191,6 +207,10 @@ export function NotificationPreferencesForm({
                 className={`rounded-full px-3 py-2 ${
                   draft.quietHoursEnabled ? 'bg-primary' : 'bg-zinc-200 dark:bg-zinc-700'
                 } ${isBusy ? 'opacity-60' : 'active:opacity-90'}`}
+                accessibilityRole="switch"
+                accessibilityLabel="Ativar modo silencioso"
+                accessibilityHint="Quando ativado, evita alertas push no horario configurado."
+                accessibilityState={{ checked: Boolean(draft.quietHoursEnabled), disabled: isBusy }}
               >
                 <Text
                   className={`text-xs font-semibold ${
@@ -223,6 +243,8 @@ export function NotificationPreferencesForm({
                   autoCorrect={false}
                   keyboardType="numbers-and-punctuation"
                   placeholder="22:00"
+                  accessibilityLabel="Horario de inicio do modo silencioso"
+                  accessibilityHint="Informe no formato HH:mm. Exemplo: 22:00."
                   className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
                 />
               </View>
@@ -247,6 +269,8 @@ export function NotificationPreferencesForm({
                   autoCorrect={false}
                   keyboardType="numbers-and-punctuation"
                   placeholder="07:00"
+                  accessibilityLabel="Horario de fim do modo silencioso"
+                  accessibilityHint="Informe no formato HH:mm. Exemplo: 07:00."
                   className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
                 />
               </View>
@@ -276,6 +300,8 @@ export function NotificationPreferencesForm({
                 }));
               }}
               keyboardType="number-pad"
+              accessibilityLabel="Minutos de antecedencia do lembrete"
+              accessibilityHint="Defina entre 5 e 1440 minutos antes do atendimento."
               className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
             />
           </Card>
@@ -286,6 +312,10 @@ export function NotificationPreferencesForm({
             className={`h-12 items-center justify-center rounded-xl ${
               isBusy || !hasChanges ? 'bg-zinc-300 dark:bg-zinc-700' : 'bg-primary active:opacity-90'
             }`}
+            accessibilityRole="button"
+            accessibilityLabel="Salvar preferencias de notificacao"
+            accessibilityHint="Aplica os ajustes desta tela."
+            accessibilityState={{ disabled: isBusy || !hasChanges }}
           >
             <Text
               className={`text-base font-semibold ${

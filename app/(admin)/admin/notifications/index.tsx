@@ -17,6 +17,9 @@ export default function AdminNotificationsScreen() {
         <Pressable
           onPress={() => router.back()}
           className="h-12 items-center justify-center rounded-xl border border-zinc-300 bg-transparent active:opacity-90 dark:border-zinc-700"
+          accessibilityRole="button"
+          accessibilityLabel="Voltar para a tela anterior"
+          accessibilityHint="Retorna para o dashboard administrativo."
         >
           <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Voltar</Text>
         </Pressable>

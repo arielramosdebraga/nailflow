@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-
-import { getUnreadNotificationsCount } from '@/services/notifications';
+import { subscribeUnreadNotificationsCount } from '@/services/notifications';
 import { useSessionStore } from '@/stores/sessionStore';
 
 interface UseUnreadNotificationsCountResult {
@@ -14,28 +12,62 @@ interface UseUnreadNotificationsCountResult {
 export function useUnreadNotificationsCount(): UseUnreadNotificationsCountResult {
   const userId = useSessionStore((state) => state.userId);
   const status = useSessionStore((state) => state.status);
+  const [unreadSnapshot, setUnreadSnapshot] = useState<{
+    sourceKey: string | null;
+    value: number;
+  }>({
+    sourceKey: null,
+    value: 0,
+  });
+  const [loadedSourceKey, setLoadedSourceKey] = useState<string | null>(null);
+  const [errorSnapshot, setErrorSnapshot] = useState<{
+    sourceKey: string | null;
+    message: string | null;
+  }>({
+    sourceKey: null,
+    message: null,
+  });
 
   const isEnabled = status === 'authenticated' && Boolean(userId);
+  const sourceKey = isEnabled && userId ? userId : null;
 
-  const unreadCountQuery = useQuery({
-    queryKey: ['notifications-unread-count', userId ?? ''],
-    enabled: isEnabled,
-    refetchInterval: 4_000,
-    queryFn: async () => {
-      if (!userId) {
-        return 0;
+  useEffect(() => {
+    if (!sourceKey || !userId) {
+      return undefined;
+    }
+
+    const unsubscribe = subscribeUnreadNotificationsCount(
+      userId,
+      (count) => {
+        setUnreadSnapshot({ sourceKey, value: count });
+        setLoadedSourceKey(sourceKey);
+        setErrorSnapshot({ sourceKey, message: null });
+      },
+      (error) => {
+        setLoadedSourceKey(sourceKey);
+        setErrorSnapshot({ sourceKey, message: error.message });
       }
+    );
 
-      return getUnreadNotificationsCount(userId);
-    },
-  });
+    return unsubscribe;
+  }, [sourceKey, userId]);
+
+  const unreadCount =
+    sourceKey && unreadSnapshot.sourceKey === sourceKey
+      ? unreadSnapshot.value
+      : 0;
+  const isLoading = Boolean(sourceKey) && loadedSourceKey !== sourceKey;
+  const errorMessage =
+    sourceKey && errorSnapshot.sourceKey === sourceKey
+      ? errorSnapshot.message
+      : null;
 
   return useMemo(
     () => ({
-      unreadCount: isEnabled ? unreadCountQuery.data ?? 0 : 0,
-      isLoading: isEnabled && unreadCountQuery.isLoading,
-      errorMessage: unreadCountQuery.error instanceof Error ? unreadCountQuery.error.message : null,
+      unreadCount,
+      isLoading,
+      errorMessage,
     }),
-    [isEnabled, unreadCountQuery.data, unreadCountQuery.error, unreadCountQuery.isLoading]
+    [errorMessage, isLoading, unreadCount]
   );
 }
