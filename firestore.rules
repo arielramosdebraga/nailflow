@@ -49,6 +49,7 @@ service cloud.firestore {
           'email',
           'role',
           'salonId',
+          'googleCalendar',
           'twoFactor',
           'createdAt',
           'updatedAt',

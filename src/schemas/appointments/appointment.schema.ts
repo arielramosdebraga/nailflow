@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const AppointmentStatusSchema = z.enum(['scheduled', 'confirmed', 'completed', 'cancelled']);
+export const AppointmentSyncStatusSchema = z.enum(['pending', 'synced', 'error', 'disabled']);
 
 type AppointmentTimeFields = {
   startTime: Date;
@@ -31,6 +32,10 @@ export const AppointmentSchema = z
     endTime: z.date(),
     notes: z.string().max(2000),
     priceCents: z.number().int().nonnegative(),
+    googleEventId: z.string().optional(),
+    syncStatus: AppointmentSyncStatusSchema.default('disabled'),
+    syncUpdatedAt: z.date().nullable().default(null),
+    syncErrorMessage: z.string().max(500).optional(),
     createdAt: z.date().nullable(),
     updatedAt: z.date().nullable(),
   })
@@ -69,6 +74,7 @@ export const UpdateAppointmentStatusSchema = z.object({
 });
 
 export type AppointmentStatus = z.infer<typeof AppointmentStatusSchema>;
+export type AppointmentSyncStatus = z.infer<typeof AppointmentSyncStatusSchema>;
 export type Appointment = z.infer<typeof AppointmentSchema>;
 export type UpsertAppointmentInput = z.infer<typeof UpsertAppointmentSchema>;
 export type ListAppointmentsInterval = z.infer<typeof ListAppointmentsIntervalSchema>;

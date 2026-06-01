@@ -88,6 +88,10 @@ function mapAppointmentSnapshot(snapshot: DocumentSnapshot<DocumentData>): Appoi
     endTime: toDateOrNull(data.endTime),
     notes: typeof data.notes === 'string' ? data.notes : '',
     priceCents: typeof data.priceCents === 'number' ? data.priceCents : 0,
+    googleEventId: typeof data.googleEventId === 'string' ? data.googleEventId : undefined,
+    syncStatus: typeof data.syncStatus === 'string' ? data.syncStatus : 'disabled',
+    syncUpdatedAt: toDateOrNull(data.syncUpdatedAt),
+    syncErrorMessage: typeof data.syncErrorMessage === 'string' ? data.syncErrorMessage : undefined,
     createdAt: toDateOrNull(data.createdAt),
     updatedAt: toDateOrNull(data.updatedAt),
   });
@@ -242,6 +246,8 @@ export async function createAppointment(input: UpsertAppointmentInput): Promise<
     endTime: parsed.endTime,
     notes: parsed.notes,
     priceCents: parsed.priceCents,
+    syncStatus: 'pending',
+    syncUpdatedAt: serverTimestamp(),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -280,6 +286,9 @@ export async function updateAppointment(appointmentId: string, input: UpsertAppo
     endTime: parsed.endTime,
     notes: parsed.notes,
     priceCents: parsed.priceCents,
+    syncStatus: 'pending',
+    syncUpdatedAt: serverTimestamp(),
+    syncErrorMessage: null,
     updatedAt: serverTimestamp(),
   });
 }
@@ -303,6 +312,9 @@ export async function updateAppointmentStatus(
 
   await updateDoc(appointmentRef, {
     status: parsedStatus.status,
+    syncStatus: 'pending',
+    syncUpdatedAt: serverTimestamp(),
+    syncErrorMessage: null,
     updatedAt: serverTimestamp(),
   });
 }

@@ -23,8 +23,16 @@ export const NotificationPreferencesSchema = z.object({
 
 export const GoogleCalendarSchema = z.object({
   connected: z.boolean().default(false),
-  refreshToken: z.string().optional(),
+  encryptedRefreshToken: z.string().optional(),
+  tokenVersion: z.number().int().nonnegative().default(1),
   calendarId: z.string().optional(),
+  syncStatus: z
+    .enum(['idle', 'pending', 'authorizing', 'synced', 'disabled', 'expired', 'error'])
+    .default('idle'),
+  lastSyncedAt: z.string().optional(),
+  lastErrorAt: z.string().optional(),
+  lastErrorMessage: z.string().max(500).optional(),
+  isRefreshingToken: z.boolean().default(false),
   watchChannelId: z.string().optional(),
   watchExpiration: z.string().optional(),
   syncToken: z.string().optional(),
@@ -38,7 +46,12 @@ export const UserSchema = z.object({
   salonId: z.string().nullable(),
   phone: z.string().optional(),
   photoURL: z.string().url().optional(),
-  googleCalendar: GoogleCalendarSchema.default({ connected: false }),
+  googleCalendar: GoogleCalendarSchema.default({
+    connected: false,
+    tokenVersion: 1,
+    syncStatus: 'idle',
+    isRefreshingToken: false,
+  }),
   notificationPreferences: NotificationPreferencesSchema.default({
     newAppointment: true,
     appointmentCanceled: true,
