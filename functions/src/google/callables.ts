@@ -18,6 +18,8 @@ import {
   encryptRefreshToken,
   getCurrentGoogleTokenVersion,
 } from "./token-crypto";
+import {enqueueGoogleCalendarSyncTask} from "./sync-queue";
+import {ensureGoogleCalendarWatchForUser} from "./watch-management";
 import {getUserProfile, requireAuthenticatedUid} from "../shared/user-context";
 
 function assertGoogleCalendarRole(role: string): void {
@@ -62,6 +64,11 @@ export const getGoogleCalendarStatus = onCall(async (request) => {
     connected: googleCalendar.connected,
     calendarId: googleCalendar.calendarId,
     syncStatus: googleCalendar.syncStatus,
+    watchChannelId: googleCalendar.watchChannelId,
+    watchResourceId: googleCalendar.watchResourceId,
+    watchExpiration: toIsoString(googleCalendar.watchExpiration),
+    syncToken: googleCalendar.syncToken,
+    lastInboundSyncAt: toIsoString(googleCalendar.lastInboundSyncAt),
     lastSyncedAt: toIsoString(googleCalendar.lastSyncedAt),
     lastErrorAt: toIsoString(googleCalendar.lastErrorAt),
     lastErrorMessage: googleCalendar.lastErrorMessage,
@@ -187,6 +194,13 @@ export const completeGoogleCalendarConnection = onCall(async (request) => {
       {merge: true}
     );
 
+    await ensureGoogleCalendarWatchForUser(uid, {forceRenew: true});
+    await enqueueGoogleCalendarSyncTask({
+      userId: uid,
+      source: "watch_renewal",
+      forceFull: true,
+    });
+
     return {
       connected: true,
       calendarId,
@@ -216,4 +230,29 @@ export const completeGoogleCalendarConnection = onCall(async (request) => {
 
     throw new HttpsError("internal", "Nao foi possivel concluir a conexao Google Calendar.");
   }
+});
+
+export const refreshGoogleCalendarWatch = onCall(async (request) => {
+  const uid = requireAuthenticatedUid(request);
+  const profile = await getUserProfile(uid);
+  assertGoogleCalendarRole(profile.role);
+
+  const watchResult = await ensureGoogleCalendarWatchForUser(uid, {
+    forceRenew: true,
+  });
+
+  const queued = await enqueueGoogleCalendarSyncTask({
+    userId: uid,
+    source: "watch_renewal",
+    forceFull: true,
+  });
+
+  return {
+    ok: true,
+    renewed: watchResult.renewed,
+    watchChannelId: watchResult.watchChannelId,
+    watchResourceId: watchResult.watchResourceId,
+    watchExpiration: watchResult.watchExpiration?.toISOString() ?? null,
+    queue: queued,
+  };
 });

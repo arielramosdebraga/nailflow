@@ -22,12 +22,19 @@ import {
   beginGoogleCalendarConnection,
   completeGoogleCalendarConnection,
   getGoogleCalendarStatus,
+  refreshGoogleCalendarWatch,
 } from "./google/callables";
 import {
   onAppointmentCreatedSyncGoogleCalendar,
   onAppointmentDeletedSyncGoogleCalendar,
   onAppointmentUpdatedSyncGoogleCalendar,
 } from "./google/appointment-triggers";
+import {onGoogleCalendarSyncQueueCreated} from "./google/sync-queue";
+import {receiveGoogleCalendarWatchWebhook} from "./google/watch-webhook";
+import {
+  reconcileGoogleCalendarAtNight,
+  renewGoogleCalendarWatchChannels,
+} from "./google/watch-scheduler";
 import {createSalon} from "./salons/create-salon";
 
 setGlobalOptions({
@@ -56,7 +63,12 @@ export {
   getGoogleCalendarStatus,
   beginGoogleCalendarConnection,
   completeGoogleCalendarConnection,
+  refreshGoogleCalendarWatch,
   onAppointmentCreatedSyncGoogleCalendar,
   onAppointmentUpdatedSyncGoogleCalendar,
   onAppointmentDeletedSyncGoogleCalendar,
+  receiveGoogleCalendarWatchWebhook,
+  onGoogleCalendarSyncQueueCreated,
+  renewGoogleCalendarWatchChannels,
+  reconcileGoogleCalendarAtNight,
 };
