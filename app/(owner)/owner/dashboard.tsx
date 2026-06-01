@@ -104,6 +104,11 @@ export default function OwnerDashboardScreen() {
               <Button label="Gerenciar comandas" onPress={() => router.push('./commands')} />
               <Button label="Agenda consolidada do dia" variant="secondary" onPress={() => router.push('./agenda')} />
               <Button label="Lista de manicures" variant="ghost" onPress={() => router.push('./manicures')} />
+              <Button
+                label="Conectar Google Agenda"
+                variant="ghost"
+                onPress={() => router.push('/(nail-technician)/nail-technician/google-calendar')}
+              />
             </View>
 
             {recentCommands.length > 0 ? (
