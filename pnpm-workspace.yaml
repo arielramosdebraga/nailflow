@@ -1,3 +1,7 @@
+packages:
+  - .
+  - functions
+
 allowBuilds:
   '@firebase/util': set this to true or false
   msgpackr-extract: set this to true or false
@@ -8,3 +12,4 @@ minimumReleaseAgeExclude:
   - expo@56.0.6
 strictDepBuilds: false
 verifyDepsBeforeRun: false
+
