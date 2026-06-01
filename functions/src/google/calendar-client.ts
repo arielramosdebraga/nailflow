@@ -16,6 +16,32 @@ interface CalendarIdentity {
   uid: string;
 }
 
+export interface GoogleCalendarWatchChannelRequest {
+  id: string;
+  address: string;
+  token?: string;
+  type?: "web_hook";
+}
+
+export interface GoogleCalendarWatchChannelResponse {
+  channelId: string;
+  resourceId: string | null;
+  resourceUri: string | null;
+  expiration: Date | null;
+}
+
+export interface GoogleCalendarIncrementalSyncInput {
+  syncToken?: string | null;
+  maxResults?: number;
+  timeMin?: string | null;
+}
+
+export interface GoogleCalendarIncrementalSyncPage {
+  events: calendar_v3.Schema$Event[];
+  nextSyncToken: string | null;
+  pageCount: number;
+}
+
 function createOAuthClient() {
   const config = getGoogleOAuthConfig();
 
@@ -193,5 +219,109 @@ export async function deleteGoogleCalendarEvent(
 
       throw error;
     }
+  });
+}
+
+export async function startGoogleCalendarWatch(
+  refreshToken: string,
+  calendarId: string,
+  channel: GoogleCalendarWatchChannelRequest
+): Promise<GoogleCalendarWatchChannelResponse> {
+  return withCalendarClient(refreshToken, async (calendarApi) => {
+    const response = await calendarApi.events.watch({
+      calendarId,
+      singleEvents: true,
+      showDeleted: true,
+      requestBody: {
+        id: channel.id,
+        address: channel.address,
+        token: channel.token,
+        type: channel.type ?? "web_hook",
+      },
+    });
+
+    const expirationRaw = response.data.expiration;
+    const expirationMillis =
+      typeof expirationRaw === "string" ? Number.parseInt(expirationRaw, 10) : NaN;
+    const expiration =
+      Number.isFinite(expirationMillis) && expirationMillis > 0 ?
+        new Date(expirationMillis) :
+        null;
+
+    return {
+      channelId: response.data.id ?? channel.id,
+      resourceId: response.data.resourceId ?? null,
+      resourceUri: response.data.resourceUri ?? null,
+      expiration,
+    };
+  });
+}
+
+export async function stopGoogleCalendarWatch(
+  refreshToken: string,
+  channelId: string,
+  resourceId: string
+): Promise<void> {
+  await withCalendarClient(refreshToken, async (calendarApi) => {
+    try {
+      await calendarApi.channels.stop({
+        requestBody: {
+          id: channelId,
+          resourceId,
+        },
+      });
+    } catch (error) {
+      const status =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        typeof (error as {code?: unknown}).code === "number" ?
+          (error as {code: number}).code :
+          null;
+
+      if (status === 404 || status === 410) {
+        return;
+      }
+
+      throw error;
+    }
+  });
+}
+
+export async function listGoogleCalendarEventsIncremental(
+  refreshToken: string,
+  calendarId: string,
+  input: GoogleCalendarIncrementalSyncInput = {}
+): Promise<GoogleCalendarIncrementalSyncPage> {
+  return withCalendarClient(refreshToken, async (calendarApi) => {
+    const events: calendar_v3.Schema$Event[] = [];
+    const maxResults = input.maxResults ?? 250;
+    let nextPageToken: string | undefined;
+    let nextSyncToken: string | null = input.syncToken ?? null;
+    let pageCount = 0;
+
+    do {
+      const response = await calendarApi.events.list({
+        calendarId,
+        maxResults,
+        pageToken: nextPageToken,
+        singleEvents: true,
+        showDeleted: true,
+        syncToken: input.syncToken ?? undefined,
+        timeMin:
+          input.syncToken ? undefined : (input.timeMin ?? undefined),
+      });
+
+      events.push(...(response.data.items ?? []));
+      nextPageToken = response.data.nextPageToken ?? undefined;
+      nextSyncToken = response.data.nextSyncToken ?? nextSyncToken;
+      pageCount += 1;
+    } while (nextPageToken);
+
+    return {
+      events,
+      nextSyncToken,
+      pageCount,
+    };
   });
 }
