@@ -18,6 +18,16 @@ import {
   getTotpStatus,
   verifyTotpCode,
 } from "./auth/totp-callables";
+import {
+  beginGoogleCalendarConnection,
+  completeGoogleCalendarConnection,
+  getGoogleCalendarStatus,
+} from "./google/callables";
+import {
+  onAppointmentCreatedSyncGoogleCalendar,
+  onAppointmentDeletedSyncGoogleCalendar,
+  onAppointmentUpdatedSyncGoogleCalendar,
+} from "./google/appointment-triggers";
 import {createSalon} from "./salons/create-salon";
 
 setGlobalOptions({
@@ -43,4 +53,10 @@ export {
   beginTotpEnrollment,
   confirmTotpEnrollment,
   verifyTotpCode,
+  getGoogleCalendarStatus,
+  beginGoogleCalendarConnection,
+  completeGoogleCalendarConnection,
+  onAppointmentCreatedSyncGoogleCalendar,
+  onAppointmentUpdatedSyncGoogleCalendar,
+  onAppointmentDeletedSyncGoogleCalendar,
 };
