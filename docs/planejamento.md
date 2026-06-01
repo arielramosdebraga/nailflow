@@ -66,15 +66,15 @@
 - Commit bloqueado em caso de erro de lint
 - Cloud Function "hello world" deployada
 
-### Status de execução (atualizado em 29/05/2026)
+### Status de execução (atualizado em 01/06/2026)
 - ✅ 0.1 Criar projeto Expo com TypeScript strict — concluído (Expo SDK 56 + TypeScript)
 - ✅ 0.2 Configurar NativeWind v4 + tailwind.config — concluído
 - ✅ 0.3 Configurar Expo Router — concluído
-- ⚠️ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — parcialmente concluído (Auth/Firestore/Functions em uso; FCM/Storage ainda sem fluxo funcional completo)
-- ⚠️ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — parcialmente concluído (ESLint/Prettier configurados; Husky/lint-staged pendentes)
+- ✅ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — concluído (FCM/Storage com fluxo funcional básico entregue na Sprint 2)
+- ✅ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — concluído
 - ✅ 0.6 Estrutura de pastas src/ — concluído
 - ✅ 0.7 Configurar Zustand + TanStack Query + RHF + Zod — concluído
-- ⚠️ 0.8 Repositório Git + branches + CI básico — parcialmente concluído (branches e fluxo Git ativos; CI básico pendente)
+- ✅ 0.8 Repositório Git + branches + CI básico — concluído
 - ✅ 0.9 Setup Cloud Functions (Node 20+, TS) — concluído
 
 ---
@@ -104,13 +104,13 @@
 - Super admin fora da allowlist bloqueado
 - 2FA bloqueia sem TOTP válido
 
-### Status de execução (atualizado em 29/05/2026)
+### Status de execução (atualizado em 01/06/2026)
 - ✅ 1.1 Telas Login, Cadastro, Recuperar senha — concluído
 - ✅ 1.2 Firebase Auth (e-mail/senha + Google) — concluído
 - ✅ 1.3 Modelagem coleção users — concluído
 - ✅ 1.4 Cloud Function pós-cadastro — concluído
 - ✅ 1.5 Allowlist super_admin — concluído (via variável de ambiente)
-- ❌ 1.6 2FA (TOTP) para admin — pendente
+- ✅ 1.6 2FA (TOTP) para admin — concluído (entregue na Sprint 2 como 2.0)
 - ✅ 1.7 Regras Firestore RBAC base — concluído
 - ✅ 1.8 Zustand store de sessão — concluído
 - ✅ 1.9 Middleware rotas protegidas — concluído
@@ -194,6 +194,12 @@
 - Conflito de horário bloqueado
 - Agenda carrega em <2s
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ Sprint 3 concluída
+- ✅ Serviço de atendimentos e hooks principais implementados
+- ✅ Fluxo base de agenda e telas de atendimento entregue
+- ✅ Regras Firestore para appointments aplicadas
+
 ---
 
 ## 💼 Sprint 4 — Comandas e Painel Salon Owner
@@ -214,6 +220,12 @@
 - Comanda fechada não reabre sem admin
 - Dono visualiza agendas das 2 manicures
 - Cálculos financeiros corretos
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ Sprint 4 concluída
+- ✅ Fluxo de comandas (listar/abrir/editar/fechar) entregue
+- ✅ Dashboard do salão implementado com indicadores base
+- ✅ Visões de equipe e agenda consolidada entregues no escopo da sprint
 
 ---
 
@@ -236,6 +248,11 @@
 - Logs com quem/o quê/quando/IP
 - Apenas super admin lê auditLogs
 - Sessão expira em 1h de inatividade
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ Sprint 5 concluída
+- ✅ Painel de super_admin e controles administrativos entregues no escopo planejado
+- ✅ Estrutura de auditoria e governança avançada implementada
 
 ---
 
@@ -260,6 +277,12 @@
 - Atendimento no Google em <10s
 - refresh_token criptografado
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ Sprint 6 concluída
+- ✅ OAuth Google Calendar implementado
+- ✅ Sincronização App → Google (create/update/delete) entregue
+- ✅ Gestão de tokens e status de sincronização implementada
+
 ---
 
 ## 🔄 Sprint 7 — Sync Google→App + Reconciliação
@@ -283,6 +306,12 @@
 - Webhook auto-renovado
 - Zero perda em 7 dias contínuos
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ Sprint 7 concluída
+- ✅ Webhook de watch channel e sync incremental implementados
+- ✅ Reconciliação agendada e renovação de canais entregues
+- ✅ Tratativas de token expirado/revogado implementadas
+
 ---
 
 ## 🔔 Sprint 8 — Sistema de Notificações
@@ -304,6 +333,17 @@
 - Push em <5s
 - Não-perturbe silencia push
 - Badge em tempo real
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 8.1 expo-notifications + FCM — concluído
+- ✅ 8.2 fcmTokens no usuário — concluído
+- ✅ 8.3 Helper de envio — concluído
+- ✅ 8.4 6 tipos da Fase A — concluído
+- ✅ 8.5 Central com sino + badge — concluído
+- ✅ 8.6 Agrupamento + swipe + marcar lida — concluído
+- ✅ 8.7 Configurações por usuário — concluído
+- ✅ 8.8 Não-perturbe + lembrete configurável — concluído
+- ✅ 8.9 Lembretes pré-atendimento — concluído
 
 ---
 
@@ -385,9 +425,9 @@
 ## 🎯 Próximos Passos
 
 1. Validar este plano com Ariel (PO)
-2. Iniciar Sprint 3 (Agenda e Atendimentos)
-3. Executar modelagem e fluxo completo de appointments (service + hook + telas)
-4. Validar conflito de horários e estados de atendimento no app
+2. Consolidar Sprint 9 (testes, performance e refinamentos)
+3. Expandir cobertura de testes unitários e E2E dos fluxos críticos
+4. Executar auditoria de performance para consultas e telas principais
 5. Manter status por sprint atualizado neste documento ao fim de cada entrega
 
 ---
