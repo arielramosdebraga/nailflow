@@ -21,9 +21,11 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
   - Husky + lint-staged + CI (lint/typecheck/test)
 - Sprint 3: concluída
 - Sprint 4: concluída
-- Sprint 5: concluída
+- Sprint 5: parcialmente concluída (governança super_admin e LGPD pendentes)
 - Sprint 6: concluída
-- Sprint 7: em andamento (Sync Google->App + reconciliação)
+- Sprint 7: concluída
+- Sprint 8: concluída
+- Sprint 9: em andamento (testes, performance e refinamentos)
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)
