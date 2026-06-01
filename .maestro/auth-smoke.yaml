@@ -1,0 +1,21 @@
+appId: host.exp.exponent
+tags:
+  - smoke
+  - auth
+---
+- launchApp
+- assertVisible: "Entrar na conta"
+- assertVisible: "E-mail"
+- assertVisible: "Senha"
+- assertVisible: "Entrar"
+- assertVisible: "Entrar com Google"
+- assertVisible: "Esqueci minha senha"
+- assertVisible: "Criar conta"
+- tapOn: "Criar conta"
+- assertVisible: "Criar nova conta"
+- tapOn: "Já tenho conta"
+- assertVisible: "Entrar na conta"
+- tapOn: "Esqueci minha senha"
+- assertVisible: "Recuperar senha"
+- tapOn: "Voltar para login"
+- assertVisible: "Entrar na conta"
