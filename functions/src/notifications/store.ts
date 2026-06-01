@@ -8,6 +8,13 @@ import {
 
 const NOTIFICATIONS_COLLECTION = "notifications";
 const DEDUPE_PREFIX = "dedupe_";
+const NOTIFICATION_TTL_DAYS = 90;
+
+function buildNotificationExpiryDate(now: Date): Date {
+  const expiryDate = new Date(now);
+  expiryDate.setDate(expiryDate.getDate() + NOTIFICATION_TTL_DAYS);
+  return expiryDate;
+}
 
 function normalizeDedupeKey(key: string | null | undefined): string | null {
   if (typeof key !== "string") {
@@ -26,6 +33,8 @@ function buildDedupeDocumentId(rawKey: string): string {
 function createNotificationPayload(
   input: NotificationRecordInput
 ): Record<string, unknown> {
+  const now = new Date();
+
   return {
     userId: input.userId,
     salonId: input.salonId,
@@ -36,6 +45,7 @@ function createNotificationPayload(
     read: false,
     createdAt: FieldValue.serverTimestamp(),
     readAt: null,
+    expiresAt: buildNotificationExpiryDate(now),
   };
 }
 
@@ -73,4 +83,3 @@ export async function createNotificationRecord(
     created,
   };
 }
-

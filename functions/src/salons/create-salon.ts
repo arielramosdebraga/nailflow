@@ -7,6 +7,7 @@ import {
   requireAuthenticatedUid,
   type UserProfile,
 } from "../shared/user-context";
+import {ensureValidIanaTimeZoneOrThrow} from "../shared/timezone";
 
 interface CreateSalonInput {
   name: string;
@@ -54,17 +55,6 @@ function readBooleanWithDefault(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function ensureValidTimeZone(timezone: string): void {
-  try {
-    new Intl.DateTimeFormat("en-US", {timeZone: timezone});
-  } catch {
-    throw new HttpsError(
-      "invalid-argument",
-      "Timezone invalida. Informe um timezone IANA valido."
-    );
-  }
-}
-
 function readSettings(value: unknown): {timezone: string; currency: string} {
   const settingsRecord = getRecord(value);
   const rawTimezone = settingsRecord.timezone;
@@ -78,7 +68,7 @@ function readSettings(value: unknown): {timezone: string; currency: string} {
     throw new HttpsError("invalid-argument", "Timezone nao pode ser vazia.");
   }
 
-  ensureValidTimeZone(timezone);
+  ensureValidIanaTimeZoneOrThrow(timezone);
 
   const currency = typeof rawCurrency === "string" ?
     rawCurrency.trim().toUpperCase() :

@@ -38,8 +38,11 @@ interface SyncQueueJob {
 }
 
 const SYNC_QUEUE_COLLECTION = "syncQueue";
+const SYNC_QUEUE_DEAD_LETTER_COLLECTION = "syncQueueDeadLetter";
 const MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 1500;
+const RETRY_MAX_DELAY_MS = 30000;
+const RETRY_JITTER_RATIO = 0.2;
 
 function normalizeString(value: unknown): string | null {
   if (typeof value !== "string") {
@@ -94,6 +97,15 @@ async function delay(ms: number): Promise<void> {
   });
 }
 
+function computeRetryDelayMs(attempt: number): number {
+  const exponentialDelay = RETRY_BASE_DELAY_MS * (2 ** Math.max(0, attempt - 1));
+  const cappedDelay = Math.min(exponentialDelay, RETRY_MAX_DELAY_MS);
+  const jitterMultiplier =
+    1 + ((Math.random() * 2) - 1) * RETRY_JITTER_RATIO;
+
+  return Math.max(250, Math.round(cappedDelay * jitterMultiplier));
+}
+
 async function updateJob(
   jobRef: FirebaseFirestore.DocumentReference,
   payload: Record<string, unknown>
@@ -105,6 +117,33 @@ async function updateJob(
     },
     {merge: true}
   );
+}
+
+async function moveJobToDeadLetter(
+  jobId: string,
+  job: SyncQueueJob,
+  attempts: number,
+  errorMessage: string
+): Promise<void> {
+  await getFirestore()
+    .collection(SYNC_QUEUE_DEAD_LETTER_COLLECTION)
+    .doc(jobId)
+    .set({
+      userId: job.userId,
+      source: job.source,
+      attempts,
+      maxAttempts: job.maxAttempts,
+      forceFull: job.forceFull,
+      channelId: job.channelId,
+      resourceId: job.resourceId,
+      resourceState: job.resourceState,
+      messageNumber: job.messageNumber,
+      status: "dead_letter",
+      errorMessage,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+      failedAt: FieldValue.serverTimestamp(),
+    });
 }
 
 async function processSyncJob(job: SyncQueueJob): Promise<InboundGoogleCalendarSyncResult> {
@@ -154,6 +193,7 @@ export async function enqueueGoogleCalendarSyncTask(
     updatedAt: FieldValue.serverTimestamp(),
     startedAt: null,
     finishedAt: null,
+    nextRetryAt: null,
     errorMessage: null,
     syncSummary: null,
   });
@@ -191,6 +231,7 @@ export const onGoogleCalendarSyncQueueCreated = onDocumentCreated(
         status: "processing",
         attempts: attempt,
         startedAt: FieldValue.serverTimestamp(),
+        nextRetryAt: null,
         errorMessage: null,
       });
 
@@ -200,6 +241,7 @@ export const onGoogleCalendarSyncQueueCreated = onDocumentCreated(
           status: "done",
           attempts: attempt,
           finishedAt: FieldValue.serverTimestamp(),
+          nextRetryAt: null,
           syncSummary: syncResult,
         });
         processed = true;
@@ -209,10 +251,18 @@ export const onGoogleCalendarSyncQueueCreated = onDocumentCreated(
         const hasRetry = attempt < job.maxAttempts;
 
         if (!hasRetry) {
+          await moveJobToDeadLetter(
+            snapshot.id,
+            job,
+            attempt,
+            errorMessage
+          );
+
           await updateJob(snapshot.ref, {
             status: "error",
             attempts: attempt,
             finishedAt: FieldValue.serverTimestamp(),
+            nextRetryAt: null,
             errorMessage,
           });
           logger.error("Google sync queue job failed", {
@@ -224,13 +274,15 @@ export const onGoogleCalendarSyncQueueCreated = onDocumentCreated(
           break;
         }
 
+        const retryDelayMs = computeRetryDelayMs(attempt);
         await updateJob(snapshot.ref, {
           status: "pending",
           attempts: attempt,
+          nextRetryAt: new Date(Date.now() + retryDelayMs),
           errorMessage: `Tentativa ${attempt} falhou: ${errorMessage}`,
         });
 
-        await delay(RETRY_BASE_DELAY_MS * attempt);
+        await delay(retryDelayMs);
       }
     }
 

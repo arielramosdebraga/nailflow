@@ -4,10 +4,30 @@ import * as logger from "firebase-functions/logger";
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {enqueueGoogleCalendarSyncTask} from "./sync-queue";
 import {ensureGoogleCalendarWatchForUser} from "./watch-management";
+import {
+  DEFAULT_IANA_TIMEZONE,
+  isValidIanaTimeZone,
+  resolveTimeZoneWithFallback,
+} from "../shared/timezone";
 
-const SCHEDULER_TIMEZONE = "America/Sao_Paulo";
+const REQUESTED_SCHEDULER_TIMEZONE = process.env.SCHEDULER_TIMEZONE;
+const SCHEDULER_TIMEZONE = resolveTimeZoneWithFallback(
+  REQUESTED_SCHEDULER_TIMEZONE,
+  DEFAULT_IANA_TIMEZONE
+);
 const WATCH_RENEW_BATCH_SIZE = 200;
 const RECONCILE_BATCH_SIZE = 200;
+
+if (
+  typeof REQUESTED_SCHEDULER_TIMEZONE === "string" &&
+  REQUESTED_SCHEDULER_TIMEZONE.trim().length > 0 &&
+  !isValidIanaTimeZone(REQUESTED_SCHEDULER_TIMEZONE.trim())
+) {
+  logger.warn("Invalid scheduler timezone. Falling back to default.", {
+    providedTimezone: REQUESTED_SCHEDULER_TIMEZONE.trim(),
+    fallbackTimezone: SCHEDULER_TIMEZONE,
+  });
+}
 
 interface ConnectedUser {
   userId: string;
