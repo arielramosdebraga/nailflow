@@ -3,12 +3,14 @@ import { ScrollView, Text, View } from 'react-native';
 import { endOfDay, startOfDay } from 'date-fns';
 
 import { CommandCard } from '@/components/features/commands/CommandCard';
+import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useClients } from '@/hooks/clients/useClients';
 import { useCommands } from '@/hooks/commands/useCommands';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useManicures } from '@/hooks/users/useManicures';
 import { formatCurrency } from '@/components/features/commands/commandFormatters';
 
@@ -23,6 +25,7 @@ export default function OwnerDashboardScreen() {
   });
   const clientsQuery = useClients({ limitCount: 200 });
   const manicuresQuery = useManicures({ limitCount: 50 });
+  const unreadNotifications = useUnreadNotificationsCount();
 
   const commands = commandsQuery.data ?? [];
   const closedCommands = commands.filter((item) => item.status === 'closed');
@@ -42,7 +45,15 @@ export default function OwnerDashboardScreen() {
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
         <View className="gap-2 pb-5">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard do salao</Text>
+          <View className="flex-row items-center justify-between gap-3">
+            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              Dashboard do salao
+            </Text>
+            <NotificationsBellButton
+              unreadCount={unreadNotifications.unreadCount}
+              onPress={() => router.push('./notifications')}
+            />
+          </View>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
             Visao rapida de comandas, agenda do dia e equipe.
           </Text>
