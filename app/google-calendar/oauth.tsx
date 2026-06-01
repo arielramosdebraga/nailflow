@@ -7,7 +7,7 @@ export default function GoogleCalendarOAuthRedirectScreen() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.replace('/(nail-technician)/nail-technician/google-calendar');
+      router.replace('/nail-technician/google-calendar' as never);
     }, 1200);
 
     return () => clearTimeout(timeout);
