@@ -36,6 +36,8 @@ export default function AdminDashboardScreen() {
             <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
             <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
             <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./logs')} />
+            <Button label="Configuracoes globais" variant="ghost" onPress={() => router.push('./settings')} />
+            <Button label="Exportacao LGPD" variant="ghost" onPress={() => router.push('./lgpd-export')} />
           </Card>
         </View>
         <Button label="Central de notificações" variant="secondary" onPress={() => router.push('./notifications')} />

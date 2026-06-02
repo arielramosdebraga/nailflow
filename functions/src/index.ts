@@ -24,6 +24,7 @@ import {
   getGoogleCalendarStatus,
   refreshGoogleCalendarWatch,
 } from "./google/callables";
+import {exportLgpdData} from "./admin/export-lgpd-data";
 import {
   onAppointmentCreatedSyncGoogleCalendar,
   onAppointmentDeletedSyncGoogleCalendar,
@@ -62,6 +63,7 @@ export const health = onRequest((request, response) => {
 export {onUserCreated};
 export {
   createSalon,
+  exportLgpdData,
   getTotpStatus,
   beginTotpEnrollment,
   confirmTotpEnrollment,
