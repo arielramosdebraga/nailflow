@@ -21,6 +21,19 @@ describe('Auth Schemas', () => {
       email: 'ariel@example.com',
       password: '123456',
       confirmPassword: '654321',
+      acceptedLegalTerms: true,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects signup when legal terms are not accepted', () => {
+    const result = SignUpFormSchema.safeParse({
+      displayName: 'Ariel Braga',
+      email: 'ariel@example.com',
+      password: '123456',
+      confirmPassword: '123456',
+      acceptedLegalTerms: false,
     });
 
     expect(result.success).toBe(false);

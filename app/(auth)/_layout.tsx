@@ -15,5 +15,10 @@ export default function AuthLayout() {
     return <Redirect href="/" />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="privacy-policy" options={{ headerShown: true, title: 'Politica de Privacidade' }} />
+      <Stack.Screen name="terms-consent" options={{ headerShown: true, title: 'Termos e Consentimento' }} />
+    </Stack>
+  );
 }
