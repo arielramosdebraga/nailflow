@@ -83,7 +83,7 @@ function parseJob(snapshot: QueryDocumentSnapshot): SyncQueueJob {
   };
 }
 
-function normalizeErrorMessage(error: unknown): string {
+export function normalizeErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message.trim().length > 0) {
     return error.message;
   }
@@ -97,7 +97,7 @@ async function delay(ms: number): Promise<void> {
   });
 }
 
-function computeRetryDelayMs(attempt: number): number {
+export function computeRetryDelayMs(attempt: number): number {
   const exponentialDelay = RETRY_BASE_DELAY_MS * (2 ** Math.max(0, attempt - 1));
   const cappedDelay = Math.min(exponentialDelay, RETRY_MAX_DELAY_MS);
   const jitterMultiplier =
