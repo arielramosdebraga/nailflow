@@ -41,8 +41,10 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.29.7",
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.15",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^9.39.4",
     "eslint-config-expo": "^56.0.4",
     "husky": "^9.1.7",
@@ -71,6 +73,8 @@
     "format": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "firebase emulators:exec --only firestore,auth \"vitest run --config vitest.integration.config.ts\"",
     "test:e2e": "node scripts/run-maestro.mjs",
     "seed:test-accounts": "node scripts/seed-test-accounts.mjs",
     "prepare": "husky"
