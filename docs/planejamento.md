@@ -66,6 +66,17 @@
 - Commit bloqueado em caso de erro de lint
 - Cloud Function "hello world" deployada
 
+### Status de execução (atualizado em 29/05/2026)
+- ✅ 0.1 Criar projeto Expo com TypeScript strict — concluído (Expo SDK 56 + TypeScript)
+- ✅ 0.2 Configurar NativeWind v4 + tailwind.config — concluído
+- ✅ 0.3 Configurar Expo Router — concluído
+- ⚠️ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — parcialmente concluído (Auth/Firestore/Functions em uso; FCM/Storage ainda sem fluxo funcional completo)
+- ⚠️ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — parcialmente concluído (ESLint/Prettier configurados; Husky/lint-staged pendentes)
+- ✅ 0.6 Estrutura de pastas src/ — concluído
+- ✅ 0.7 Configurar Zustand + TanStack Query + RHF + Zod — concluído
+- ⚠️ 0.8 Repositório Git + branches + CI básico — parcialmente concluído (branches e fluxo Git ativos; CI básico pendente)
+- ✅ 0.9 Setup Cloud Functions (Node 20+, TS) — concluído
+
 ---
 
 ## 🔐 Sprint 1 — Autenticação e RBAC
@@ -93,13 +104,25 @@
 - Super admin fora da allowlist bloqueado
 - 2FA bloqueia sem TOTP válido
 
+### Status de execução (atualizado em 29/05/2026)
+- ✅ 1.1 Telas Login, Cadastro, Recuperar senha — concluído
+- ✅ 1.2 Firebase Auth (e-mail/senha + Google) — concluído
+- ✅ 1.3 Modelagem coleção users — concluído
+- ✅ 1.4 Cloud Function pós-cadastro — concluído
+- ✅ 1.5 Allowlist super_admin — concluído (via variável de ambiente)
+- ❌ 1.6 2FA (TOTP) para admin — pendente
+- ✅ 1.7 Regras Firestore RBAC base — concluído
+- ✅ 1.8 Zustand store de sessão — concluído
+- ✅ 1.9 Middleware rotas protegidas — concluído
+
 ---
 
 ## 🗄️ Sprint 2 — Modelagem de Dados e CRUD de Clientes
 
-**Duração:** 2 semanas | **SP:** 40 | **Dependências:** Sprint 1
+**Duração:** 2 semanas | **SP:** 56 | **Dependências:** Sprint 1 (inclui pendências de Sprint 0 e Sprint 1)
 
 ### Tarefas
+- 2.0 Implementar 2FA (TOTP) para super_admin e salon_owner — 8 SP
 - 2.1 Criar coleções Firestore (schemas Zod) — 5 SP
 - 2.2 Índices compostos — 2 SP
 - 2.3 clientsService (CRUD + queries) — 5 SP
@@ -110,11 +133,44 @@
 - 2.8 Regras Firestore para clients — 3 SP
 - 2.9 Cloud Function criar salão — 5 SP
 - 2.10 Componentes UI: Button, Input, Card, Avatar, Tag — 4 SP
+- 2.11 Concluir setup Firebase para FCM e Storage com fluxo funcional básico — 3 SP
+- 2.12 Configurar Husky + lint-staged no fluxo de commit local — 2 SP
+- 2.13 Configurar CI básico (lint + typecheck + test) — 3 SP
 
 ### Critérios de Sucesso
 - CRUD funciona offline
 - Isolamento por salão validado
 - Listas com >100 itens em <1s
+- 2FA bloqueia acesso administrativo sem TOTP válido
+- Pipeline CI executa lint, typecheck e testes automaticamente
+
+### Status de execução (atualizado em 29/05/2026)
+- ✅ 2.0 Implementar 2FA (TOTP) para super_admin e salon_owner — concluído
+- ✅ 2.1 Criar coleções Firestore (schemas Zod) — concluído
+- ✅ 2.2 Índices compostos — concluído
+- ✅ 2.3 clientsService (CRUD + queries) — concluído
+- ✅ 2.4 Hooks useClients, useClient — concluído
+- ✅ 2.5 Tela Lista de Clientes — concluído
+- ✅ 2.6 Tela Detalhe do Cliente — concluído
+- ✅ 2.7 Tela Criar/Editar Cliente — concluído
+- ✅ 2.8 Regras Firestore para clients — concluído
+- ✅ 2.9 Cloud Function criar salão — concluído
+- ✅ 2.10 Componentes UI: Button, Input, Card, Avatar, Tag — concluído
+- ✅ 2.11 Concluir setup Firebase para FCM e Storage com fluxo funcional básico — concluído
+- ✅ 2.12 Configurar Husky + lint-staged no fluxo de commit local — concluído
+- ✅ 2.13 Configurar CI básico (lint + typecheck + test) — concluído
+
+### Evidências de fechamento da Sprint 2
+- ✅ Validações locais executadas com sucesso:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `npm run lint` (em `functions/`)
+  - `npm run build` (em `functions/`)
+- ✅ Fluxo de autenticação com 2FA TOTP ativo para perfis administrativos.
+- ✅ CRUD de clientes implementado com service + hooks + telas.
+- ✅ Setup inicial de push token (FCM via Expo) e Storage implementado.
+- ✅ Pipeline de qualidade ativo no GitHub Actions e pre-commit local.
 
 ---
 
@@ -300,7 +356,7 @@
 |---|---|---|---|---|
 | 0 | Setup | 1 sem | 20 | 🟢 Baixo |
 | 1 | Auth + RBAC | 2 sem | 38 | 🟡 Médio |
-| 2 | Modelagem + Clientes | 2 sem | 40 | 🟢 Baixo |
+| 2 | Modelagem + Clientes + Pendências S0/S1 | 2 sem | 56 | 🟡 Médio |
 | 3 | Agenda + Atendimentos | 2 sem | 42 | 🟡 Médio |
 | 4 | Comandas + Owner | 2 sem | 40 | 🟢 Baixo |
 | 5 | Super Admin + Auditoria | 2 sem | 38 | 🟡 Médio |
@@ -309,7 +365,7 @@
 | 8 | Notificações | 2 sem | 40 | 🟡 Médio |
 | 9 | Testes + Performance | 2 sem | 38 | 🟢 Baixo |
 | 10 | Piloto | 2 sem | 30 | 🟡 Médio |
-| **Total** | — | **21 sem** | **412 SP** | — |
+| **Total** | — | **21 sem** | **428 SP** | — |
 
 ---
 
@@ -329,10 +385,10 @@
 ## 🎯 Próximos Passos
 
 1. Validar este plano com Ariel (PO)
-2. Iniciar Sprint 0
-3. Configurar ferramentas (Linear, Jira ou GitHub Projects)
-4. Agendar cerimônias recorrentes
-5. Definir canal de comunicação (Slack/Discord)
+2. Iniciar Sprint 3 (Agenda e Atendimentos)
+3. Executar modelagem e fluxo completo de appointments (service + hook + telas)
+4. Validar conflito de horários e estados de atendimento no app
+5. Manter status por sprint atualizado neste documento ao fim de cada entrega
 
 ---
 

@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import {getAuth} from "firebase-admin/auth";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
@@ -16,7 +17,7 @@ function getSuperAdminAllowlist(): Set<string> {
 export const onUserCreated = functions.auth.user().onCreate(async (user) => {
   const allowlist = getSuperAdminAllowlist();
   const email = (user.email ?? "").toLowerCase();
-  const role = allowlist.has(email) ? "super_admin" : "manicure";
+  const role = allowlist.has(email) ? "super_admin" : "nail_technician";
 
   await getFirestore().collection("users").doc(user.uid).set(
     {

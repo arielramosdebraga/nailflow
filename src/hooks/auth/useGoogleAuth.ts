@@ -72,7 +72,7 @@ export function useGoogleAuth() {
             uid: result.user.uid,
             email: result.user.email ?? '',
             displayName: result.user.displayName ?? 'Usuario',
-            role: 'manicure',
+            role: 'nail_technician',
           });
           profile = await getUserProfileById(result.user.uid);
         }
@@ -84,6 +84,7 @@ export function useGoogleAuth() {
         signIn({
           userId: result.user.uid,
           role: profile.role,
+          salonId: profile.salonId,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Falha no login com Google.');

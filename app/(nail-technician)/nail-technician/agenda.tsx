@@ -15,6 +15,9 @@ export default function NailTechnicianAgendaScreen() {
         <Text className="text-base text-zinc-600 dark:text-zinc-300">
           Estrutura inicial pronta para evoluir na Sprint 3 (atendimentos + calendário).
         </Text>
+        <View className="pt-2">
+          <Button label="Acessar clientes" onPress={() => router.push('./clients')} />
+        </View>
       </View>
 
       <Button

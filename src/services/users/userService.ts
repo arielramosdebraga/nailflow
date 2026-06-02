@@ -1,6 +1,10 @@
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
-import { UserRoleSchema, type UserRole } from '@/schemas/users/user.schema';
+import {
+  PersistedUserRoleSchema,
+  normalizeUserRole,
+  type UserRole,
+} from '@/schemas/users/user.schema';
 import { assertFirebaseConfigured, db } from '@/services/firebase';
 
 interface CreateUserProfileParams {
@@ -66,7 +70,7 @@ export async function getUserProfileById(uid: string): Promise<UserProfile | nul
   }
 
   const data = snapshot.data();
-  const roleResult = UserRoleSchema.safeParse(data.role);
+  const roleResult = PersistedUserRoleSchema.safeParse(data.role);
 
   if (!roleResult.success) {
     throw new Error('Perfil de usuario sem role valido.');
@@ -76,7 +80,7 @@ export async function getUserProfileById(uid: string): Promise<UserProfile | nul
     uid,
     email: typeof data.email === 'string' ? data.email : '',
     displayName: typeof data.displayName === 'string' ? data.displayName : '',
-    role: roleResult.data,
+    role: normalizeUserRole(roleResult.data),
     salonId: typeof data.salonId === 'string' ? data.salonId : null,
   };
 }

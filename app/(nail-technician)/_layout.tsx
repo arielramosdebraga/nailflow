@@ -14,7 +14,7 @@ export default function NailTechnicianLayout() {
     return <Redirect href="/login" />;
   }
 
-  if (role !== 'manicure' && role !== 'salon_owner' && role !== 'super_admin') {
+  if (role !== 'nail_technician' && role !== 'salon_owner' && role !== 'super_admin') {
     return <Redirect href="/" />;
   }
 
