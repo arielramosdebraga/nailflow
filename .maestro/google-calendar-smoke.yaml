@@ -1,0 +1,12 @@
+appId: host.exp.exponent
+tags:
+  - authenticated
+  - google
+---
+- launchApp
+- assertVisible: "Minha agenda"
+- tapOn: "Conectar Google Agenda"
+- assertVisible: "Google Agenda"
+- assertVisible: "Conectar Google Agenda"
+- assertVisible: "Atualizar status"
+
