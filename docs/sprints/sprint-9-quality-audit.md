@@ -32,16 +32,27 @@ Consolidar um baseline técnico para estabilidade do app antes da Sprint 10 (pil
 - Definir política de retries/backoff + dead-letter para `syncQueue`.
 - Registrar estratégia de TTL para notificações antigas (90 dias).
 
-## Resultado parcial (início da Sprint 9)
-- Adicionados testes unitários para preferências de notificações em Cloud Functions.
-- Adicionados testes para normalização de role e defaults de notificações no schema de usuário.
-- Próximo passo: expandir cenários E2E e revisão de performance em fluxos críticos.
+## Resultado consolidado
+- Setup Maestro versionado com runner dedicado em `pnpm test:e2e`.
+- Smoke flow de autenticação expandido para cobrir login, recuperação, cadastro e telas de LGPD.
+- Cobertura unitária reforçada em Cloud Functions para notificações, timezone, auditoria e fila de sync do Google Calendar.
+- Estados de loading/erro/vazio revisados nas telas principais entregues até a Sprint 9.
+- Acessibilidade básica reforçada no `Button` base e no módulo de notificações.
+- Guia de uso do piloto documentado em `docs/guia-de-uso-piloto.md`.
 
 ## Plano de fechamento documental da Sprint 9
-- [ ] Cobrir testes de conflitos `last-write-wins`.
-- [ ] Cobrir testes de sync incremental.
+- [x] Cobrir testes de conflitos `last-write-wins` em helpers críticos da fila.
+- [x] Cobrir testes de sync incremental em helpers críticos da fila.
 - [ ] Cobrir testes de idempotência dos triggers.
 - [ ] Executar medição de carga e anexar evidência de sync `< 10s`.
-- [ ] Validar reconciliação agendada às 3h com timezone do salão/usuário.
-- [ ] Documentar política de retries/backoff e dead-letter da `syncQueue`.
-- [ ] Implementar ou registrar plano de TTL de notificações (90 dias).
+- [x] Validar reconciliação agendada às 3h com timezone do salão/usuário no código e documentação.
+- [x] Documentar política de retries/backoff e dead-letter da `syncQueue`.
+- [x] Implementar ou registrar plano de TTL de notificações (90 dias).
+
+## Observações de validação
+- `pnpm lint`: ok
+- `pnpm typecheck`: ok
+- `pnpm test`: ok
+- `pnpm --dir functions lint`: ok
+- `pnpm --dir functions build`: ok
+- `pnpm test:e2e`: pendente de execução local porque a CLI do Maestro não está instalada neste ambiente

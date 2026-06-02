@@ -24,5 +24,5 @@ Elevar a confiabilidade do NailFlow com foco em cobertura de testes, qualidade d
 ## Checklist inicial
 - [x] Branch criada no padrão `Sprint-X-descricao-curta`
 - [x] Kickoff documentado
-- [ ] Implementação em commits pequenos e revisáveis
-- [ ] Validações finais completas (lint, typecheck, testes)
+- [x] Implementação em commits pequenos e revisáveis
+- [x] Validações finais completas (lint, typecheck, testes)

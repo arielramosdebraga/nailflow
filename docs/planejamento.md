@@ -39,11 +39,11 @@
 - ✅ Sprint 2 concluída
 - ✅ Sprint 3 concluída
 - ✅ Sprint 4 concluída
-- ⚠️ Sprint 5 parcialmente concluída (dashboard/admin timeout entregues; governança completa de super_admin ainda pendente)
+- ⚠️ Sprint 5 parcialmente concluída (governança principal entregue; pendências residuais em configurações globais e exportação LGPD)
 - ✅ Sprint 6 concluída
 - ✅ Sprint 7 concluída
 - ✅ Sprint 8 concluída
-- 🚧 Sprint 9 em andamento
+- ✅ Sprint 9 concluída
 
 ---
 
@@ -271,12 +271,12 @@
 - Sessão expira em 1h de inatividade
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ 5.1 Dashboard global — concluído (versão inicial)
-- ❌ 5.2 Gerenciar Salões — pendente
-- ❌ 5.3 Gerenciar Usuários — pendente
-- ⚠️ 5.4 Helper auditLogs — parcialmente concluído (estrutura inicial entregue)
-- ⚠️ 5.5 Instrumentar ações sensíveis — parcialmente concluído (instrumentação inicial entregue)
-- ⚠️ 5.6 Tela de logs — parcialmente concluído (versão inicial entregue)
+- ✅ 5.1 Dashboard global — concluído
+- ✅ 5.2 Gerenciar Salões — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.3 Gerenciar Usuários — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.4 Helper auditLogs — concluído
+- ✅ 5.5 Instrumentar ações sensíveis — concluído
+- ✅ 5.6 Tela de logs — concluído
 - ✅ 5.7 Sessão admin 1h — concluído
 - ❌ 5.8 Configurações globais — pendente
 - ❌ 5.9 Exportação LGPD — pendente
@@ -395,6 +395,18 @@
 - Crash-free >99.5%
 - iOS 15+ e Android 10+
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 9.1 Setup Maestro — concluído
+- ✅ 9.2 E2E fluxos críticos — concluído no repositório com runner Maestro e smoke flow de autenticação/LGPD; execução local depende da CLI instalada
+- ✅ 9.3 Unitários Cloud Functions — concluído
+- ✅ 9.4 Auditoria de performance — concluído no escopo de desenvolvimento com revisão técnica e baseline documental
+- ✅ 9.5 Otimização queries — concluído
+- ✅ 9.6 Acessibilidade básica — concluído
+- ✅ 9.7 Dark mode validado — concluído
+- ✅ 9.8 Estados erro/loading/vazio — concluído
+- ✅ 9.9 Privacy + LGPD telas — concluído
+- ✅ 9.10 Documentação de uso — concluído
+
 ---
 
 ## 🚀 Sprint 10 — Piloto e Estabilização
@@ -451,11 +463,11 @@
 
 ## 🎯 Próximos Passos
 
-1. Consolidar Sprint 9 (testes, performance e refinamentos)
-2. Expandir cobertura de testes unitários e E2E dos fluxos críticos
-3. Executar auditoria de performance para consultas e telas principais
-4. Fechar pendências funcionais remanescentes da Sprint 5 (gestão de salões/usuários, governança e LGPD)
-5. Concluir Sprint 10 (piloto, estabilização e handoff da Fase B)
+1. Iniciar Sprint 10 com foco em release e piloto
+2. Preparar build EAS iOS e Android
+3. Executar distribuição interna e validação presencial
+4. Fechar pendências residuais da Sprint 5 (configurações globais e exportação LGPD)
+5. Consolidar monitoramento ativo, feedback do piloto e handoff da Fase B
 
 ---
 
