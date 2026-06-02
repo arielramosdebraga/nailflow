@@ -21,9 +21,9 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
   - Husky + lint-staged + CI (lint/typecheck/test)
 - Sprint 3: concluída
 - Sprint 4: concluída
-- Sprint 5: parcialmente concluída
+- Sprint 5: concluída
   - governança principal de `super_admin` entregue na Sprint 9
-  - pendências residuais: configurações globais e exportação LGPD
+  - pendências residuais finalizadas na Sprint 10
 - Sprint 6: concluída
 - Sprint 7: concluída
 - Sprint 8: concluída
@@ -36,6 +36,7 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
 
 Observação:
 - A execução operacional do piloto continua manual: gerar builds no EAS, distribuir internamente, conduzir onboarding e coletar feedback em campo.
+- Em outras palavras: 100% do desenvolvimento versionado no repositório foi concluído; o que resta é execução operacional do piloto.
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)

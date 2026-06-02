@@ -46,6 +46,10 @@
 - ✅ Sprint 9 concluída
 - ✅ Sprint 10 concluída no escopo de desenvolvimento
 
+### Leitura correta do status
+- ✅ 100% do escopo de desenvolvimento previsto no planejamento foi implementado e versionado no repositório.
+- ⚠️ O planejamento total ainda possui etapas operacionais fora do código, especialmente na Sprint 10: distribuição interna, onboarding presencial e coleta de feedback do piloto.
+
 ---
 
 ## 🏁 Sprint 0 — Setup e Fundação Técnica
