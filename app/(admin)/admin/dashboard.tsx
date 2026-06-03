@@ -9,24 +9,23 @@ import { useAdminSessionGuard, useGlobalDashboard } from '@/hooks/admin';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
 
 export default function AdminDashboardScreen() {
-  useAdminSessionGuard();
   const router = useRouter();
-  const unreadNotifications = useUnreadNotificationsCount();
+  useAdminSessionGuard();
   const dashboardQuery = useGlobalDashboard({ includeInactiveSalons: true });
+  const unreadNotifications = useUnreadNotificationsCount();
 
   return (
     <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
-      <View className="items-end pt-4">
-        <NotificationsBellButton
-          unreadCount={unreadNotifications.unreadCount}
-          onPress={() => router.push('./notifications')}
-        />
-      </View>
-
       <AdminHeader
         title="Painel do Superadministrador"
         subtitle="Governanca global do NailFlow com KPIs, auditoria e atalhos operacionais."
         activeRoute="dashboard"
+        accessory={
+          <NotificationsBellButton
+            unreadCount={unreadNotifications.unreadCount}
+            onPress={() => router.push('./notifications')}
+          />
+        }
       />
 
       <View className="gap-3 pt-6">
