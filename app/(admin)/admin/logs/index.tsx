@@ -76,7 +76,9 @@ export default function AdminAuditLogsScreen() {
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">
                 Momento: {formatTimestamp(item.timestamp)}
               </Text>
-              {item.ipAddress ? <Text className="text-xs text-zinc-600 dark:text-zinc-300">IP: {item.ipAddress}</Text> : null}
+              {item.ipAddress ? (
+                <Text className="text-xs text-zinc-600 dark:text-zinc-300">IP: {item.ipAddress}</Text>
+              ) : null}
               {item.requestId ? (
                 <Text className="text-xs text-zinc-600 dark:text-zinc-300">Request ID: {item.requestId}</Text>
               ) : null}

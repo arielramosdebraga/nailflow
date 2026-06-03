@@ -5,17 +5,17 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { formatAppointmentStatus } from '@/components/features/appointments/appointmentFormatters';
+import {
+  AppointmentFormSchema,
+  mapAppointmentFormToUpsertInput,
+} from '@/schemas/appointments/appointment-form.schema';
 import {
   type Appointment,
   type AppointmentStatus,
   type UpsertAppointmentInput,
 } from '@/schemas/appointments/appointment.schema';
-import {
-  AppointmentFormSchema,
-  mapAppointmentFormToUpsertInput,
-} from '@/schemas/appointments/appointment-form.schema';
 import { type Client } from '@/schemas/clients/client.schema';
-import { formatAppointmentStatus } from '@/components/features/appointments/appointmentFormatters';
 
 export interface AppointmentFormValues {
   clientId: string;
@@ -28,12 +28,20 @@ export interface AppointmentFormValues {
   status: AppointmentStatus;
 }
 
+export interface AppointmentClientOption {
+  id: string;
+  name: string;
+  phone?: string | null;
+}
+
+type AppointmentFormClient = Client | AppointmentClientOption;
+
 interface AppointmentFormProps {
   title: string;
   description: string;
   submitLabel: string;
   manicureId: string;
-  clients: Client[];
+  clients: AppointmentFormClient[];
   isSubmitting: boolean;
   initialAppointment?: Appointment | null;
   defaultDate?: string;
@@ -104,7 +112,10 @@ function parseDateTime(dateValue: string, timeValue: string): Date | null {
   return parsed;
 }
 
-function getDefaultValues(initialAppointment: Appointment | null | undefined, defaultDate: string | undefined): AppointmentFormValues {
+function getDefaultValues(
+  initialAppointment: Appointment | null | undefined,
+  defaultDate: string | undefined,
+): AppointmentFormValues {
   if (initialAppointment) {
     return {
       clientId: initialAppointment.clientId,
@@ -140,6 +151,14 @@ function getDefaultValues(initialAppointment: Appointment | null | undefined, de
   };
 }
 
+function getClientPhone(client: AppointmentFormClient | null): string | null {
+  if (!client || !('phone' in client)) {
+    return null;
+  }
+
+  return client.phone ?? null;
+}
+
 export function AppointmentForm({
   title,
   description,
@@ -165,7 +184,10 @@ export function AppointmentForm({
     name: 'status',
   });
 
-  const selectedClient = useMemo(() => clients.find((item) => item.id === selectedClientId) ?? null, [clients, selectedClientId]);
+  const selectedClient = useMemo(
+    () => clients.find((item) => item.id === selectedClientId) ?? null,
+    [clients, selectedClientId],
+  );
 
   useEffect(() => {
     form.reset(getDefaultValues(initialAppointment, defaultDate));
@@ -244,6 +266,7 @@ export function AppointmentForm({
             <View className="gap-2">
               {clients.map((client) => {
                 const isSelected = client.id === selectedClientId;
+                const clientPhone = getClientPhone(client);
                 return (
                   <Pressable
                     key={client.id}
@@ -251,7 +274,9 @@ export function AppointmentForm({
                     onPress={() => form.setValue('clientId', client.id, { shouldValidate: true })}
                   >
                     <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
-                    <Text className="text-xs text-zinc-600 dark:text-zinc-300">{client.phone}</Text>
+                    {clientPhone ? (
+                      <Text className="text-xs text-zinc-600 dark:text-zinc-300">{clientPhone}</Text>
+                    ) : null}
                   </Pressable>
                 );
               })}
@@ -385,7 +410,11 @@ export function AppointmentForm({
         ) : null}
 
         <View className="gap-2">
-          <Button label={isSubmitting ? 'Salvando...' : submitLabel} onPress={form.handleSubmit(handleSubmit)} disabled={isSubmitting} />
+          <Button
+            label={isSubmitting ? 'Salvando...' : submitLabel}
+            onPress={form.handleSubmit(handleSubmit)}
+            disabled={isSubmitting}
+          />
           <Button label="Cancelar" variant="ghost" onPress={onCancel} disabled={isSubmitting} />
         </View>
       </View>

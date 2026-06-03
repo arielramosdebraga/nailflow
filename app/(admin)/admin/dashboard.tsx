@@ -16,23 +16,17 @@ export default function AdminDashboardScreen() {
 
   return (
     <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
-      <View className="gap-4 pt-10">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1">
-            <AdminHeader
-              title="Dashboard global"
-              subtitle="KPIs reais de operacao do NailFlow para acompanhamento do superadministrador."
-              activeRoute="dashboard"
-            />
-          </View>
-          <View className="pt-1">
-            <NotificationsBellButton
-              unreadCount={unreadNotifications.unreadCount}
-              onPress={() => router.push('./notifications')}
-            />
-          </View>
-        </View>
-      </View>
+      <AdminHeader
+        title="Painel do Superadministrador"
+        subtitle="Governanca global do NailFlow com KPIs, auditoria e atalhos operacionais."
+        activeRoute="dashboard"
+        accessory={
+          <NotificationsBellButton
+            unreadCount={unreadNotifications.unreadCount}
+            onPress={() => router.push('./notifications')}
+          />
+        }
+      />
 
       <View className="gap-3 pt-6">
         <View className="flex-row items-center justify-between gap-3">
@@ -82,6 +76,17 @@ export default function AdminDashboardScreen() {
         {dashboardQuery.data ? (
           <AdminKpiCards summary={dashboardQuery.data.summary} generatedAt={dashboardQuery.data.generatedAt} />
         ) : null}
+
+        <Card className="gap-3">
+          <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Governanca</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Consulte saloes, usuarios administrativos, notificacoes e logs de auditoria em um unico lugar.
+          </Text>
+          <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
+          <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
+          <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./audit-logs')} />
+          <Button label="Central de notificacoes" variant="secondary" onPress={() => router.push('./notifications')} />
+        </Card>
       </View>
     </ScrollView>
   );
