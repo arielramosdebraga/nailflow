@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
 
@@ -17,6 +17,7 @@ export default function SignUpScreen() {
       email: '',
       password: '',
       confirmPassword: '',
+      acceptedLegalTerms: false,
     },
   });
 
@@ -29,7 +30,8 @@ export default function SignUpScreen() {
           field === 'displayName' ||
           field === 'email' ||
           field === 'password' ||
-          field === 'confirmPassword'
+          field === 'confirmPassword' ||
+          field === 'acceptedLegalTerms'
         ) {
           form.setError(field, { message: issue.message });
         }
@@ -124,6 +126,60 @@ export default function SignUpScreen() {
               value={field.value}
               error={fieldState.error?.message}
             />
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="acceptedLegalTerms"
+          render={({ field, fieldState }) => (
+            <View className="gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+              <Pressable
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: field.value }}
+                className="flex-row gap-3"
+                onPress={() => {
+                  const nextValue = !field.value;
+                  field.onChange(nextValue);
+                  if (nextValue) {
+                    form.clearErrors('acceptedLegalTerms');
+                  }
+                }}
+              >
+                <View
+                  className={`mt-0.5 h-5 w-5 items-center justify-center rounded border ${
+                    field.value
+                      ? 'border-sky-700 bg-sky-700 dark:border-sky-400 dark:bg-sky-400'
+                      : 'border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900'
+                  }`}
+                >
+                  {field.value ? <Text className="text-[10px] font-bold text-white">X</Text> : null}
+                </View>
+                <Text className="flex-1 text-sm leading-6 text-zinc-700 dark:text-zinc-200">
+                  Li e aceito a Politica de Privacidade e os Termos e Consentimento para tratamento dos
+                  meus dados conforme a LGPD.
+                </Text>
+              </Pressable>
+
+              <View className="gap-2">
+                <Link href="/privacy-policy" asChild>
+                  <Pressable accessibilityRole="link">
+                    <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+                      Ler Politica de Privacidade
+                    </Text>
+                  </Pressable>
+                </Link>
+                <Link href="/terms-consent" asChild>
+                  <Pressable accessibilityRole="link">
+                    <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+                      Ler Termos e Consentimento
+                    </Text>
+                  </Pressable>
+                </Link>
+              </View>
+
+              {fieldState.error?.message ? <Text className="text-sm text-error">{fieldState.error.message}</Text> : null}
+            </View>
           )}
         />
 

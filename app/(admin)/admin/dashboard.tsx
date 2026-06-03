@@ -17,8 +17,8 @@ export default function AdminDashboardScreen() {
   return (
     <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
       <AdminHeader
-        title="Dashboard global"
-        subtitle="KPIs reais de operacao do NailFlow para acompanhamento do superadministrador."
+        title="Painel do Superadministrador"
+        subtitle="Governanca global do NailFlow com KPIs, auditoria e atalhos operacionais."
         activeRoute="dashboard"
         accessory={
           <NotificationsBellButton
@@ -29,7 +29,7 @@ export default function AdminDashboardScreen() {
       />
 
       <View className="gap-3 pt-6">
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between gap-3">
           <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Indicadores</Text>
           <Button
             label={dashboardQuery.isFetching ? 'Atualizando...' : 'Atualizar'}
@@ -64,6 +64,17 @@ export default function AdminDashboardScreen() {
             generatedAt={dashboardQuery.data.generatedAt}
           />
         ) : null}
+
+        <Card className="gap-3">
+          <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Governanca</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Consulte saloes, usuarios administrativos, notificacoes e logs de auditoria em um unico lugar.
+          </Text>
+          <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
+          <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
+          <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./audit-logs')} />
+          <Button label="Central de notificacoes" variant="secondary" onPress={() => router.push('./notifications')} />
+        </Card>
       </View>
     </ScrollView>
   );

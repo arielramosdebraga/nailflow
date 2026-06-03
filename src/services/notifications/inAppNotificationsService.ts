@@ -21,6 +21,7 @@ import { assertFirebaseConfigured, db } from '@/services/firebase';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
 const USERS_COLLECTION = 'users';
+const NOTIFICATIONS_RETENTION_DAYS = 90;
 
 export type NotificationPriority = 'high' | 'normal' | 'low';
 
@@ -218,6 +219,12 @@ function assertDatabaseAvailable() {
   }
 }
 
+function buildNotificationsRetentionCutoffDate(): Date {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - NOTIFICATIONS_RETENTION_DAYS);
+  return cutoff;
+}
+
 interface SubscribeNotificationsParams {
   userId: string;
   limitCount?: number;
@@ -232,11 +239,13 @@ export async function listUserNotifications(
   }
 
   assertDatabaseAvailable();
+  const retentionCutoff = buildNotificationsRetentionCutoffDate();
 
   const notificationsRef = collection(db!, NOTIFICATIONS_COLLECTION);
   const notificationsQuery = query(
     notificationsRef,
     where('userId', '==', normalizedUserId),
+    where('createdAt', '>=', retentionCutoff),
     orderBy('createdAt', 'desc'),
     limit(params.limitCount ?? 100)
   );
@@ -264,9 +273,11 @@ export function subscribeUserNotifications(
   }
 
   const notificationsRef = collection(db!, NOTIFICATIONS_COLLECTION);
+  const retentionCutoff = buildNotificationsRetentionCutoffDate();
   const notificationsQuery = query(
     notificationsRef,
     where('userId', '==', normalizedUserId),
+    where('createdAt', '>=', retentionCutoff),
     orderBy('createdAt', 'desc'),
     limit(params.limitCount ?? 100)
   );
@@ -301,10 +312,12 @@ export function subscribeUnreadNotificationsCount(
   }
 
   const notificationsRef = collection(db!, NOTIFICATIONS_COLLECTION);
+  const retentionCutoff = buildNotificationsRetentionCutoffDate();
   const unreadQuery = query(
     notificationsRef,
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
+    where('createdAt', '>=', retentionCutoff),
     limit(500)
   );
 
@@ -324,10 +337,12 @@ export async function getUnreadNotificationsCount(userId: string): Promise<numbe
   assertDatabaseAvailable();
 
   const notificationsRef = collection(db!, NOTIFICATIONS_COLLECTION);
+  const retentionCutoff = buildNotificationsRetentionCutoffDate();
   const unreadQuery = query(
     notificationsRef,
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
+    where('createdAt', '>=', retentionCutoff),
     limit(500)
   );
 
@@ -371,10 +386,12 @@ export async function markAllNotificationsAsRead(userId: string): Promise<number
   assertDatabaseAvailable();
 
   const notificationsRef = collection(db!, NOTIFICATIONS_COLLECTION);
+  const retentionCutoff = buildNotificationsRetentionCutoffDate();
   const unreadQuery = query(
     notificationsRef,
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
+    where('createdAt', '>=', retentionCutoff),
     limit(500)
   );
 

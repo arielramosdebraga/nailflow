@@ -526,7 +526,7 @@ Integrado ao próprio app (não há painel web separado na Fase A). Acessível a
 - Configurações de notificação
 
 ### Mês 5 — Testes, Refinamentos e Piloto
-- Testes E2E (Detox ou Maestro)
+- Testes E2E (Maestro)
 - Testes manuais com piloto
 - Performance e otimização
 - Acessibilidade básica

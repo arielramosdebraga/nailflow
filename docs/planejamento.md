@@ -33,6 +33,18 @@
 | 8 | 2–4 dias | Alta |
 | 13 | 4–7 dias | Muito alta (considerar quebrar) |
 
+### Status atual do projeto (atualizado em 01/06/2026)
+- ✅ Sprint 0 concluída (pendências absorvidas e finalizadas na Sprint 2)
+- ✅ Sprint 1 concluída (2FA administrativo finalizado na Sprint 2)
+- ✅ Sprint 2 concluída
+- ✅ Sprint 3 concluída
+- ✅ Sprint 4 concluída
+- ⚠️ Sprint 5 parcialmente concluída (governança principal entregue; pendências residuais em configurações globais e exportação LGPD)
+- ✅ Sprint 6 concluída
+- ✅ Sprint 7 concluída
+- ✅ Sprint 8 concluída
+- ✅ Sprint 9 concluída
+
 ---
 
 ## 🏁 Sprint 0 — Setup e Fundação Técnica
@@ -70,11 +82,11 @@
 - ✅ 0.1 Criar projeto Expo com TypeScript strict — concluído (Expo SDK 56 + TypeScript)
 - ✅ 0.2 Configurar NativeWind v4 + tailwind.config — concluído
 - ✅ 0.3 Configurar Expo Router — concluído
-- ✅ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — concluído (FCM/Storage com fluxo funcional básico entregue na Sprint 2)
-- ✅ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — concluído
+- ✅ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — concluído (fluxo funcional básico finalizado na Sprint 2)
+- ✅ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — concluído (finalizado na Sprint 2)
 - ✅ 0.6 Estrutura de pastas src/ — concluído
 - ✅ 0.7 Configurar Zustand + TanStack Query + RHF + Zod — concluído
-- ✅ 0.8 Repositório Git + branches + CI básico — concluído
+- ✅ 0.8 Repositório Git + branches + CI básico — concluído (finalizado na Sprint 2)
 - ✅ 0.9 Setup Cloud Functions (Node 20+, TS) — concluído
 
 ---
@@ -110,7 +122,7 @@
 - ✅ 1.3 Modelagem coleção users — concluído
 - ✅ 1.4 Cloud Function pós-cadastro — concluído
 - ✅ 1.5 Allowlist super_admin — concluído (via variável de ambiente)
-- ✅ 1.6 2FA (TOTP) para admin — concluído (entregue na Sprint 2 como 2.0)
+- ✅ 1.6 2FA (TOTP) para admin — concluído (entregue na Sprint 2 para super_admin e salon_owner)
 - ✅ 1.7 Regras Firestore RBAC base — concluído
 - ✅ 1.8 Zustand store de sessão — concluído
 - ✅ 1.9 Middleware rotas protegidas — concluído
@@ -195,10 +207,15 @@
 - Agenda carrega em <2s
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ Sprint 3 concluída
-- ✅ Serviço de atendimentos e hooks principais implementados
-- ✅ Fluxo base de agenda e telas de atendimento entregue
-- ✅ Regras Firestore para appointments aplicadas
+- ✅ 3.1 appointmentsService — concluído
+- ✅ 3.2 Hooks useAppointments — concluído
+- ✅ 3.3 react-native-calendars (mês/semana/dia) — concluído
+- ✅ 3.4 Home da Manicure — concluído
+- ✅ 3.5 Criar/Editar Atendimento — concluído
+- ✅ 3.6 Detalhe do Atendimento — concluído
+- ✅ 3.7 Validação de conflitos — concluído
+- ✅ 3.8 Estados de atendimento — concluído
+- ✅ 3.9 Regras Firestore appointments — concluído
 
 ---
 
@@ -222,10 +239,14 @@
 - Cálculos financeiros corretos
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ Sprint 4 concluída
-- ✅ Fluxo de comandas (listar/abrir/editar/fechar) entregue
-- ✅ Dashboard do salão implementado com indicadores base
-- ✅ Visões de equipe e agenda consolidada entregues no escopo da sprint
+- ✅ 4.1 commandsService + hooks — concluído
+- ✅ 4.2 Listar Comandas — concluído
+- ✅ 4.3 Abrir/Editar Comanda — concluído
+- ✅ 4.4 Fechar Comanda — concluído
+- ✅ 4.5 Dashboard Salon Owner — concluído
+- ✅ 4.6 Gerenciar Manicures — concluído
+- ✅ 4.7 Visão consolidada de agendas — concluído
+- ✅ 4.8 Relatório financeiro básico — concluído
 
 ---
 
@@ -250,9 +271,15 @@
 - Sessão expira em 1h de inatividade
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ Sprint 5 concluída
-- ✅ Painel de super_admin e controles administrativos entregues no escopo planejado
-- ✅ Estrutura de auditoria e governança avançada implementada
+- ✅ 5.1 Dashboard global — concluído
+- ✅ 5.2 Gerenciar Salões — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.3 Gerenciar Usuários — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.4 Helper auditLogs — concluído
+- ✅ 5.5 Instrumentar ações sensíveis — concluído
+- ✅ 5.6 Tela de logs — concluído
+- ✅ 5.7 Sessão admin 1h — concluído
+- ❌ 5.8 Configurações globais — pendente
+- ❌ 5.9 Exportação LGPD — pendente
 
 ---
 
@@ -278,10 +305,16 @@
 - refresh_token criptografado
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ Sprint 6 concluída
-- ✅ OAuth Google Calendar implementado
-- ✅ Sincronização App → Google (create/update/delete) entregue
-- ✅ Gestão de tokens e status de sincronização implementada
+- ✅ 6.1 Projeto Google Cloud + OAuth (Testing) — concluído
+- ✅ 6.2 Tela Conectar Google — concluído
+- ✅ 6.3 OAuth com expo-auth-session — concluído
+- ✅ 6.4 Cloud Function tokens + criptografia — concluído
+- ✅ 6.5 Criar calendário dedicado — concluído
+- ✅ 6.6 Trigger onCreate → Google — concluído
+- ✅ 6.7 Trigger onUpdate → Google — concluído
+- ✅ 6.8 Trigger onDelete → Google — concluído
+- ✅ 6.9 googleEventId + syncStatus — concluído
+- ✅ 6.10 Indicador de status — concluído
 
 ---
 
@@ -307,10 +340,15 @@
 - Zero perda em 7 dias contínuos
 
 ### Status de execução (atualizado em 01/06/2026)
-- ✅ Sprint 7 concluída
-- ✅ Webhook de watch channel e sync incremental implementados
-- ✅ Reconciliação agendada e renovação de canais entregues
-- ✅ Tratativas de token expirado/revogado implementadas
+- ✅ 7.1 Watch channel (webhook) — concluído
+- ✅ 7.2 HTTP function recebe webhooks — concluído
+- ✅ 7.3 Sync incremental via syncToken — concluído
+- ✅ 7.4 Mapeamento Google → Firestore — concluído
+- ✅ 7.5 Last-write-wins — concluído
+- ✅ 7.6 Renovação diária webhooks — concluído
+- ✅ 7.7 Reconciliação 3h da manhã — concluído
+- ✅ 7.8 syncQueue (Pub/Sub) — concluído
+- ✅ 7.9 Token revogado/expirado — concluído
 
 ---
 
@@ -334,17 +372,6 @@
 - Não-perturbe silencia push
 - Badge em tempo real
 
-### Status de execução (atualizado em 01/06/2026)
-- ✅ 8.1 expo-notifications + FCM — concluído
-- ✅ 8.2 fcmTokens no usuário — concluído
-- ✅ 8.3 Helper de envio — concluído
-- ✅ 8.4 6 tipos da Fase A — concluído
-- ✅ 8.5 Central com sino + badge — concluído
-- ✅ 8.6 Agrupamento + swipe + marcar lida — concluído
-- ✅ 8.7 Configurações por usuário — concluído
-- ✅ 8.8 Não-perturbe + lembrete configurável — concluído
-- ✅ 8.9 Lembretes pré-atendimento — concluído
-
 ---
 
 ## 🧪 Sprint 9 — Testes, Performance e Refinamentos
@@ -367,6 +394,18 @@
 - 10 critérios de aceite validados
 - Crash-free >99.5%
 - iOS 15+ e Android 10+
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 9.1 Setup Maestro — concluído
+- ✅ 9.2 E2E fluxos críticos — concluído no repositório com runner Maestro e smoke flow de autenticação/LGPD; execução local depende da CLI instalada
+- ✅ 9.3 Unitários Cloud Functions — concluído
+- ✅ 9.4 Auditoria de performance — concluído no escopo de desenvolvimento com revisão técnica e baseline documental
+- ✅ 9.5 Otimização queries — concluído
+- ✅ 9.6 Acessibilidade básica — concluído
+- ✅ 9.7 Dark mode validado — concluído
+- ✅ 9.8 Estados erro/loading/vazio — concluído
+- ✅ 9.9 Privacy + LGPD telas — concluído
+- ✅ 9.10 Documentação de uso — concluído
 
 ---
 
@@ -424,11 +463,11 @@
 
 ## 🎯 Próximos Passos
 
-1. Validar este plano com Ariel (PO)
-2. Consolidar Sprint 9 (testes, performance e refinamentos)
-3. Expandir cobertura de testes unitários e E2E dos fluxos críticos
-4. Executar auditoria de performance para consultas e telas principais
-5. Manter status por sprint atualizado neste documento ao fim de cada entrega
+1. Iniciar Sprint 10 com foco em release e piloto
+2. Preparar build EAS iOS e Android
+3. Executar distribuição interna e validação presencial
+4. Fechar pendências residuais da Sprint 5 (configurações globais e exportação LGPD)
+5. Consolidar monitoramento ativo, feedback do piloto e handoff da Fase B
 
 ---
 

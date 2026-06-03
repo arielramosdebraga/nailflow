@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
-  listUserNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
+  subscribeUserNotifications,
   type AppNotification,
 } from '@/services/notifications';
 import { useSessionStore } from '@/stores/sessionStore';
@@ -27,81 +25,126 @@ export function useNotificationsFeed(
 ): UseNotificationsFeedResult {
   const userId = useSessionStore((state) => state.userId);
   const status = useSessionStore((state) => state.status);
-  const queryClient = useQueryClient();
+  const [notificationsSnapshot, setNotificationsSnapshot] = useState<{
+    sourceKey: string | null;
+    data: AppNotification[];
+  }>({
+    sourceKey: null,
+    data: [],
+  });
+  const [loadedSourceKey, setLoadedSourceKey] = useState<string | null>(null);
+  const [isMarkingOneAsRead, setIsMarkingOneAsRead] = useState(false);
+  const [isMarkingAllAsRead, setIsMarkingAllAsRead] = useState(false);
+  const [errorSnapshot, setErrorSnapshot] = useState<{
+    sourceKey: string | null;
+    message: string | null;
+  }>({
+    sourceKey: null,
+    message: null,
+  });
 
   const isEnabled = status === 'authenticated' && Boolean(userId);
   const limitCount = options.limitCount ?? 100;
+  const sourceKey = isEnabled && userId ? `${userId}:${limitCount}` : null;
 
-  const notificationsQuery = useQuery({
-    queryKey: ['notifications', userId ?? '', limitCount],
-    enabled: isEnabled,
-    refetchInterval: 5_000,
-    queryFn: async () => {
-      if (!userId) {
-        return [];
+  useEffect(() => {
+    if (!sourceKey || !userId) {
+      return undefined;
+    }
+
+    const unsubscribe = subscribeUserNotifications(
+      { userId, limitCount },
+      (items) => {
+        setNotificationsSnapshot({ sourceKey, data: items });
+        setLoadedSourceKey(sourceKey);
+        setErrorSnapshot({ sourceKey, message: null });
+      },
+      (error) => {
+        setLoadedSourceKey(sourceKey);
+        setErrorSnapshot({ sourceKey, message: error.message });
       }
-      return listUserNotifications({ userId, limitCount });
-    },
-  });
+    );
 
-  const markOneMutation = useMutation({
-    mutationFn: async (notificationId: string) => {
+    return unsubscribe;
+  }, [limitCount, sourceKey, userId]);
+
+  const markOneAsRead = useCallback(
+    async (notificationId: string) => {
       if (!userId) {
         return;
       }
-      await markNotificationAsRead({ userId, notificationId });
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['notifications', userId ?? '', limitCount] }),
-        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count', userId ?? ''] }),
-      ]);
-    },
-  });
 
-  const markAllMutation = useMutation({
-    mutationFn: async () => {
-      if (!userId) {
-        return 0;
+      setIsMarkingOneAsRead(true);
+
+      try {
+        await markNotificationAsRead({ userId, notificationId });
+      } catch (error) {
+        setErrorSnapshot({
+          sourceKey,
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Falha ao marcar notificacao como lida.',
+        });
+      } finally {
+        setIsMarkingOneAsRead(false);
       }
-      return markAllNotificationsAsRead(userId);
     },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['notifications', userId ?? '', limitCount] }),
-        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count', userId ?? ''] }),
-      ]);
-    },
-  });
+    [sourceKey, userId]
+  );
+
+  const markAllAsRead = useCallback(async () => {
+    if (!userId) {
+      return;
+    }
+
+    setIsMarkingAllAsRead(true);
+
+    try {
+      await markAllNotificationsAsRead(userId);
+    } catch (error) {
+      setErrorSnapshot({
+        sourceKey,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Falha ao marcar notificacoes como lidas.',
+      });
+    } finally {
+      setIsMarkingAllAsRead(false);
+    }
+  }, [sourceKey, userId]);
 
   return useMemo(
-    () => ({
-      notifications: isEnabled ? notificationsQuery.data ?? [] : [],
-      isLoading:
-        isEnabled &&
-        (notificationsQuery.isLoading || markOneMutation.isPending || markAllMutation.isPending),
-      errorMessage:
-        notificationsQuery.error instanceof Error
-          ? notificationsQuery.error.message
-          : markOneMutation.error instanceof Error
-            ? markOneMutation.error.message
-            : markAllMutation.error instanceof Error
-              ? markAllMutation.error.message
-              : null,
-      markOneAsRead: async (notificationId: string) => {
-        await markOneMutation.mutateAsync(notificationId);
-      },
-      markAllAsRead: async () => {
-        await markAllMutation.mutateAsync();
-      },
-    }),
+    () => {
+      const notifications =
+        sourceKey && notificationsSnapshot.sourceKey === sourceKey
+          ? notificationsSnapshot.data
+          : [];
+      const isLoading =
+        Boolean(sourceKey) && loadedSourceKey !== sourceKey;
+      const errorMessage =
+        sourceKey && errorSnapshot.sourceKey === sourceKey
+          ? errorSnapshot.message
+          : null;
+
+      return {
+        notifications,
+        isLoading: isLoading || isMarkingOneAsRead || isMarkingAllAsRead,
+        errorMessage,
+        markOneAsRead,
+        markAllAsRead,
+      };
+    },
     [
-      isEnabled,
-      markAllMutation,
-      markOneMutation,
-      notificationsQuery.data,
-      notificationsQuery.error,
-      notificationsQuery.isLoading,
+      errorSnapshot,
+      isMarkingAllAsRead,
+      isMarkingOneAsRead,
+      loadedSourceKey,
+      markAllAsRead,
+      markOneAsRead,
+      notificationsSnapshot,
+      sourceKey,
     ]
   );
 }

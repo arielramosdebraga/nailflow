@@ -1,9 +1,13 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { Card } from '@/components/ui/Card';
-import type { AppointmentStatus } from '@/schemas/appointments/appointment.schema';
-
-import { AppointmentStatusTag } from './AppointmentStatusTag';
+import {
+  formatAppointmentCurrencyFromCents,
+  formatAppointmentDate,
+  formatAppointmentStatus,
+  formatAppointmentTimeRange,
+  getAppointmentStatusColorClassName,
+} from '@/components/features/appointments/appointmentFormatters';
+import { type Appointment } from '@/schemas/appointments/appointment.schema';
 
 export interface AppointmentCardItem {
   id: string;
@@ -11,83 +15,90 @@ export interface AppointmentCardItem {
   clientName: string;
   startsAt: string;
   endsAt: string;
-  status: AppointmentStatus;
+  status: Appointment['status'];
   priceCents: number;
   notes?: string;
 }
 
+type AppointmentCardData = Appointment | AppointmentCardItem;
+
 interface AppointmentCardProps {
-  appointment: AppointmentCardItem;
+  appointment: AppointmentCardData;
+  clientName?: string;
+  manicureName?: string;
+  showDate?: boolean;
   onPress?: (appointmentId: string) => void;
 }
 
-function formatTimeRange(startsAt: string, endsAt: string): string {
-  const startDate = new Date(startsAt);
-  const endDate = new Date(endsAt);
+function isPersistedAppointment(value: AppointmentCardData): value is Appointment {
+  return "startTime" in value && "endTime" in value;
+}
 
-  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-    return 'Horario indisponivel';
+function getStartDate(appointment: AppointmentCardData): Date {
+  return isPersistedAppointment(appointment) ? appointment.startTime : new Date(appointment.startsAt);
+}
+
+function getEndDate(appointment: AppointmentCardData): Date {
+  return isPersistedAppointment(appointment) ? appointment.endTime : new Date(appointment.endsAt);
+}
+
+function getClientLabel(appointment: AppointmentCardData, clientName?: string): string {
+  if (clientName) {
+    return clientName;
   }
 
-  const formatter = new Intl.DateTimeFormat('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  return `${formatter.format(startDate)} - ${formatter.format(endDate)}`;
+  return isPersistedAppointment(appointment) ? appointment.clientId : appointment.clientName;
 }
 
-function formatPriceLabel(priceCents: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(priceCents / 100);
+function getNotes(appointment: AppointmentCardData): string {
+  return appointment.notes ?? '';
 }
 
-function formatDateLabel(startsAt: string): string {
-  const startDate = new Date(startsAt);
-  if (Number.isNaN(startDate.getTime())) {
-    return 'Data invalida';
-  }
-
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    weekday: 'long',
-  }).format(startDate);
-}
-
-function AppointmentCardContent({ appointment }: { appointment: AppointmentCardItem }) {
-  return (
-    <Card className="gap-3">
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="flex-1 gap-1">
-          <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{appointment.clientName}</Text>
-          <Text className="text-xs capitalize text-zinc-500 dark:text-zinc-400">{formatDateLabel(appointment.startsAt)}</Text>
-          <Text className="text-xs text-zinc-500 dark:text-zinc-400">
-            {formatTimeRange(appointment.startsAt, appointment.endsAt)}
-          </Text>
-          <Text className="text-xs font-medium text-zinc-700 dark:text-zinc-200">
-            {formatPriceLabel(appointment.priceCents)}
-          </Text>
-        </View>
-        <AppointmentStatusTag status={appointment.status} />
+export function AppointmentCard({
+  appointment,
+  clientName,
+  manicureName,
+  showDate = false,
+  onPress,
+}: AppointmentCardProps) {
+  const statusClassName = getAppointmentStatusColorClassName(appointment.status);
+  const startDate = getStartDate(appointment);
+  const endDate = getEndDate(appointment);
+  const notes = getNotes(appointment);
+  const content = (
+    <View className="gap-1 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+      <View className="flex-row items-center justify-between gap-3">
+        <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          {formatAppointmentTimeRange(startDate, endDate)}
+        </Text>
+        <Text className={`text-xs font-semibold ${statusClassName}`}>{formatAppointmentStatus(appointment.status)}</Text>
       </View>
 
-      {appointment.notes ? (
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">{appointment.notes}</Text>
+      {showDate ? (
+        <Text className="text-xs text-zinc-500 dark:text-zinc-400">{formatAppointmentDate(startDate)}</Text>
       ) : null}
-    </Card>
-  );
-}
 
-export function AppointmentCard({ appointment, onPress }: AppointmentCardProps) {
+      <Text className="text-sm text-zinc-700 dark:text-zinc-200">Cliente: {getClientLabel(appointment, clientName)}</Text>
+      {manicureName ? <Text className="text-sm text-zinc-700 dark:text-zinc-200">Profissional: {manicureName}</Text> : null}
+
+      <View className="flex-row items-center justify-between pt-1">
+        <Text className="text-xs text-zinc-600 dark:text-zinc-300">Valor</Text>
+        <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          {formatAppointmentCurrencyFromCents(appointment.priceCents)}
+        </Text>
+      </View>
+
+      {notes ? <Text className="pt-1 text-xs text-zinc-600 dark:text-zinc-300">{notes}</Text> : null}
+    </View>
+  );
+
   if (!onPress) {
-    return <AppointmentCardContent appointment={appointment} />;
+    return content;
   }
 
   return (
-    <Pressable onPress={() => onPress(appointment.id)} accessibilityRole="button">
-      <AppointmentCardContent appointment={appointment} />
+    <Pressable className="active:opacity-90" onPress={() => onPress(appointment.id)}>
+      {content}
     </Pressable>
   );
 }

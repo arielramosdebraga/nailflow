@@ -21,13 +21,19 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
   - Husky + lint-staged + CI (lint/typecheck/test)
 - Sprint 3: concluída
 - Sprint 4: concluída
-- Sprint 5: concluída
+- Sprint 5: parcialmente concluída
+  - governança principal de `super_admin` entregue na Sprint 9
+  - pendências residuais: configurações globais e exportação LGPD
 - Sprint 6: concluída
-- Sprint 7: em andamento (Sync Google->App + reconciliação)
+- Sprint 7: concluída
+- Sprint 8: concluída
+- Sprint 9: concluída
+- Sprint 10: pendente (piloto, distribuição e estabilização operacional)
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)
 - [docs/AGENTS.md](./docs/AGENTS.md)
+- [docs/guia-de-uso-piloto.md](./docs/guia-de-uso-piloto.md)
 
 ## Stack principal
 
@@ -100,7 +106,12 @@ pnpm web
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:e2e
 ```
+
+Observação:
+- `pnpm test:e2e` executa os fluxos Maestro versionados em `.maestro/`.
+- A execução local depende da CLI do Maestro instalada no ambiente.
 
 ## Scripts úteis
 

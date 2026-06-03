@@ -10,5 +10,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    exclude: ['functions/lib/**', 'node_modules/**', '.expo/**', 'dist/**'],
   },
 });

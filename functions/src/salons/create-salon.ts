@@ -1,12 +1,16 @@
 /* eslint-disable require-jsdoc */
 import {getAuth} from "firebase-admin/auth";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
+import * as logger from "firebase-functions/logger";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
+import {extractRequestMetadata} from "../audit/extract-request-metadata";
 import {
   getUserProfile,
   requireAuthenticatedUid,
   type UserProfile,
 } from "../shared/user-context";
+import {writeAuditLog} from "../audit";
+import {ensureValidIanaTimeZoneOrThrow} from "../shared/timezone";
 
 interface CreateSalonInput {
   name: string;
@@ -54,17 +58,6 @@ function readBooleanWithDefault(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function ensureValidTimeZone(timezone: string): void {
-  try {
-    new Intl.DateTimeFormat("en-US", {timeZone: timezone});
-  } catch {
-    throw new HttpsError(
-      "invalid-argument",
-      "Timezone invalida. Informe um timezone IANA valido."
-    );
-  }
-}
-
 function readSettings(value: unknown): {timezone: string; currency: string} {
   const settingsRecord = getRecord(value);
   const rawTimezone = settingsRecord.timezone;
@@ -78,7 +71,7 @@ function readSettings(value: unknown): {timezone: string; currency: string} {
     throw new HttpsError("invalid-argument", "Timezone nao pode ser vazia.");
   }
 
-  ensureValidTimeZone(timezone);
+  ensureValidIanaTimeZoneOrThrow(timezone);
 
   const currency = typeof rawCurrency === "string" ?
     rawCurrency.trim().toUpperCase() :
@@ -219,6 +212,30 @@ export const createSalon = onCall(async (request) => {
     await auth.setCustomUserClaims(ownerUid, {
       ...existingClaims,
       role: "salon_owner",
+    });
+  }
+
+  try {
+    await writeAuditLog({
+      userId: callerUid,
+      userRole: callerProfile.role,
+      action: "salon.create",
+      targetType: "salon",
+      targetId: salonRef.id,
+      metadata: {
+        ownerId: ownerUid,
+        salonId: salonRef.id,
+        active: input.active,
+        timezone: input.settings.timezone,
+        currency: input.settings.currency,
+      },
+      requestMetadata: extractRequestMetadata(request),
+    });
+  } catch (error) {
+    logger.warn("Failed to persist audit log for createSalon", {
+      callerUid,
+      salonId: salonRef.id,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 

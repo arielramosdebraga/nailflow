@@ -1,67 +1,76 @@
-import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { AppointmentStatusTag } from '@/components/features/appointments';
+import {
+  AppointmentCard,
+  formatAppointmentDate,
+  formatAppointmentSyncStatus,
+  formatAppointmentTimeRange,
+  formatAppointmentStatus,
+} from '@/components/features/appointments';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { useAppointment } from '@/hooks/appointments';
-import { useClients } from '@/hooks/clients/useClients';
+import {
+  useAppointment,
+  useDeleteAppointmentMutation,
+  useUpdateAppointmentStatusMutation,
+} from '@/hooks/appointments';
+import { useClient } from '@/hooks/clients/useClient';
+import { type AppointmentStatus } from '@/schemas/appointments/appointment.schema';
+import { useSessionStore } from '@/stores/sessionStore';
 
-function readAppointmentId(value: string | string[] | undefined): string {
-  if (Array.isArray(value)) {
-    return value[0] ?? '';
-  }
+const statusOptions: AppointmentStatus[] = ['scheduled', 'confirmed', 'completed', 'cancelled'];
 
-  return value ?? '';
-}
-
-function formatDateAndTimeRange(startsAt: Date, endsAt: Date): string {
-  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) {
-    return 'Horario indisponivel';
-  }
-
-  const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-  const timeFormatter = new Intl.DateTimeFormat('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  return `${dateFormatter.format(startsAt)} | ${timeFormatter.format(startsAt)} - ${timeFormatter.format(endsAt)}`;
-}
-
-function formatPrice(priceCents: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(priceCents / 100);
-}
-
-export default function AppointmentDetailsScreen() {
+export default function NailTechnicianAppointmentDetailsScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ appointmentId?: string | string[] }>();
-  const appointmentId = readAppointmentId(params.appointmentId);
+  const params = useLocalSearchParams<{ appointmentId?: string }>();
+  const appointmentId = params.appointmentId;
+  const userId = useSessionStore((state) => state.userId);
 
   const appointmentQuery = useAppointment(appointmentId);
-  const clientsQuery = useClients({ limitCount: 300 });
-
   const appointment = appointmentQuery.data;
+  const clientQuery = useClient(appointment?.clientId);
+  const updateStatusMutation = useUpdateAppointmentStatusMutation();
+  const deleteAppointmentMutation = useDeleteAppointmentMutation();
 
-  const clientName = useMemo(() => {
-    if (!appointment) {
-      return '';
+  async function handleUpdateStatus(status: AppointmentStatus) {
+    if (!appointmentId) {
+      return;
     }
 
-    const client = (clientsQuery.data ?? []).find((item) => item.id === appointment.clientId);
-    return client?.name ?? 'Cliente sem cadastro';
-  }, [appointment, clientsQuery.data]);
+    try {
+      await updateStatusMutation.mutateAsync({
+        appointmentId,
+        status,
+      });
+    } catch (error) {
+      Alert.alert('Erro', error instanceof Error ? error.message : 'Falha ao atualizar status.');
+    }
+  }
 
-  if (appointmentQuery.isLoading || clientsQuery.isLoading) {
+  function handleDeleteAppointment() {
+    if (!appointmentId) {
+      return;
+    }
+
+    Alert.alert('Excluir atendimento', 'Tem certeza que deseja excluir este atendimento?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteAppointmentMutation.mutateAsync(appointmentId);
+            router.replace('../../agenda');
+          } catch (error) {
+            Alert.alert('Erro', error instanceof Error ? error.message : 'Falha ao excluir atendimento.');
+          }
+        },
+      },
+    ]);
+  }
+
+  if (appointmentQuery.isLoading || clientQuery.isLoading) {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
@@ -71,51 +80,92 @@ export default function AppointmentDetailsScreen() {
     );
   }
 
-  if (appointmentQuery.error || clientsQuery.error || !appointment) {
+  const error = appointmentQuery.error ?? clientQuery.error ?? null;
+  if (error || !appointment) {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
           <Text className="text-sm text-error">
-            {appointmentQuery.error instanceof Error
-              ? appointmentQuery.error.message
-              : clientsQuery.error instanceof Error
-                ? clientsQuery.error.message
-                : 'Atendimento nao encontrado.'}
+            {error instanceof Error ? error.message : 'Atendimento nao encontrado.'}
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para atendimentos" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
         </View>
       </View>
     );
   }
+
+  if (!userId || appointment.manicureId !== userId) {
+    return (
+      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
+        <Card>
+          <Text className="text-sm text-error">Este atendimento nao pertence a profissional logada.</Text>
+        </Card>
+        <View className="pt-4">
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
+        </View>
+      </View>
+    );
+  }
+
+  const clientName = clientQuery.data?.name ?? appointment.clientId;
+  const isMutating = updateStatusMutation.isPending || deleteAppointmentMutation.isPending;
 
   return (
     <View className="flex-1 justify-between bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
       <View className="gap-4">
         <View className="gap-2">
           <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{clientName}</Text>
-          <Text className="text-base text-zinc-700 dark:text-zinc-200">
-            {formatDateAndTimeRange(appointment.startTime, appointment.endTime)}
-          </Text>
-          <Text className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
-            Valor: {formatPrice(appointment.priceCents)}
+          <Text className="text-base text-zinc-600 dark:text-zinc-300">
+            {formatAppointmentDate(appointment.startTime)}
           </Text>
         </View>
 
-        <AppointmentStatusTag status={appointment.status} />
+        <AppointmentCard appointment={appointment} clientName={clientName} />
 
         <Card className="gap-2">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Observacoes</Text>
+          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Resumo</Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            {appointment.notes ? appointment.notes : 'Sem observacoes cadastradas.'}
+            Horario: {formatAppointmentTimeRange(appointment.startTime, appointment.endTime)}
           </Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Status atual: {formatAppointmentStatus(appointment.status)}
+          </Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Sincronizacao: {formatAppointmentSyncStatus(appointment.syncStatus)}
+          </Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Observacoes: {appointment.notes || 'Sem observacoes'}
+          </Text>
+        </Card>
+
+        <Card className="gap-3">
+          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Atualizar status</Text>
+          <View className="flex-row flex-wrap gap-2">
+            {statusOptions.map((status) => (
+              <Button
+                key={status}
+                label={formatAppointmentStatus(status)}
+                fullWidth={false}
+                variant={status === appointment.status ? 'secondary' : 'ghost'}
+                onPress={() => void handleUpdateStatus(status)}
+                disabled={isMutating || status === appointment.status}
+              />
+            ))}
+          </View>
         </Card>
       </View>
 
-      <View className="gap-2">
-        <Button label="Editar atendimento" onPress={() => router.push('./edit')} />
-        <Button label="Voltar para lista" variant="ghost" onPress={() => router.replace('../')} />
+      <View className="gap-2 pt-4">
+        <Button label="Editar atendimento" onPress={() => router.push('./edit')} disabled={isMutating} />
+        <Button
+          label={deleteAppointmentMutation.isPending ? 'Excluindo...' : 'Excluir atendimento'}
+          variant="danger"
+          onPress={handleDeleteAppointment}
+          disabled={isMutating}
+        />
+        <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} disabled={isMutating} />
       </View>
     </View>
   );

@@ -34,6 +34,7 @@ export interface NotificationPreferences {
 
 export interface UserNotificationProfile {
   uid: string;
+  role: NotificationUserRole | null;
   salonId: string | null;
   displayName: string;
   fcmTokens: string[];
@@ -44,6 +45,11 @@ export interface NotificationCreationResult {
   id: string;
   created: boolean;
 }
+
+export type NotificationUserRole =
+  | "super_admin"
+  | "salon_owner"
+  | "nail_technician";
 
 function readRecord(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null) {
@@ -87,6 +93,24 @@ function readStringArray(value: unknown): string[] {
   return [...new Set(normalizedTokens)];
 }
 
+function readUserRole(value: unknown): NotificationUserRole | null {
+  const normalizedValue = readOptionalString(value).toLowerCase();
+
+  if (normalizedValue === "manicure") {
+    return "nail_technician";
+  }
+
+  if (
+    normalizedValue === "super_admin" ||
+    normalizedValue === "salon_owner" ||
+    normalizedValue === "nail_technician"
+  ) {
+    return normalizedValue;
+  }
+
+  return null;
+}
+
 function normalizePreReminderMinutes(value: number): number {
   const boundedValue = Math.floor(value);
 
@@ -110,6 +134,7 @@ export function readUserNotificationProfile(
 
   return {
     uid,
+    role: readUserRole(root.role),
     salonId: readNullableString(root.salonId),
     displayName: readOptionalString(root.displayName),
     fcmTokens: readStringArray(root.fcmTokens),

@@ -1,4 +1,10 @@
 
+> ⚠️ ESCOPO DESTE DOCUMENTO
+> Esta stack (PostgreSQL + NestJS + Next.js) NÃO se aplica à Fase A (piloto).
+> A Fase A usa Firebase + Expo (ver `docs/prompt.md` §3) por custo quase zero e velocidade.
+> Este documento descreve a arquitetura-alvo da Fase B (SaaS app + portal web),
+> a ser adotada após validação do piloto, via ADR de migração.
+
 ### Componentes serverless complementares
 
 Mesmo no monolito, use **serverless para tarefas pontuais**:

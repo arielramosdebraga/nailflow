@@ -28,6 +28,9 @@ export function Button({
   fullWidth = true,
   className,
   disabled,
+  accessibilityRole,
+  accessibilityLabel,
+  accessibilityState,
   ...props
 }: ButtonProps) {
   const widthClassName = fullWidth ? 'w-full' : '';
@@ -36,6 +39,12 @@ export function Button({
     <Pressable
       className={`h-12 items-center justify-center rounded-xl px-4 active:opacity-90 ${widthClassName} ${variantClassNames[variant]} ${disabled ? 'opacity-60' : ''} ${className ?? ''}`}
       disabled={disabled}
+      accessibilityRole={accessibilityRole ?? 'button'}
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{
+        disabled: Boolean(disabled),
+        ...accessibilityState,
+      }}
       {...props}
     >
       <Text className={`text-base font-semibold ${textVariantClassNames[variant]}`}>{label}</Text>

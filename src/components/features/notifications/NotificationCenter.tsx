@@ -34,6 +34,13 @@ interface NotificationSection {
   data: AppNotification[];
 }
 
+const STATE_MESSAGES = {
+  loading: 'Carregando notificacoes...',
+  empty: 'Nenhuma notificacao encontrada nos ultimos dias.',
+  feedError: 'Nao foi possivel carregar a lista de notificacoes.',
+  unreadError: 'Nao foi possivel atualizar o total de notificacoes nao lidas.',
+};
+
 function formatDateTime(date: Date | null): string {
   if (!date) {
     return 'Agora';
@@ -245,18 +252,30 @@ export function NotificationCenter({
             className="h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
             accessibilityRole="button"
             accessibilityLabel="Abrir configuracoes de notificacao"
+            accessibilityHint="Abre a tela para ajustar tipos de alerta e horarios."
           >
             <Settings2 size={18} color="#52525b" />
           </Pressable>
         </View>
 
-        <View className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <View
+          className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+          accessible
+          accessibilityLabel={`Total de notificacoes nao lidas: ${unread.unreadCount}.`}
+        >
           <View className="flex-row items-center justify-between">
             <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Nao lidas</Text>
-            <Text className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{unread.unreadCount}</Text>
+            <Text
+              className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
+              accessibilityLiveRegion="polite"
+            >
+              {unread.unreadCount}
+            </Text>
           </View>
           {unread.errorMessage ? (
-            <Text className="pt-2 text-sm text-error">{unread.errorMessage}</Text>
+            <Text className="pt-2 text-sm text-error" accessibilityLiveRegion="polite">
+              {`${STATE_MESSAGES.unreadError} ${unread.errorMessage}`}
+            </Text>
           ) : null}
           {unread.unreadCount > 0 ? (
             <Pressable
@@ -264,6 +283,8 @@ export function NotificationCenter({
               className="mt-3 h-10 items-center justify-center rounded-xl bg-primary px-4 active:opacity-90"
               accessibilityRole="button"
               accessibilityLabel="Marcar todas as notificacoes como lidas"
+              accessibilityHint="Define todas as notificacoes da lista como lidas."
+              accessibilityState={{ disabled: feed.isLoading }}
             >
               <Text className="text-sm font-semibold text-white">Marcar todas como lidas</Text>
             </Pressable>
@@ -273,22 +294,27 @@ export function NotificationCenter({
 
       {feed.errorMessage ? (
         <Card>
-          <Text className="text-sm text-error">{feed.errorMessage}</Text>
+          <Text className="text-sm text-error" accessibilityLiveRegion="polite">
+            {`${STATE_MESSAGES.feedError} ${feed.errorMessage}`}
+          </Text>
         </Card>
       ) : null}
 
       {feed.isLoading || unread.isLoading ? (
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando notificacoes...</Text>
+        <Card accessible accessibilityLabel={STATE_MESSAGES.loading}>
+          <Text
+            className="text-sm text-zinc-600 dark:text-zinc-300"
+            accessibilityLiveRegion="polite"
+          >
+            {STATE_MESSAGES.loading}
+          </Text>
         </Card>
       ) : null}
 
       {!feed.isLoading && !unread.isLoading && !hasNotifications ? (
-        <Card className="items-center gap-2">
+        <Card className="items-center gap-2" accessible accessibilityLabel={STATE_MESSAGES.empty}>
           <Bell size={20} color="#52525b" />
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Nenhuma notificacao encontrada nos ultimos dias.
-          </Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">{STATE_MESSAGES.empty}</Text>
         </Card>
       ) : null}
 
@@ -298,8 +324,12 @@ export function NotificationCenter({
           keyExtractor={(item) => item.id}
           stickySectionHeadersEnabled={false}
           contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
+          accessibilityLabel="Lista de notificacoes"
           renderSectionHeader={({ section }) => (
-            <Text className="pt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <Text
+              className="pt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+              accessibilityRole="header"
+            >
               {section.title}
             </Text>
           )}
@@ -317,6 +347,13 @@ export function NotificationCenter({
                       ? 'border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
                       : 'border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
                   }`}
+                  accessible
+                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabel}. ${item.read ? 'Notificacao lida' : 'Notificacao nao lida'}.`}
+                  accessibilityHint={
+                    item.read
+                      ? undefined
+                      : 'Deslize para a esquerda ou use o botao para marcar como lida.'
+                  }
                 >
                   <View className="flex-row items-center justify-between gap-2">
                     <Text className="flex-1 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
@@ -338,6 +375,9 @@ export function NotificationCenter({
                       <Pressable
                         onPress={() => void feed.markOneAsRead(item.id)}
                         className="rounded-lg border border-zinc-300 px-3 py-1 active:opacity-80 dark:border-zinc-700"
+                        accessibilityRole="button"
+                        accessibilityLabel="Marcar notificacao como lida"
+                        accessibilityHint="Atualiza somente esta notificacao para status de lida."
                       >
                         <Text className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
                           Marcar lida

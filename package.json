@@ -62,7 +62,7 @@
     "format": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "echo \"Maestro E2E ainda nao configurado\" && exit 1",
+    "test:e2e": "node scripts/run-maestro.mjs",
     "seed:test-accounts": "node scripts/seed-test-accounts.mjs",
     "prepare": "husky"
   },

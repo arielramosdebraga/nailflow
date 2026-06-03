@@ -145,5 +145,9 @@ service cloud.firestore {
     match /syncQueue/{taskId} {
       allow read, write: if false;
     }
+
+    match /syncQueueDeadLetter/{taskId} {
+      allow read, write: if false;
+    }
   }
 }

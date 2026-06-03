@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
 
@@ -103,6 +103,29 @@ export default function LoginScreen() {
         />
 
         {googleAuth.googleError ? <Text className="text-sm text-error">{googleAuth.googleError}</Text> : null}
+
+        <View className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+          <Text className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+            Ao continuar, voce declara que leu nossa Politica de Privacidade e os Termos e Consentimento
+            para uso e tratamento de dados.
+          </Text>
+          <View className="mt-3 gap-2">
+            <Link href="/privacy-policy" asChild>
+              <Pressable accessibilityRole="link">
+                <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+                  Abrir Politica de Privacidade
+                </Text>
+              </Pressable>
+            </Link>
+            <Link href="/terms-consent" asChild>
+              <Pressable accessibilityRole="link">
+                <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+                  Abrir Termos e Consentimento
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        </View>
 
         <View className="gap-2">
           <Pressable onPress={() => router.push('/recover')} accessibilityRole="button">
