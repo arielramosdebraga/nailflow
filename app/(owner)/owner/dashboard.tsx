@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { endOfDay, startOfDay } from 'date-fns';
 
@@ -13,6 +13,20 @@ import { useCommands } from '@/hooks/commands/useCommands';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useManicures } from '@/hooks/users/useManicures';
 import { formatCurrency } from '@/components/features/commands/commandFormatters';
+
+const ownerRoutes = {
+  notifications: '/owner/notifications',
+  commands: '/owner/commands',
+  agenda: '/owner/agenda',
+  manicures: '/owner/manicures',
+  googleCalendar: '/nail-technician/google-calendar',
+  login: '/login',
+} as const satisfies Record<string, Href>;
+
+const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]',
+  params: { commandId },
+});
 
 export default function OwnerDashboardScreen() {
   const router = useRouter();
@@ -51,7 +65,7 @@ export default function OwnerDashboardScreen() {
             </Text>
             <NotificationsBellButton
               unreadCount={unreadNotifications.unreadCount}
-              onPress={() => router.push('./notifications')}
+              onPress={() => router.push(ownerRoutes.notifications)}
             />
           </View>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
@@ -112,13 +126,17 @@ export default function OwnerDashboardScreen() {
             </Card>
 
             <View className="gap-2">
-              <Button label="Gerenciar comandas" onPress={() => router.push('./commands')} />
-              <Button label="Agenda consolidada do dia" variant="secondary" onPress={() => router.push('./agenda')} />
-              <Button label="Lista de manicures" variant="ghost" onPress={() => router.push('./manicures')} />
+              <Button label="Gerenciar comandas" onPress={() => router.push(ownerRoutes.commands)} />
+              <Button
+                label="Agenda consolidada do dia"
+                variant="secondary"
+                onPress={() => router.push(ownerRoutes.agenda)}
+              />
+              <Button label="Lista de manicures" variant="ghost" onPress={() => router.push(ownerRoutes.manicures)} />
               <Button
                 label="Conectar Google Agenda"
                 variant="ghost"
-                onPress={() => router.push('/nail-technician/google-calendar')}
+                onPress={() => router.push(ownerRoutes.googleCalendar)}
               />
             </View>
 
@@ -132,7 +150,7 @@ export default function OwnerDashboardScreen() {
                       command={command}
                       clientName={clientsById.get(command.clientId)?.name}
                       manicureName={manicuresById.get(command.manicureId)?.displayName}
-                      onPress={() => router.push(`./commands/${command.id}`)}
+                      onPress={() => router.push(getOwnerCommandDetailsRoute(command.id))}
                     />
                   ))}
                 </View>
@@ -148,7 +166,7 @@ export default function OwnerDashboardScreen() {
           variant="ghost"
           onPress={async () => {
             await authSession.signOut();
-            router.replace('/login');
+            router.replace(ownerRoutes.login);
           }}
         />
       </View>

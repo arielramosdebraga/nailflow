@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
@@ -17,8 +17,10 @@ interface AdminHeaderProps {
 interface NavigationItem {
   key: AdminRoute;
   label: string;
-  href: '/admin/dashboard' | '/admin/audit-logs';
+  href: Href;
 }
+
+const adminLoginRoute = '/login' satisfies Href;
 
 const navigationItems: NavigationItem[] = [
   { key: 'dashboard', label: 'Dashboard', href: '/admin/dashboard' },
@@ -62,7 +64,7 @@ export function AdminHeader({ title, subtitle, activeRoute, accessory }: AdminHe
         className="self-start rounded-xl border border-zinc-300 bg-white px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900"
         onPress={async () => {
           await authSession.signOut();
-          router.replace('/login');
+          router.replace(adminLoginRoute);
         }}
       >
         <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
