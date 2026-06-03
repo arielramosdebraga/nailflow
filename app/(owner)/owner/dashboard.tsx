@@ -1,16 +1,32 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { endOfDay, startOfDay } from 'date-fns';
 
 import { CommandCard } from '@/components/features/commands/CommandCard';
+import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useClients } from '@/hooks/clients/useClients';
 import { useCommands } from '@/hooks/commands/useCommands';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useManicures } from '@/hooks/users/useManicures';
 import { formatCurrency } from '@/components/features/commands/commandFormatters';
+
+const ownerRoutes = {
+  notifications: '/owner/notifications',
+  commands: '/owner/commands',
+  agenda: '/owner/agenda',
+  manicures: '/owner/manicures',
+  googleCalendar: '/nail-technician/google-calendar',
+  login: '/login',
+} as const satisfies Record<string, Href>;
+
+const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]',
+  params: { commandId },
+});
 
 export default function OwnerDashboardScreen() {
   const router = useRouter();
@@ -23,6 +39,7 @@ export default function OwnerDashboardScreen() {
   });
   const clientsQuery = useClients({ limitCount: 200 });
   const manicuresQuery = useManicures({ limitCount: 50 });
+  const unreadNotifications = useUnreadNotificationsCount();
 
   const commands = commandsQuery.data ?? [];
   const closedCommands = commands.filter((item) => item.status === 'closed');
@@ -42,7 +59,15 @@ export default function OwnerDashboardScreen() {
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
         <View className="gap-2 pb-5">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard do salao</Text>
+          <View className="flex-row items-center justify-between gap-3">
+            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              Dashboard do salao
+            </Text>
+            <NotificationsBellButton
+              unreadCount={unreadNotifications.unreadCount}
+              onPress={() => router.push(ownerRoutes.notifications)}
+            />
+          </View>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
             Visao rapida de comandas, agenda do dia e equipe.
           </Text>
@@ -101,13 +126,17 @@ export default function OwnerDashboardScreen() {
             </Card>
 
             <View className="gap-2">
-              <Button label="Gerenciar comandas" onPress={() => router.push('./commands')} />
-              <Button label="Agenda consolidada do dia" variant="secondary" onPress={() => router.push('./agenda')} />
-              <Button label="Lista de manicures" variant="ghost" onPress={() => router.push('./manicures')} />
+              <Button label="Gerenciar comandas" onPress={() => router.push(ownerRoutes.commands)} />
+              <Button
+                label="Agenda consolidada do dia"
+                variant="secondary"
+                onPress={() => router.push(ownerRoutes.agenda)}
+              />
+              <Button label="Lista de manicures" variant="ghost" onPress={() => router.push(ownerRoutes.manicures)} />
               <Button
                 label="Conectar Google Agenda"
                 variant="ghost"
-                onPress={() => router.push('/(nail-technician)/nail-technician/google-calendar')}
+                onPress={() => router.push(ownerRoutes.googleCalendar)}
               />
             </View>
 
@@ -121,7 +150,7 @@ export default function OwnerDashboardScreen() {
                       command={command}
                       clientName={clientsById.get(command.clientId)?.name}
                       manicureName={manicuresById.get(command.manicureId)?.displayName}
-                      onPress={() => router.push(`./commands/${command.id}`)}
+                      onPress={() => router.push(getOwnerCommandDetailsRoute(command.id))}
                     />
                   ))}
                 </View>
@@ -137,7 +166,7 @@ export default function OwnerDashboardScreen() {
           variant="ghost"
           onPress={async () => {
             await authSession.signOut();
-            router.replace('/login');
+            router.replace(ownerRoutes.login);
           }}
         />
       </View>

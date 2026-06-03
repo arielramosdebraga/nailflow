@@ -9,3 +9,6 @@
   - Validações executadas
   - Riscos / pendências
   - Próximos passos
+- [ ] A descrição final da sprint deve ser entregue dentro de bloco Markdown fenced para facilitar cópia:
+  - Abrir com ```md
+  - Fechar com ```

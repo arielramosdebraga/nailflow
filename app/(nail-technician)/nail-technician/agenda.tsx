@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
+import { NotificationsBellButton } from '@/components/features/notifications';
 import { GoogleCalendarSyncStatusTag } from '@/components/features/google';
 import {
   AgendaCalendar,
@@ -13,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useGoogleCalendarConnection } from '@/hooks/google';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useAppointments } from '@/hooks/appointments';
 import { useClients } from '@/hooks/clients/useClients';
 import type { Appointment } from '@/schemas/appointments/appointment.schema';
@@ -51,6 +53,7 @@ export default function NailTechnicianAgendaScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
   const googleConnection = useGoogleCalendarConnection();
+  const unreadNotifications = useUnreadNotificationsCount();
   const role = useSessionStore((state) => state.role);
   const userId = useSessionStore((state) => state.userId);
 
@@ -83,10 +86,18 @@ export default function NailTechnicianAgendaScreen() {
     <View className="flex-1 justify-between bg-zinc-50 p-6 dark:bg-zinc-950">
       <View className="flex-1 gap-4 pt-10">
         <View className="gap-2">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Agenda de atendimentos</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Acompanhe os horarios do dia e da semana com acesso rapido para criar, editar e consultar detalhes.
-          </Text>
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-1 gap-2">
+              <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Agenda de atendimentos</Text>
+              <Text className="text-base text-zinc-600 dark:text-zinc-300">
+                Acompanhe os horarios do dia e da semana com acesso rapido para criar, editar e consultar detalhes.
+              </Text>
+            </View>
+            <NotificationsBellButton
+              unreadCount={unreadNotifications.unreadCount}
+              onPress={() => router.push('./notifications')}
+            />
+          </View>
         </View>
 
         <AgendaViewToggle mode={mode} onChangeMode={setMode} />

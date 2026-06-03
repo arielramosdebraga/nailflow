@@ -1,13 +1,18 @@
+import { useRouter } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 
 import { AdminHeader, AdminKpiCards } from '@/components/features/admin';
+import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAdminSessionGuard, useGlobalDashboard } from '@/hooks/admin';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 
 export default function AdminDashboardScreen() {
+  const router = useRouter();
   useAdminSessionGuard();
   const dashboardQuery = useGlobalDashboard({ includeInactiveSalons: true });
+  const unreadNotifications = useUnreadNotificationsCount();
 
   return (
     <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
@@ -15,6 +20,12 @@ export default function AdminDashboardScreen() {
         title="Dashboard global"
         subtitle="KPIs reais de operacao do NailFlow para acompanhamento do superadministrador."
         activeRoute="dashboard"
+        accessory={
+          <NotificationsBellButton
+            unreadCount={unreadNotifications.unreadCount}
+            onPress={() => router.push('./notifications')}
+          />
+        }
       />
 
       <View className="gap-3 pt-6">

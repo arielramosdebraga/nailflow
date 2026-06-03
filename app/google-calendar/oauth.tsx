@@ -1,13 +1,15 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
+
+const googleCalendarRoute = '/nail-technician/google-calendar' satisfies Href;
 
 export default function GoogleCalendarOAuthRedirectScreen() {
   const router = useRouter();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.replace('/(nail-technician)/nail-technician/google-calendar');
+      router.replace(googleCalendarRoute);
     }, 1200);
 
     return () => clearTimeout(timeout);

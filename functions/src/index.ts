@@ -36,6 +36,12 @@ import {
   reconcileGoogleCalendarAtNight,
   renewGoogleCalendarWatchChannels,
 } from "./google/watch-scheduler";
+import {
+  onAppointmentCreatedNotifyUsers,
+  onAppointmentUpdatedNotifyUsers,
+  onUserGoogleStatusUpdatedNotifyUsers,
+  sendPreReminderNotifications,
+} from "./notifications/triggers";
 import {createSalon} from "./salons/create-salon";
 
 setGlobalOptions({
@@ -73,5 +79,9 @@ export {
   onGoogleCalendarSyncQueueCreated,
   renewGoogleCalendarWatchChannels,
   reconcileGoogleCalendarAtNight,
+  onAppointmentCreatedNotifyUsers,
+  onAppointmentUpdatedNotifyUsers,
+  onUserGoogleStatusUpdatedNotifyUsers,
+  sendPreReminderNotifications,
 };
 
