@@ -15,7 +15,9 @@ interface SessionState {
   salonId: string | null;
   secondFactorRequired: boolean;
   secondFactorVerified: boolean;
+  lastActivityAt: number | null;
   setLoading: () => void;
+  touchActivity: () => void;
   signIn: (params: { userId: string; role: UserRole; salonId: string | null }) => void;
   completeSecondFactor: () => void;
   signOut: () => void;
@@ -28,8 +30,21 @@ export const useSessionStore = create<SessionState>((set) => ({
   salonId: null,
   secondFactorRequired: false,
   secondFactorVerified: false,
+  lastActivityAt: null,
   setLoading: () => {
     set({ status: 'loading' });
+  },
+  touchActivity: () => {
+    set((state) => {
+      if (!state.userId) {
+        return state;
+      }
+
+      return {
+        ...state,
+        lastActivityAt: Date.now(),
+      };
+    });
   },
   signIn: ({ userId, role, salonId }) => {
     set((state) => {
@@ -44,6 +59,7 @@ export const useSessionStore = create<SessionState>((set) => ({
         salonId,
         secondFactorRequired,
         secondFactorVerified,
+        lastActivityAt: Date.now(),
       };
     });
   },
@@ -57,6 +73,7 @@ export const useSessionStore = create<SessionState>((set) => ({
         ...state,
         status: 'authenticated',
         secondFactorVerified: true,
+        lastActivityAt: Date.now(),
       };
     });
   },
@@ -68,6 +85,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       salonId: null,
       secondFactorRequired: false,
       secondFactorVerified: false,
+      lastActivityAt: null,
     });
   },
 }));

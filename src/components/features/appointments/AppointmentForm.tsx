@@ -17,7 +17,7 @@ import {
 import { type Client } from '@/schemas/clients/client.schema';
 import { formatAppointmentStatus } from '@/components/features/appointments/appointmentFormatters';
 
-interface AppointmentFormValues {
+export interface AppointmentFormValues {
   clientId: string;
   startDate: string;
   startTime: string;
