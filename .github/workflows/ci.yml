@@ -37,4 +37,10 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Functions lint
+        run: pnpm --dir functions lint
+
+      - name: Functions build
+        run: pnpm --dir functions build
+
 

@@ -14,6 +14,9 @@ describe('appointment schemas', () => {
       endTime: new Date('2026-06-02T13:00:00.000Z'),
       notes: 'Cliente prefere esmalte claro.',
       priceCents: 9500,
+      googleEventId: 'google-event-001',
+      syncStatus: 'synced',
+      syncUpdatedAt: new Date('2026-05-10T10:05:00.000Z'),
       createdAt: new Date('2026-05-01T10:00:00.000Z'),
       updatedAt: new Date('2026-05-10T10:00:00.000Z'),
     });
@@ -34,5 +37,29 @@ describe('appointment schemas', () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it('deve aplicar syncStatus padrao quando nao informado', () => {
+    const result = AppointmentSchema.safeParse({
+      id: 'apt-002',
+      salonId: 'salon-001',
+      manicureId: 'user-123',
+      clientId: 'client-456',
+      status: 'scheduled',
+      startTime: new Date('2026-06-02T12:00:00.000Z'),
+      endTime: new Date('2026-06-02T13:00:00.000Z'),
+      notes: '',
+      priceCents: 8000,
+      syncUpdatedAt: null,
+      createdAt: new Date('2026-05-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-05-10T10:00:00.000Z'),
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) {
+      return;
+    }
+
+    expect(result.data.syncStatus).toBe('disabled');
   });
 });

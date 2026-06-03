@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
+import { GoogleCalendarSyncStatusTag } from '@/components/features/google';
 import {
   AgendaCalendar,
   AgendaViewToggle,
@@ -11,6 +12,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useGoogleCalendarConnection } from '@/hooks/google';
 import { useAppointments } from '@/hooks/appointments';
 import { useClients } from '@/hooks/clients/useClients';
 import type { Appointment } from '@/schemas/appointments/appointment.schema';
@@ -33,9 +35,22 @@ function mapAppointmentToCardItem(
   };
 }
 
+function getGoogleStatusDescription(syncIndicator: ReturnType<typeof useGoogleCalendarConnection>['syncIndicator']) {
+  if (syncIndicator === 'connected') {
+    return 'Conta conectada e pronta para sincronizar os atendimentos.';
+  }
+
+  if (syncIndicator === 'error') {
+    return 'Erro de sincronização detectado. Revise a conexão para continuar.';
+  }
+
+  return 'Conexão pendente. Finalize o OAuth para ativar a sincronização.';
+}
+
 export default function NailTechnicianAgendaScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
+  const googleConnection = useGoogleCalendarConnection();
   const role = useSessionStore((state) => state.role);
   const userId = useSessionStore((state) => state.userId);
 
@@ -76,6 +91,28 @@ export default function NailTechnicianAgendaScreen() {
 
         <AgendaViewToggle mode={mode} onChangeMode={setMode} />
         <AgendaCalendar referenceDate={referenceDate} mode={mode} onChangeReferenceDate={setReferenceDate} />
+
+        <Card className="gap-3">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-1 gap-1">
+              <Text className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Sincronização Google Agenda</Text>
+              <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+                {getGoogleStatusDescription(googleConnection.syncIndicator)}
+              </Text>
+            </View>
+            <GoogleCalendarSyncStatusTag status={googleConnection.syncIndicator} />
+          </View>
+
+          {googleConnection.errorMessage ? (
+            <Text className="text-sm text-error">{googleConnection.errorMessage}</Text>
+          ) : null}
+
+          <Button
+            label="Gerenciar Google Agenda"
+            variant="secondary"
+            onPress={() => router.push('./google-calendar')}
+          />
+        </Card>
 
         <View className="flex-row gap-2">
           <Button label="Novo atendimento" className="flex-1" onPress={() => router.push('./appointments/new')} />

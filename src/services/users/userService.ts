@@ -129,6 +129,9 @@ export async function createUserProfile(params: CreateUserProfileParams): Promis
       salonId: params.salonId ?? null,
       googleCalendar: {
         connected: false,
+        syncStatus: 'idle',
+        tokenVersion: 1,
+        isRefreshingToken: false,
       },
       notificationPreferences: {
         newAppointment: true,

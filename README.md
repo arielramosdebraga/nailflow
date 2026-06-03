@@ -19,7 +19,10 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
   - Cloud Function `createSalon`
   - setup funcional básico de FCM/Storage
   - Husky + lint-staged + CI (lint/typecheck/test)
-- Próxima etapa: Sprint 3 (agenda e atendimentos)
+- Sprint 3: concluída
+- Sprint 4: concluída
+- Sprint 5: concluída
+- Sprint 6: em andamento (Google Calendar OAuth + sync App->Google)
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)
@@ -59,6 +62,8 @@ EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
 EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
 EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_CALENDAR_BEGIN_CALLABLE=beginGoogleCalendarConnection
+EXPO_PUBLIC_GOOGLE_CALENDAR_CONFIRM_CALLABLE=completeGoogleCalendarConnection
 EXPO_PUBLIC_EAS_PROJECT_ID=
 ```
 
@@ -113,6 +118,18 @@ cd functions
 npm install
 npm run build
 npm run serve
+```
+
+### Variáveis de ambiente das Functions (Sprint 6)
+
+Defina no ambiente das funções:
+
+```env
+GOOGLE_CALENDAR_CLIENT_ID=
+GOOGLE_CALENDAR_CLIENT_SECRET=
+GOOGLE_CALENDAR_REDIRECT_URI=
+GOOGLE_TOKEN_ENCRYPTION_SECRET=
+GOOGLE_CALENDAR_STATE_TTL_SECONDS=600
 ```
 
 Deploy de functions:
