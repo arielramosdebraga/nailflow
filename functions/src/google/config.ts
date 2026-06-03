@@ -7,6 +7,9 @@ export interface GoogleOAuthConfig {
   redirectUri: string;
 }
 
+const DEFAULT_WATCH_RENEW_AHEAD_SECONDS = 6 * 60 * 60;
+const DEFAULT_RECONCILE_LOOKBACK_DAYS = 90;
+
 const GOOGLE_CALENDAR_SCOPES: readonly string[] = [
   "https://www.googleapis.com/auth/calendar",
   "https://www.googleapis.com/auth/calendar.events",
@@ -44,6 +47,23 @@ export function getGoogleOAuthConfig(): GoogleOAuthConfig {
 
 export function getGoogleCalendarScopes(): string[] {
   return [...GOOGLE_CALENDAR_SCOPES];
+}
+
+export function getGoogleCalendarWebhookUrl(): string {
+  return requireEnvValue(
+    process.env.GOOGLE_CALENDAR_WEBHOOK_URL,
+    "GOOGLE_CALENDAR_WEBHOOK_URL"
+  );
+}
+
+export function getGoogleCalendarWatchTokenSecret(): string {
+  const explicitSecret = process.env.GOOGLE_CALENDAR_WATCH_TOKEN_SECRET;
+
+  if (typeof explicitSecret === "string" && explicitSecret.trim().length > 0) {
+    return explicitSecret.trim();
+  }
+
+  return getGoogleTokenEncryptionSecret();
 }
 
 export function getGoogleTokenEncryptionSecret(): string {
@@ -88,6 +108,38 @@ export function getOAuthStateTtlMs(): number {
   }
 
   return parsed * 1000;
+}
+
+export function getGoogleCalendarWatchRenewAheadMs(): number {
+  const raw = process.env.GOOGLE_CALENDAR_WATCH_RENEW_AHEAD_SECONDS;
+
+  if (typeof raw !== "string" || raw.trim().length === 0) {
+    return DEFAULT_WATCH_RENEW_AHEAD_SECONDS * 1000;
+  }
+
+  const parsed = Number.parseInt(raw.trim(), 10);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_WATCH_RENEW_AHEAD_SECONDS * 1000;
+  }
+
+  return parsed * 1000;
+}
+
+export function getGoogleCalendarReconcileLookbackDays(): number {
+  const raw = process.env.GOOGLE_CALENDAR_RECONCILE_LOOKBACK_DAYS;
+
+  if (typeof raw !== "string" || raw.trim().length === 0) {
+    return DEFAULT_RECONCILE_LOOKBACK_DAYS;
+  }
+
+  const parsed = Number.parseInt(raw.trim(), 10);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_RECONCILE_LOOKBACK_DAYS;
+  }
+
+  return parsed;
 }
 
 export function buildDedicatedCalendarSummary(

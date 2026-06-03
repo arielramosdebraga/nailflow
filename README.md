@@ -22,7 +22,8 @@ Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autentica�
 - Sprint 3: concluída
 - Sprint 4: concluída
 - Sprint 5: concluída
-- Sprint 6: em andamento (Google Calendar OAuth + sync App->Google)
+- Sprint 6: concluída
+- Sprint 7: em andamento (Sync Google->App + reconciliação)
 
 Para detalhes completos, consulte:
 - [docs/planejamento.md](./docs/planejamento.md)
@@ -120,7 +121,7 @@ npm run build
 npm run serve
 ```
 
-### Variáveis de ambiente das Functions (Sprint 6)
+### Variáveis de ambiente das Functions (Sprints 6 e 7)
 
 Defina no ambiente das funções:
 
@@ -130,6 +131,10 @@ GOOGLE_CALENDAR_CLIENT_SECRET=
 GOOGLE_CALENDAR_REDIRECT_URI=
 GOOGLE_TOKEN_ENCRYPTION_SECRET=
 GOOGLE_CALENDAR_STATE_TTL_SECONDS=600
+GOOGLE_CALENDAR_WEBHOOK_URL=
+GOOGLE_CALENDAR_WATCH_TOKEN_SECRET=
+GOOGLE_CALENDAR_WATCH_RENEW_AHEAD_SECONDS=21600
+GOOGLE_CALENDAR_RECONCILE_LOOKBACK_DAYS=90
 ```
 
 Deploy de functions:

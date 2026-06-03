@@ -30,10 +30,13 @@ export const GoogleCalendarSchema = z.object({
     .enum(['idle', 'pending', 'authorizing', 'synced', 'disabled', 'expired', 'error'])
     .default('idle'),
   lastSyncedAt: z.string().optional(),
+  lastInboundSyncAt: z.string().optional(),
   lastErrorAt: z.string().optional(),
   lastErrorMessage: z.string().max(500).optional(),
   isRefreshingToken: z.boolean().default(false),
   watchChannelId: z.string().optional(),
+  watchResourceId: z.string().optional(),
+  watchChannelTokenHash: z.string().optional(),
   watchExpiration: z.string().optional(),
   syncToken: z.string().optional(),
 });
