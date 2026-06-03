@@ -29,6 +29,7 @@ import {
   onAppointmentDeletedSyncGoogleCalendar,
   onAppointmentUpdatedSyncGoogleCalendar,
 } from "./google/appointment-triggers";
+import {getGlobalDashboard} from "./admin/get-global-dashboard";
 import {onGoogleCalendarSyncQueueCreated} from "./google/sync-queue";
 import {receiveGoogleCalendarWatchWebhook} from "./google/watch-webhook";
 import {
@@ -62,6 +63,7 @@ export const health = onRequest((request, response) => {
 export {onUserCreated};
 export {
   createSalon,
+  getGlobalDashboard,
   getTotpStatus,
   beginTotpEnrollment,
   confirmTotpEnrollment,

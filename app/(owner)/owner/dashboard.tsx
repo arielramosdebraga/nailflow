@@ -118,7 +118,7 @@ export default function OwnerDashboardScreen() {
               <Button
                 label="Conectar Google Agenda"
                 variant="ghost"
-                onPress={() => router.push('/(nail-technician)/nail-technician/google-calendar')}
+                onPress={() => router.push('/nail-technician/google-calendar')}
               />
             </View>
 
