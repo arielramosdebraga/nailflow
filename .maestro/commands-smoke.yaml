@@ -1,0 +1,15 @@
+appId: host.exp.exponent
+tags:
+  - authenticated
+  - commands
+---
+- launchApp
+- assertVisible: "Dashboard do salao"
+- tapOn: "Gerenciar comandas"
+- assertVisible: "Comandas"
+- assertVisible: "Buscar por cliente, profissional ou ID"
+- assertVisible: "Nova comanda"
+- tapOn: "Abertas"
+- tapOn: "Fechadas"
+- tapOn: "Todas"
+

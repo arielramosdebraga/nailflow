@@ -1,0 +1,16 @@
+appId: host.exp.exponent
+tags:
+  - authenticated
+  - agenda
+---
+- launchApp
+- assertVisible: "Minha agenda"
+- assertVisible: "Google Agenda"
+- assertVisible: "Modo de visualizacao"
+- tapOn: "Semana"
+- assertVisible: "Atendimentos da semana"
+- tapOn: "Dia"
+- assertVisible: "Agenda do dia"
+- tapOn: "Mes"
+- assertVisible: "Novo atendimento"
+

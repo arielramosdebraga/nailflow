@@ -16,6 +16,7 @@ const MAX_USER_ID_LENGTH = 120;
 const MAX_ACTION_LENGTH = 80;
 const MAX_TARGET_TYPE_LENGTH = 64;
 const MAX_TARGET_ID_LENGTH = 120;
+const MAX_SALON_ID_LENGTH = 120;
 const MAX_METADATA_ENTRIES = 50;
 const MAX_METADATA_KEY_LENGTH = 64;
 const MAX_METADATA_STRING_LENGTH = 500;
@@ -23,6 +24,7 @@ const MAX_IP_LENGTH = 128;
 const MAX_USER_AGENT_LENGTH = 512;
 const MAX_REQUEST_ID_LENGTH = 120;
 
+export type AuditSource = "callable" | "trigger" | "scheduler" | "manual";
 export type AuditMetadataValue = string | number | boolean | null;
 export type AuditMetadata = Record<string, AuditMetadataValue>;
 
@@ -30,6 +32,30 @@ export interface AuditRequestMetadata {
   ipAddress: string | null;
   userAgent: string | null;
   requestId: string | null;
+}
+
+export interface AuditLogInput {
+  userId: string;
+  actorRole: string;
+  action: string;
+  targetType: string;
+  targetId?: string | null;
+  salonId?: string | null;
+  source: AuditSource;
+  ipAddress?: string | null;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ParsedAuditLogInput {
+  userId: string;
+  actorRole: UserRole;
+  action: string;
+  targetType: string;
+  targetId: string | null;
+  salonId: string | null;
+  source: AuditSource;
+  ipAddress: string | null;
+  metadata: AuditMetadata;
 }
 
 export interface WriteAuditLogInput {
@@ -82,13 +108,12 @@ function assertOptionalString(
     return null;
   }
 
-  const normalizedValue = assertNonEmptyString(value, fieldName, maxLength);
-  return normalizedValue;
+  return assertNonEmptyString(value, fieldName, maxLength);
 }
 
-function assertUserRole(value: unknown): UserRole {
+function assertUserRole(value: unknown, fieldName = "userRole"): UserRole {
   if (typeof value !== "string" || !USER_ROLES.has(value)) {
-    throw new HttpsError("invalid-argument", "userRole invalido para audit log.");
+    throw new HttpsError("invalid-argument", `${fieldName} invalido para audit log.`);
   }
 
   return value as UserRole;
@@ -120,6 +145,19 @@ function assertTargetType(value: unknown): string {
 
 function assertTargetId(value: unknown): string {
   return assertNonEmptyString(value, "targetId", MAX_TARGET_ID_LENGTH);
+}
+
+function assertAuditSource(value: unknown): AuditSource {
+  if (
+    value === "callable" ||
+    value === "trigger" ||
+    value === "scheduler" ||
+    value === "manual"
+  ) {
+    return value;
+  }
+
+  throw new HttpsError("invalid-argument", "source invalido para audit log.");
 }
 
 function assertMetadataValue(
@@ -185,8 +223,15 @@ function assertMetadata(value: unknown): AuditMetadata {
   const normalizedMetadata: AuditMetadata = {};
 
   for (const [key, rawValue] of entries) {
-    const normalizedKey = assertNonEmptyString(key, "metadata key", MAX_METADATA_KEY_LENGTH);
-    normalizedMetadata[normalizedKey] = assertMetadataValue(rawValue, normalizedKey);
+    const normalizedKey = assertNonEmptyString(
+      key,
+      "metadata key",
+      MAX_METADATA_KEY_LENGTH
+    );
+    normalizedMetadata[normalizedKey] = assertMetadataValue(
+      rawValue,
+      normalizedKey
+    );
   }
 
   return normalizedMetadata;
@@ -217,6 +262,43 @@ function assertRequestMetadata(value: unknown): AuditRequestMetadata {
   };
 }
 
+function legacyRequiredString(value: unknown, fieldName: string): string {
+  if (typeof value !== "string") {
+    throw new Error(`${fieldName} obrigatorio.`);
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    throw new Error(`${fieldName} obrigatorio.`);
+  }
+
+  return trimmedValue;
+}
+
+function legacyOptionalString(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+  return trimmedValue ? trimmedValue : null;
+}
+
+export function parseAuditLogInput(input: AuditLogInput): ParsedAuditLogInput {
+  return {
+    userId: legacyRequiredString(input.userId, "userId"),
+    actorRole: assertUserRole(legacyRequiredString(input.actorRole, "actorRole"), "actorRole"),
+    action: legacyRequiredString(input.action, "action"),
+    targetType: legacyRequiredString(input.targetType, "targetType"),
+    targetId: legacyOptionalString(input.targetId),
+    salonId: legacyOptionalString(input.salonId),
+    source: assertAuditSource(input.source),
+    ipAddress: legacyOptionalString(input.ipAddress),
+    metadata: assertMetadata(input.metadata),
+  };
+}
+
 export function parseWriteAuditLogInput(data: unknown): WriteAuditLogInput {
   if (typeof data !== "object" || data === null) {
     throw new HttpsError("invalid-argument", "Payload de audit log invalido.");
@@ -233,4 +315,8 @@ export function parseWriteAuditLogInput(data: unknown): WriteAuditLogInput {
     metadata: assertMetadata(payload.metadata),
     requestMetadata: assertRequestMetadata(payload.requestMetadata),
   };
+}
+
+export function parseOptionalSalonId(value: unknown): string | null {
+  return assertOptionalString(value, "salonId", MAX_SALON_ID_LENGTH);
 }

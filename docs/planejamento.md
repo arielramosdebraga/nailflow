@@ -33,17 +33,22 @@
 | 8 | 2–4 dias | Alta |
 | 13 | 4–7 dias | Muito alta (considerar quebrar) |
 
-### Status atual do projeto (atualizado em 01/06/2026)
+### Status atual do projeto (atualizado em 02/06/2026)
 - ✅ Sprint 0 concluída (pendências absorvidas e finalizadas na Sprint 2)
 - ✅ Sprint 1 concluída (2FA administrativo finalizado na Sprint 2)
 - ✅ Sprint 2 concluída
 - ✅ Sprint 3 concluída
 - ✅ Sprint 4 concluída
-- ⚠️ Sprint 5 parcialmente concluída (governança principal entregue; pendências residuais em configurações globais e exportação LGPD)
+- ✅ Sprint 5 concluída (pendências residuais finalizadas na Sprint 10)
 - ✅ Sprint 6 concluída
 - ✅ Sprint 7 concluída
 - ✅ Sprint 8 concluída
 - ✅ Sprint 9 concluída
+- ✅ Sprint 10 concluída no escopo de desenvolvimento
+
+### Leitura correta do status
+- ✅ 100% do escopo de desenvolvimento previsto no planejamento foi implementado e versionado no repositório.
+- ⚠️ O planejamento total ainda possui etapas operacionais fora do código, especialmente na Sprint 10: distribuição interna, onboarding presencial e coleta de feedback do piloto.
 
 ---
 
@@ -278,8 +283,8 @@
 - ✅ 5.5 Instrumentar ações sensíveis — concluído
 - ✅ 5.6 Tela de logs — concluído
 - ✅ 5.7 Sessão admin 1h — concluído
-- ❌ 5.8 Configurações globais — pendente
-- ❌ 5.9 Exportação LGPD — pendente
+- ✅ 5.8 Configurações globais — concluído na Sprint 10
+- ✅ 5.9 Exportação LGPD — concluído na Sprint 10
 
 ---
 
@@ -427,6 +432,19 @@
 - NPS >50
 - Retenção >90% em 30 dias
 
+### Status de execução (atualizado em 02/06/2026)
+- ✅ 10.1 Build EAS iOS + Android — concluído no escopo de desenvolvimento com `app.config.ts`, `eas.json`, scripts e preflight versionados
+- ⚠️ 10.2 Distribuição interna — preparada no escopo de desenvolvimento; execução operacional manual pendente
+- ⚠️ 10.3 Onboarding presencial — documentado; execução operacional manual pendente
+- ✅ 10.4 Monitoramento ativo — concluído no escopo de desenvolvimento com health check e tela de readiness do `super_admin`
+- ⚠️ 10.5 Coleta de feedback (7 dias) — preparada documentalmente; execução operacional manual pendente
+- ✅ 10.6 Hotfix bucket — reservado e pronto para uso após feedback do piloto
+- ✅ 10.7 Relatório + handoff Fase B — concluído com documentação de release e handoff
+
+### Observação de encerramento
+- A Sprint 10 está concluída no escopo de desenvolvimento versionado no repositório.
+- As etapas restantes dependem de operação externa ao código: credenciais do EAS, distribuição dos binários, onboarding em campo e coleta de feedback real.
+
 ---
 
 ## 📊 Resumo Consolidado
@@ -463,11 +481,11 @@
 
 ## 🎯 Próximos Passos
 
-1. Iniciar Sprint 10 com foco em release e piloto
-2. Preparar build EAS iOS e Android
-3. Executar distribuição interna e validação presencial
-4. Fechar pendências residuais da Sprint 5 (configurações globais e exportação LGPD)
-5. Consolidar monitoramento ativo, feedback do piloto e handoff da Fase B
+1. Executar `pnpm release:preflight` com as variáveis finais do ambiente
+2. Gerar builds EAS internos para Android e iOS
+3. Distribuir os binários do piloto e conduzir onboarding presencial
+4. Coletar feedback operacional do piloto e usar o hotfix bucket se necessário
+5. Consolidar aprendizados do piloto para priorização da Fase B
 
 ---
 

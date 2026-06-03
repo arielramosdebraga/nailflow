@@ -11,7 +11,8 @@ if (lookup.status !== 0) {
   process.exit(1);
 }
 
-const args = ['test', '.maestro'];
+const tags = process.env.MAESTRO_TAGS?.trim() || 'smoke';
+const args = ['test', '--include-tags', tags, '.maestro'];
 
 const result = spawnSync('maestro', args, {
   stdio: 'inherit',

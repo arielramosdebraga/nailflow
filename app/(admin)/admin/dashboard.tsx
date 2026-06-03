@@ -42,6 +42,21 @@ export default function AdminDashboardScreen() {
           />
         </View>
 
+        <View className="flex-row gap-2">
+          <Button
+            label="Central de notificacoes"
+            variant="secondary"
+            className="flex-1"
+            onPress={() => router.push('./notifications')}
+          />
+          <Button
+            label="Auditoria"
+            variant="ghost"
+            className="flex-1"
+            onPress={() => router.push('./audit-logs')}
+          />
+        </View>
+
         {dashboardQuery.isLoading && !dashboardQuery.data ? (
           <Card>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando KPIs do dashboard...</Text>
@@ -59,10 +74,7 @@ export default function AdminDashboardScreen() {
         ) : null}
 
         {dashboardQuery.data ? (
-          <AdminKpiCards
-            summary={dashboardQuery.data.summary}
-            generatedAt={dashboardQuery.data.generatedAt}
-          />
+          <AdminKpiCards summary={dashboardQuery.data.summary} generatedAt={dashboardQuery.data.generatedAt} />
         ) : null}
 
         <Card className="gap-3">

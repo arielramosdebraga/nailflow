@@ -26,6 +26,7 @@ import {
   type CommandStatus,
   type UpsertCommandInput,
 } from '@/schemas/commands/command.schema';
+import type { UserRole } from '@/schemas/users/user.schema';
 import { calculateCommandTotals } from '@/services/commands/command-totals';
 import { assertFirebaseConfigured, db } from '@/services/firebase';
 
@@ -36,6 +37,32 @@ interface ListCommandsParams {
   manicureId?: string;
   clientId?: string;
   appointmentId?: string;
+}
+
+interface UpdateCommandOptions {
+  actorRole?: UserRole;
+}
+
+interface CanReopenCommandParams {
+  currentStatus: CommandStatus;
+  nextStatus: CommandStatus;
+  actorRole: UserRole;
+}
+
+export function canReopenCommand(params: CanReopenCommandParams): boolean {
+  if (params.currentStatus !== 'closed' || params.nextStatus !== 'open') {
+    return true;
+  }
+
+  return params.actorRole === 'salon_owner' || params.actorRole === 'super_admin';
+}
+
+export function assertCanReopenCommand(params: CanReopenCommandParams): void {
+  if (canReopenCommand(params)) {
+    return;
+  }
+
+  throw new Error('Comanda fechada nao pode ser reaberta por este perfil.');
 }
 
 function toDateOrNull(value: unknown): Date | null {
@@ -229,7 +256,11 @@ export async function createCommand(input: UpsertCommandInput): Promise<string> 
   return commandRef.id;
 }
 
-export async function updateCommand(commandId: string, input: UpsertCommandInput): Promise<void> {
+export async function updateCommand(
+  commandId: string,
+  input: UpsertCommandInput,
+  options: UpdateCommandOptions = {},
+): Promise<void> {
   assertFirebaseConfigured();
   if (!db) {
     throw new Error('Banco Firestore indisponivel.');
@@ -246,8 +277,12 @@ export async function updateCommand(commandId: string, input: UpsertCommandInput
   }
 
   const existingStatus = CommandStatusSchema.safeParse(existingSnapshot.data().status);
-  if (existingStatus.success && existingStatus.data === 'closed' && parsed.status === 'open') {
-    throw new Error('Comanda fechada nao pode ser reaberta.');
+  if (existingStatus.success) {
+    assertCanReopenCommand({
+      currentStatus: existingStatus.data,
+      nextStatus: parsed.status,
+      actorRole: options.actorRole ?? 'nail_technician',
+    });
   }
 
   await updateDoc(commandRef, {
