@@ -1,24 +1,54 @@
 /* eslint-disable require-jsdoc */
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
-import {AuditLogInput, parseAuditLogInput} from "./audit-log.schema";
+import {
+  AuditMetadata,
+  WriteAuditLogInput,
+  parseWriteAuditLogInput,
+} from "./audit-log.schema";
 
-const AUDIT_LOGS_COLLECTION = "auditLogs";
+const SENSITIVE_KEY_PATTERN =
+  /(password|passwd|token|secret|authorization|cookie|session|refresh|cpf|cnpj|email|phone)/i;
+const REDACTED_VALUE = "[REDACTED]";
 
-export async function writeAuditLog(input: AuditLogInput): Promise<string> {
-  const parsed = parseAuditLogInput(input);
+function sanitizeMetadata(metadata: AuditMetadata): AuditMetadata {
+  const sanitizedMetadata: AuditMetadata = {};
 
-  const logRef = await getFirestore().collection(AUDIT_LOGS_COLLECTION).add({
-    userId: parsed.userId,
-    actorRole: parsed.actorRole,
-    action: parsed.action,
-    targetType: parsed.targetType,
-    targetId: parsed.targetId,
-    salonId: parsed.salonId,
-    source: parsed.source,
-    ipAddress: parsed.ipAddress,
-    metadata: parsed.metadata,
+  for (const [rawKey, rawValue] of Object.entries(metadata)) {
+    const key = rawKey.trim();
+
+    if (!key) {
+      continue;
+    }
+
+    if (SENSITIVE_KEY_PATTERN.test(key)) {
+      sanitizedMetadata[key] = REDACTED_VALUE;
+      continue;
+    }
+
+    sanitizedMetadata[key] = rawValue;
+  }
+
+  return sanitizedMetadata;
+}
+
+export async function writeAuditLog(input: WriteAuditLogInput): Promise<string> {
+  const payload = parseWriteAuditLogInput(input);
+  const metadata = sanitizeMetadata(payload.metadata ?? {});
+
+  const auditLogRef = getFirestore().collection("auditLogs").doc();
+
+  await auditLogRef.set({
+    userId: payload.userId,
+    userRole: payload.userRole,
+    action: payload.action,
+    targetType: payload.targetType,
+    targetId: payload.targetId,
+    metadata,
+    ipAddress: payload.requestMetadata.ipAddress,
+    userAgent: payload.requestMetadata.userAgent,
+    requestId: payload.requestMetadata.requestId,
     timestamp: FieldValue.serverTimestamp(),
   });
 
-  return logRef.id;
+  return auditLogRef.id;
 }

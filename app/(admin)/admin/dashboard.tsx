@@ -1,54 +1,82 @@
 import { useRouter } from 'expo-router';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
+import { AdminHeader, AdminKpiCards } from '@/components/features/admin';
 import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useAdminSessionGuard, useGlobalDashboard } from '@/hooks/admin';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
 
 export default function AdminDashboardScreen() {
+  useAdminSessionGuard();
   const router = useRouter();
-  const authSession = useAuthSession();
   const unreadNotifications = useUnreadNotificationsCount();
+  const dashboardQuery = useGlobalDashboard({ includeInactiveSalons: true });
 
   return (
-    <View className="flex-1 justify-between bg-zinc-50 p-6 dark:bg-zinc-950">
-      <View className="gap-2 pt-10">
-        <View className="flex-row items-center justify-between gap-3">
-          <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            Painel do Superadministrador
-          </Text>
-          <NotificationsBellButton
-            unreadCount={unreadNotifications.unreadCount}
-            onPress={() => router.push('./notifications')}
-          />
-        </View>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Governança global do NailFlow com auditoria, permissões e monitoramento operacional.
-        </Text>
-        <View className="gap-3 pt-4">
-          <Card className="gap-3">
-            <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Governança</Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Consulte saloes, usuarios administrativos e trilha de auditoria em um unico lugar.
-            </Text>
-            <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
-            <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
-            <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./logs')} />
-          </Card>
-        </View>
-        <Button label="Central de notificações" variant="secondary" onPress={() => router.push('./notifications')} />
+    <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
+      <View className="items-end pt-4">
+        <NotificationsBellButton
+          unreadCount={unreadNotifications.unreadCount}
+          onPress={() => router.push('./notifications')}
+        />
       </View>
 
-      <Button
-        label={authSession.isLoading ? 'Saindo...' : 'Sair'}
-        variant="ghost"
-        onPress={async () => {
-          await authSession.signOut();
-          router.replace('/login');
-        }}
+      <AdminHeader
+        title="Painel do Superadministrador"
+        subtitle="Governanca global do NailFlow com KPIs, auditoria e atalhos operacionais."
+        activeRoute="dashboard"
       />
-    </View>
+
+      <View className="gap-3 pt-6">
+        <View className="flex-row items-center justify-between gap-3">
+          <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Indicadores</Text>
+          <Button
+            label={dashboardQuery.isFetching ? 'Atualizando...' : 'Atualizar'}
+            onPress={() => {
+              void dashboardQuery.refetch();
+            }}
+            fullWidth={false}
+            disabled={dashboardQuery.isFetching}
+            className="h-10 rounded-lg px-3"
+          />
+        </View>
+
+        {dashboardQuery.isLoading && !dashboardQuery.data ? (
+          <Card>
+            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando KPIs do dashboard...</Text>
+          </Card>
+        ) : null}
+
+        {dashboardQuery.error ? (
+          <Card>
+            <Text className="text-sm text-error">
+              {dashboardQuery.error instanceof Error
+                ? dashboardQuery.error.message
+                : 'Falha ao carregar dashboard global.'}
+            </Text>
+          </Card>
+        ) : null}
+
+        {dashboardQuery.data ? (
+          <AdminKpiCards
+            summary={dashboardQuery.data.summary}
+            generatedAt={dashboardQuery.data.generatedAt}
+          />
+        ) : null}
+
+        <Card className="gap-3">
+          <Text className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Governanca</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Consulte saloes, usuarios administrativos, notificacoes e logs de auditoria em um unico lugar.
+          </Text>
+          <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
+          <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
+          <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./audit-logs')} />
+          <Button label="Central de notificacoes" variant="secondary" onPress={() => router.push('./notifications')} />
+        </Card>
+      </View>
+    </ScrollView>
   );
 }

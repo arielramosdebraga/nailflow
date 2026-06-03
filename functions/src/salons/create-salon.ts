@@ -3,6 +3,7 @@ import {getAuth} from "firebase-admin/auth";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
+import {extractRequestMetadata} from "../audit/extract-request-metadata";
 import {
   getUserProfile,
   requireAuthenticatedUid,
@@ -215,28 +216,20 @@ export const createSalon = onCall(async (request) => {
   }
 
   try {
-    const forwardedForHeader = request.rawRequest.headers["x-forwarded-for"];
-    const forwardedFor =
-      typeof forwardedForHeader === "string" ?
-        forwardedForHeader.split(",")[0]?.trim() ?? null :
-        null;
-    const ipAddress = forwardedFor ?? request.rawRequest.ip ?? null;
-
     await writeAuditLog({
       userId: callerUid,
-      actorRole: callerProfile.role,
+      userRole: callerProfile.role,
       action: "salon.create",
       targetType: "salon",
       targetId: salonRef.id,
-      salonId: salonRef.id,
-      source: "callable",
-      ipAddress,
       metadata: {
         ownerId: ownerUid,
+        salonId: salonRef.id,
         active: input.active,
         timezone: input.settings.timezone,
         currency: input.settings.currency,
       },
+      requestMetadata: extractRequestMetadata(request),
     });
   } catch (error) {
     logger.warn("Failed to persist audit log for createSalon", {

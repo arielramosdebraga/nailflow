@@ -11,6 +11,7 @@ import {initializeApp} from "firebase-admin/app";
 import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
+import {getGlobalDashboard} from "./admin/get-global-dashboard";
 import {onUserCreated} from "./auth/on-user-created";
 import {
   beginTotpEnrollment,
@@ -62,6 +63,7 @@ export const health = onRequest((request, response) => {
 export {onUserCreated};
 export {
   createSalon,
+  getGlobalDashboard,
   getTotpStatus,
   beginTotpEnrollment,
   confirmTotpEnrollment,

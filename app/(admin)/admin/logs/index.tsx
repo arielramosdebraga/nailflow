@@ -6,21 +6,28 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuditLogs } from '@/hooks/audit/useAuditLogs';
 
-function formatMetadata(metadata: Record<string, unknown>) {
+function formatMetadata(metadata: Record<string, string | number | boolean | null>) {
   const entries = Object.entries(metadata).slice(0, 4);
 
   if (entries.length === 0) {
     return 'Sem metadados adicionais.';
   }
 
-  return entries
-    .map(([key, value]) => `${key}: ${typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : '[objeto]'}`)
-    .join(' | ');
+  return entries.map(([key, value]) => `${key}: ${String(value)}`).join(' | ');
+}
+
+function formatTimestamp(value: string): string {
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) {
+    return 'Nao informado';
+  }
+
+  return new Date(parsed).toLocaleString('pt-BR');
 }
 
 export default function AdminAuditLogsScreen() {
   const router = useRouter();
-  const logsQuery = useAuditLogs({ limitCount: 120 });
+  const logsQuery = useAuditLogs({ limit: 120, order: 'desc' });
   const logs = useMemo(() => logsQuery.data ?? [], [logsQuery.data]);
 
   return (
@@ -61,17 +68,20 @@ export default function AdminAuditLogsScreen() {
             <Card className="gap-2">
               <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{item.action}</Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-                Usuario: {item.userId} • Papel: {item.actorRole}
+                Usuario: {item.userId} • Papel: {item.userRole}
               </Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-                Alvo: {item.targetType} {item.targetId ? `• ${item.targetId}` : ''}
+                Alvo: {item.targetType} • {item.targetId}
               </Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-                Origem: {item.source} • IP: {item.ipAddress ?? 'Nao informado'}
+                Momento: {formatTimestamp(item.timestamp)}
               </Text>
-              <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-                Momento: {item.timestamp ? item.timestamp.toLocaleString('pt-BR') : 'Nao informado'}
-              </Text>
+              {item.ipAddress ? (
+                <Text className="text-xs text-zinc-600 dark:text-zinc-300">IP: {item.ipAddress}</Text>
+              ) : null}
+              {item.requestId ? (
+                <Text className="text-xs text-zinc-600 dark:text-zinc-300">Request ID: {item.requestId}</Text>
+              ) : null}
               <Text className="text-xs text-zinc-500 dark:text-zinc-400">{formatMetadata(item.metadata)}</Text>
             </Card>
           )}
