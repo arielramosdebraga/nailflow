@@ -34,7 +34,7 @@
     "react-native-reanimated": "^4.4.0",
     "react-native-safe-area-context": "^5.8.0",
     "react-native-screens": "^4.25.2",
-    "react-native-worklets": "0.8.3",
+    "react-native-worklets": "0.9.1",
     "tailwindcss": "^3.4.19",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
@@ -56,8 +56,8 @@
   },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "release:preflight": "node scripts/release-preflight.mjs",
     "release:env:pull:preview": "npx eas-cli@latest env:pull --environment preview",
@@ -68,7 +68,7 @@
     "build:production:all": "npx eas-cli@latest build --platform all --profile production",
     "submit:production:ios": "npx eas-cli@latest submit --platform ios --profile production",
     "submit:production:android": "npx eas-cli@latest submit --platform android --profile production",
-    "lint": "expo lint",
+    "lint": "eslint app src scripts --max-warnings=0",
     "lint-staged": "lint-staged",
     "format": "prettier --check .",
     "typecheck": "tsc --noEmit",
