@@ -61,7 +61,8 @@ Para detalhes completos, consulte:
 
 - Node.js 22+
 - pnpm 10+
-- Expo Go (Android/iOS) para testes rápidos
+- Android Studio com SDK Android para builds locais
+- JDK 21 LTS
 - Projeto Firebase configurado
 
 ## Configuração de ambiente
@@ -107,6 +108,12 @@ Subir servidor de desenvolvimento:
 
 ```bash
 pnpm start
+```
+
+Gerar build Android de teste:
+
+```bash
+pnpm build:preview:android
 ```
 
 Outros alvos:

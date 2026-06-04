@@ -1,6 +1,5 @@
 import { Platform } from 'react-native';
 
-import { isRunningInExpoGo } from 'expo';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { arrayUnion, doc, setDoc } from 'firebase/firestore';
@@ -17,7 +16,6 @@ export interface PushPermissionResult {
 
 export type PushTokenBootstrapStatus =
   | 'registered'
-  | 'expo_go_unsupported'
   | 'permission_denied'
   | 'missing_project_id'
   | 'token_unavailable'
@@ -26,17 +24,6 @@ export type PushTokenBootstrapStatus =
 export interface PushTokenBootstrapResult {
   status: PushTokenBootstrapStatus;
   token?: string;
-}
-
-export function isRemotePushUnsupportedInExpoGo(): boolean {
-  if (Platform.OS !== 'android') {
-    return false;
-  }
-
-  // SDK 56 removes Android remote push support from Expo Go, so we short-circuit
-  // before touching remote notification APIs. The appOwnership fallback keeps
-  // compatibility with older runtimes and test doubles.
-  return isRunningInExpoGo() || Constants.appOwnership === 'expo';
 }
 
 function getExpoProjectId(): string | null {
@@ -80,10 +67,6 @@ function hasNotificationPermission(permissions: Notifications.NotificationPermis
 }
 
 export async function requestPushPermissionAsync(): Promise<PushPermissionResult> {
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return { status: 'error' };
-  }
-
   try {
     await ensureAndroidNotificationChannelAsync();
 
@@ -104,10 +87,6 @@ export async function requestPushPermissionAsync(): Promise<PushPermissionResult
 }
 
 export async function getExpoPushTokenAsync(): Promise<string | null> {
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return null;
-  }
-
   const projectId = getExpoProjectId();
   if (!projectId) {
     return null;
@@ -155,10 +134,6 @@ export async function bootstrapPushTokenRegistrationAsync(
 ): Promise<PushTokenBootstrapResult> {
   if (!uid.trim()) {
     return { status: 'service_unavailable' };
-  }
-
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return { status: 'expo_go_unsupported' };
   }
 
   const permission = await requestPushPermissionAsync();

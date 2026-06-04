@@ -15,9 +15,8 @@ Atualizar o Expo SDK da versão 52 para a 56, alinhando também versões de Reac
 - Ajustes técnicos aplicados durante a evolução:
   - compatibilização de rotas tipadas do Expo Router
   - atualização de plugins/babel para o stack Expo 56
-  - ajustes de integração com Expo Go e bibliotecas de animação/worklets
+  - ajustes de integração com bibliotecas de animação/worklets
 - Riscos observados:
-  - incompatibilidade de versão do Expo Go em dispositivos desatualizados
   - regressões de build em bibliotecas com APIs antigas
 - Validações executadas:
   - `pnpm lint`

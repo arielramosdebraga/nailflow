@@ -308,16 +308,7 @@ Se houver divergência entre script e ambiente real, confiar no Firebase do ambi
 
 ## 11. Decisões e armadilhas já conhecidas
 
-### 11.1 Expo Go e notificações remotas no Android
-
-O Expo Go não suporta mais push remoto Android do `expo-notifications` como antes.
-
-Já houve correção na trilha da Sprint 10 para degradar com segurança no Expo Go, evitando crash.  
-Se a próxima conta for validar isso, revisar a implementação na worktree:
-
-- `C:\Users\ariel\Documents\Projects\nailflow-s10`
-
-### 11.2 Node das Functions
+### 11.1 Node das Functions
 
 As `functions` esperam:
 
@@ -334,7 +325,7 @@ Resultado:
 
 Não tratar isso como erro funcional imediato, mas alinhar o ambiente é recomendado.
 
-### 11.3 Documentação divergente entre worktrees
+### 11.2 Documentação divergente entre worktrees
 
 Nem toda documentação da branch `Sprint-8-notificacoes` está no mesmo nível de atualização da worktree `Sprint-10-piloto-estabilizacao`.
 
@@ -343,7 +334,7 @@ Se o objetivo for continuidade real do projeto:
 - usar a documentação da Sprint 10 como fonte principal
 - atualizar `develop` depois do merge do PR `#12`
 
-### 11.4 Typed routes do Expo Router
+### 11.3 Typed routes do Expo Router
 
 Houve ajustes em várias sprints por causa de typed routes mais estritas.
 
@@ -353,7 +344,7 @@ Ao mexer em navegação:
 - preferir `Href`
 - usar rotas absolutas tipadas quando necessário
 
-### 11.5 Maestro
+### 11.4 Maestro
 
 Parte do material menciona E2E com Maestro, mas a execução local depende da CLI instalada no ambiente.
 
