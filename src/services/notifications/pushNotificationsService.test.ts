@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const runtime = vi.hoisted(() => ({
   os: 'android',
   appOwnership: 'expo' as string | null,
+  isRunningInExpoGo: true,
 }));
 
 const notificationsMock = vi.hoisted(() => ({
@@ -24,6 +25,10 @@ vi.mock('react-native', () => ({
       return runtime.os;
     },
   },
+}));
+
+vi.mock('expo', () => ({
+  isRunningInExpoGo: () => runtime.isRunningInExpoGo,
 }));
 
 vi.mock('expo-constants', () => ({
@@ -62,6 +67,7 @@ describe('pushNotificationsService', () => {
   beforeEach(() => {
     runtime.os = 'android';
     runtime.appOwnership = 'expo';
+    runtime.isRunningInExpoGo = true;
     vi.clearAllMocks();
   });
 
@@ -70,9 +76,16 @@ describe('pushNotificationsService', () => {
   });
 
   it('nao marca development build como Expo Go', () => {
+    runtime.isRunningInExpoGo = false;
     runtime.appOwnership = null;
 
     expect(isRemotePushUnsupportedInExpoGo()).toBe(false);
+  });
+
+  it('identifica Expo Go Android mesmo sem appOwnership preenchido', () => {
+    runtime.appOwnership = null;
+
+    expect(isRemotePushUnsupportedInExpoGo()).toBe(true);
   });
 
   it('ignora bootstrap de push remoto no Expo Go Android', async () => {

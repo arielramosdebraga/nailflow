@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 
+import { isRunningInExpoGo } from 'expo';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { arrayUnion, doc, setDoc } from 'firebase/firestore';
@@ -28,7 +29,14 @@ export interface PushTokenBootstrapResult {
 }
 
 export function isRemotePushUnsupportedInExpoGo(): boolean {
-  return Platform.OS === 'android' && Constants.appOwnership === 'expo';
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+
+  // SDK 56 removes Android remote push support from Expo Go, so we short-circuit
+  // before touching remote notification APIs. The appOwnership fallback keeps
+  // compatibility with older runtimes and test doubles.
+  return isRunningInExpoGo() || Constants.appOwnership === 'expo';
 }
 
 function getExpoProjectId(): string | null {

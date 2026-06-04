@@ -10,10 +10,10 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['**/*.integration.test.ts'],
+    include: ['firestore.rules.integration.test.ts', 'functions/src/**/*.integration.test.ts'],
     fileParallelism: false,
     testTimeout: 20_000,
     hookTimeout: 30_000,
-    exclude: ['functions/lib/**', 'node_modules/**', '.expo/**', 'dist/**'],
+    exclude: ['functions/lib/**', '**/node_modules/**', '.expo/**', 'dist/**'],
   },
 });
