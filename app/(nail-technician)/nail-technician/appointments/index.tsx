@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { AppointmentCard, type AppointmentCardItem } from '@/components/features/appointments';
 import { Button } from '@/components/ui/Button';
@@ -11,10 +11,17 @@ import { useClients } from '@/hooks/clients/useClients';
 import type { Appointment } from '@/schemas/appointments/appointment.schema';
 import { useSessionStore } from '@/stores/sessionStore';
 
-function mapAppointmentToCardItem(
-  appointment: Appointment,
-  clientsById: Map<string, string>,
-): AppointmentCardItem {
+const appointmentsRoutes = {
+  agenda: '/nail-technician/agenda',
+  newAppointment: '/nail-technician/appointments/new',
+} as const satisfies Record<string, Href>;
+
+const getAppointmentDetailsRoute = (appointmentId: string): Href => ({
+  pathname: '/nail-technician/appointments/[appointmentId]',
+  params: { appointmentId },
+});
+
+function mapAppointmentToCardItem(appointment: Appointment, clientsById: Map<string, string>): AppointmentCardItem {
   return {
     id: appointment.id,
     clientId: appointment.clientId,
@@ -57,12 +64,12 @@ export default function AppointmentsListScreen() {
 
   const clientsById = useMemo(
     () => new Map((clientsQuery.data ?? []).map((client) => [client.id, client.name])),
-    [clientsQuery.data],
+    [clientsQuery.data]
   );
 
   const appointments = useMemo(
     () => (appointmentsQuery.data ?? []).map((item) => mapAppointmentToCardItem(item, clientsById)),
-    [appointmentsQuery.data, clientsById],
+    [appointmentsQuery.data, clientsById]
   );
 
   const filteredAppointments = useMemo(() => {
@@ -97,12 +104,16 @@ export default function AppointmentsListScreen() {
         />
 
         <View className="flex-row gap-2">
-          <Button label="Novo atendimento" className="flex-1" onPress={() => router.push('./new')} />
           <Button
-            label="Voltar agenda"
+            label="Criar atendimento"
+            className="flex-1"
+            onPress={() => router.push(appointmentsRoutes.newAppointment)}
+          />
+          <Button
+            label="Voltar para agenda"
             className="flex-1"
             variant="ghost"
-            onPress={() => router.replace('../agenda')}
+            onPress={() => router.replace(appointmentsRoutes.agenda)}
           />
         </View>
       </View>
@@ -135,7 +146,10 @@ export default function AppointmentsListScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
           renderItem={({ item }) => (
-            <AppointmentCard appointment={item} onPress={(appointmentId) => router.push(`./${appointmentId}`)} />
+            <AppointmentCard
+              appointment={item}
+              onPress={(appointmentId) => router.push(getAppointmentDetailsRoute(appointmentId))}
+            />
           )}
         />
       ) : null}

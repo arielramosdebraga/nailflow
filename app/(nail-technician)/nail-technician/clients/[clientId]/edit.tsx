@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -13,6 +13,13 @@ import {
   mapClientFormToUpsertInput,
   type ClientFormInput,
 } from '@/schemas/clients/client-form.schema';
+
+const clientsListRoute = '/nail-technician/clients' satisfies Href;
+
+const getClientDetailsRoute = (clientId: string): Href => ({
+  pathname: '/nail-technician/clients/[clientId]',
+  params: { clientId },
+});
 
 export default function EditClientScreen() {
   const router = useRouter();
@@ -67,7 +74,7 @@ export default function EditClientScreen() {
         clientId,
         data: mapClientFormToUpsertInput(parsed.data),
       });
-      router.replace('../');
+      router.replace(getClientDetailsRoute(clientId));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao atualizar cliente.';
       form.setError('root', { message });
@@ -93,7 +100,7 @@ export default function EditClientScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../../')} />
+          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
         </View>
       </View>
     );
@@ -205,7 +212,14 @@ export default function EditClientScreen() {
           <Button
             label="Cancelar"
             variant="ghost"
-            onPress={() => router.replace('../')}
+            onPress={() => {
+              if (clientId) {
+                router.replace(getClientDetailsRoute(clientId));
+                return;
+              }
+
+              router.replace(clientsListRoute);
+            }}
             disabled={updateClientMutation.isPending}
           />
         </View>

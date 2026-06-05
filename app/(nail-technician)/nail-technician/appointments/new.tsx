@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { AppointmentForm } from '@/components/features/appointments';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +8,13 @@ import { useCreateAppointmentMutation } from '@/hooks/appointments';
 import { useClients } from '@/hooks/clients/useClients';
 import { type UpsertAppointmentInput } from '@/schemas/appointments/appointment.schema';
 import { useSessionStore } from '@/stores/sessionStore';
+
+const agendaRoute = '/nail-technician/agenda' satisfies Href;
+
+const getAppointmentDetailsRoute = (appointmentId: string): Href => ({
+  pathname: '/nail-technician/appointments/[appointmentId]',
+  params: { appointmentId },
+});
 
 export default function NailTechnicianNewAppointmentScreen() {
   const router = useRouter();
@@ -18,7 +25,7 @@ export default function NailTechnicianNewAppointmentScreen() {
 
   async function handleSubmit(data: Omit<UpsertAppointmentInput, 'salonId'>) {
     const appointmentId = await createAppointmentMutation.mutateAsync(data);
-    router.replace(`../${appointmentId}`);
+    router.replace(getAppointmentDetailsRoute(appointmentId));
   }
 
   if (!userId) {
@@ -28,7 +35,7 @@ export default function NailTechnicianNewAppointmentScreen() {
           <Text className="text-sm text-error">Nao foi possivel identificar a profissional logada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -53,7 +60,7 @@ export default function NailTechnicianNewAppointmentScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -68,7 +75,7 @@ export default function NailTechnicianNewAppointmentScreen() {
       clients={clientsQuery.data ?? []}
       isSubmitting={createAppointmentMutation.isPending}
       onSubmit={handleSubmit}
-      onCancel={() => router.replace('../../agenda')}
+      onCancel={() => router.replace(agendaRoute)}
     />
   );
 }

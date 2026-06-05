@@ -1,5 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
@@ -11,6 +11,13 @@ import {
   mapClientFormToUpsertInput,
   type ClientFormInput,
 } from '@/schemas/clients/client-form.schema';
+
+const clientsListRoute = '/nail-technician/clients' satisfies Href;
+
+const getClientDetailsRoute = (clientId: string): Href => ({
+  pathname: '/nail-technician/clients/[clientId]',
+  params: { clientId },
+});
 
 export default function NewClientScreen() {
   const router = useRouter();
@@ -39,7 +46,7 @@ export default function NewClientScreen() {
 
     try {
       const clientId = await createClientMutation.mutateAsync(mapClientFormToUpsertInput(parsed.data));
-      router.replace(`../${clientId}`);
+      router.replace(getClientDetailsRoute(clientId));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao criar cliente.';
       form.setError('root', { message });
@@ -152,7 +159,7 @@ export default function NewClientScreen() {
           <Button
             label="Cancelar"
             variant="ghost"
-            onPress={() => router.replace('../')}
+            onPress={() => router.replace(clientsListRoute)}
             disabled={createClientMutation.isPending}
           />
         </View>

@@ -85,6 +85,7 @@ export function useGoogleAuth() {
           userId: result.user.uid,
           role: profile.role,
           salonId: profile.salonId,
+          secondFactorRequired: profile.secondFactorRequired,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Falha no login com Google.');

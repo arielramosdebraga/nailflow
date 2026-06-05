@@ -10,10 +10,11 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    include: ['src/**/*.test.ts', 'functions/src/**/*.test.ts'],
     exclude: [
       '**/*.integration.test.ts',
       'functions/lib/**',
-      'node_modules/**',
+      '**/node_modules/**',
       '.expo/**',
       'dist/**',
     ],

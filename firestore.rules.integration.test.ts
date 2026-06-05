@@ -2,6 +2,7 @@ import {
   assertFails,
   assertSucceeds,
   initializeTestEnvironment,
+  type RulesTestContext,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'node:fs';
@@ -34,7 +35,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await testEnv.clearFirestore();
 
-  await testEnv.withSecurityRulesDisabled(async (context) => {
+  await testEnv.withSecurityRulesDisabled(async (context: RulesTestContext) => {
     const db = context.firestore();
 
     await Promise.all([

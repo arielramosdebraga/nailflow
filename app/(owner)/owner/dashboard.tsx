@@ -60,9 +60,7 @@ export default function OwnerDashboardScreen() {
       <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
         <View className="gap-2 pb-5">
           <View className="flex-row items-center justify-between gap-3">
-            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-              Dashboard do salao
-            </Text>
+            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard do salao</Text>
             <NotificationsBellButton
               unreadCount={unreadNotifications.unreadCount}
               onPress={() => router.push(ownerRoutes.notifications)}
@@ -109,9 +107,7 @@ export default function OwnerDashboardScreen() {
               </Card>
               <Card className="flex-1 gap-1">
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">Atendimentos hoje</Text>
-                <Text className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {appointmentsToday.length}
-                </Text>
+                <Text className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{appointmentsToday.length}</Text>
               </Card>
             </View>
 
@@ -134,7 +130,7 @@ export default function OwnerDashboardScreen() {
               />
               <Button label="Lista de manicures" variant="ghost" onPress={() => router.push(ownerRoutes.manicures)} />
               <Button
-                label="Conectar Google Agenda"
+                label="Gerenciar Google Agenda"
                 variant="ghost"
                 onPress={() => router.push(ownerRoutes.googleCalendar)}
               />

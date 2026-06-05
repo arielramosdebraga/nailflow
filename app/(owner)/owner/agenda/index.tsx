@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { endOfDay, startOfDay } from 'date-fns';
 
 import { Button } from '@/components/ui/Button';
@@ -18,6 +18,7 @@ const appointmentStatusLabels = {
   completed: 'Concluido',
   cancelled: 'Cancelado',
 } as const;
+const ownerDashboardRoute = '/owner/dashboard' satisfies Href;
 
 export default function OwnerAgendaDayScreen() {
   const router = useRouter();
@@ -155,7 +156,7 @@ export default function OwnerAgendaDayScreen() {
       </ScrollView>
 
       <View className="p-6 pt-2">
-        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace('../dashboard')} />
+        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace(ownerDashboardRoute)} />
       </View>
     </View>
   );

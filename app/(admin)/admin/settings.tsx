@@ -1,9 +1,14 @@
 import { Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useReleaseReadiness } from '@/hooks/admin/useReleaseReadiness';
+
+const adminRoutes = {
+  dashboard: '/admin/dashboard',
+  lgpdExport: '/admin/lgpd-export',
+} as const satisfies Record<string, Href>;
 
 function formatStatus(value: boolean) {
   return value ? 'Configurado' : 'Pendente';
@@ -54,12 +59,8 @@ export default function AdminSettingsScreen() {
           <Card className="gap-2">
             <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Release</Text>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">Versao do app: {snapshot.appVersion}</Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Bundle iOS: {snapshot.iosBundleIdentifier}
-            </Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Package Android: {snapshot.androidPackage}
-            </Text>
+            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Bundle iOS: {snapshot.iosBundleIdentifier}</Text>
+            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Package Android: {snapshot.androidPackage}</Text>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
               EAS Project ID: {formatStatus(snapshot.easProjectIdConfigured)}
             </Text>
@@ -90,7 +91,7 @@ export default function AdminSettingsScreen() {
             ))}
           </Card>
 
-          <Button label="Abrir exportacao LGPD" onPress={() => router.push('./lgpd-export')} />
+          <Button label="Abrir exportacao LGPD" onPress={() => router.push(adminRoutes.lgpdExport)} />
         </View>
       ) : null}
 
@@ -102,7 +103,7 @@ export default function AdminSettingsScreen() {
             void readinessQuery.refetch();
           }}
         />
-        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace('./dashboard')} />
+        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace(adminRoutes.dashboard)} />
       </View>
     </View>
   );

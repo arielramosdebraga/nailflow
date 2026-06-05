@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { endOfDay, startOfDay } from 'date-fns';
 
 import { Button } from '@/components/ui/Button';
@@ -9,6 +9,8 @@ import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useCommands } from '@/hooks/commands/useCommands';
 import { useManicures } from '@/hooks/users/useManicures';
 import { formatCurrency } from '@/components/features/commands/commandFormatters';
+
+const ownerDashboardRoute = '/owner/dashboard' satisfies Href;
 
 export default function OwnerManicuresListScreen() {
   const router = useRouter();
@@ -91,9 +93,7 @@ export default function OwnerManicuresListScreen() {
           <View className="gap-3">
             {(manicuresQuery.data ?? []).map((manicure) => (
               <Card key={manicure.uid} className="gap-2">
-                <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                  {manicure.displayName}
-                </Text>
+                <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{manicure.displayName}</Text>
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">{manicure.email}</Text>
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">
                   Agenda hoje: {appointmentsByManicure.get(manicure.uid) ?? 0} atendimento(s)
@@ -114,7 +114,7 @@ export default function OwnerManicuresListScreen() {
       </ScrollView>
 
       <View className="p-6 pt-2">
-        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace('../dashboard')} />
+        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace(ownerDashboardRoute)} />
       </View>
     </View>
   );

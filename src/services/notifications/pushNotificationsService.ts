@@ -16,7 +16,6 @@ export interface PushPermissionResult {
 
 export type PushTokenBootstrapStatus =
   | 'registered'
-  | 'expo_go_unsupported'
   | 'permission_denied'
   | 'missing_project_id'
   | 'token_unavailable'
@@ -25,10 +24,6 @@ export type PushTokenBootstrapStatus =
 export interface PushTokenBootstrapResult {
   status: PushTokenBootstrapStatus;
   token?: string;
-}
-
-export function isRemotePushUnsupportedInExpoGo(): boolean {
-  return Platform.OS === 'android' && Constants.appOwnership === 'expo';
 }
 
 function getExpoProjectId(): string | null {
@@ -72,10 +67,6 @@ function hasNotificationPermission(permissions: Notifications.NotificationPermis
 }
 
 export async function requestPushPermissionAsync(): Promise<PushPermissionResult> {
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return { status: 'error' };
-  }
-
   try {
     await ensureAndroidNotificationChannelAsync();
 
@@ -96,10 +87,6 @@ export async function requestPushPermissionAsync(): Promise<PushPermissionResult
 }
 
 export async function getExpoPushTokenAsync(): Promise<string | null> {
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return null;
-  }
-
   const projectId = getExpoProjectId();
   if (!projectId) {
     return null;
@@ -147,10 +134,6 @@ export async function bootstrapPushTokenRegistrationAsync(
 ): Promise<PushTokenBootstrapResult> {
   if (!uid.trim()) {
     return { status: 'service_unavailable' };
-  }
-
-  if (isRemotePushUnsupportedInExpoGo()) {
-    return { status: 'expo_go_unsupported' };
   }
 
   const permission = await requestPushPermissionAsync();

@@ -78,12 +78,7 @@ function parseDate(value: unknown): Date | null {
     return value;
   }
 
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'toDate' in value &&
-    typeof value.toDate === 'function'
-  ) {
+  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof value.toDate === 'function') {
     return value.toDate();
   }
 
@@ -129,9 +124,7 @@ function mapNotificationSnapshot(snapshot: DocumentSnapshot<DocumentData>): AppN
   }
 
   const channel =
-    Array.isArray(data.channel) && data.channel.every((item) => typeof item === 'string')
-      ? data.channel
-      : [];
+    Array.isArray(data.channel) && data.channel.every((item) => typeof item === 'string') ? data.channel : [];
 
   const metadata = typeof data.data === 'object' && data.data !== null ? data.data : {};
 
@@ -172,9 +165,7 @@ function mapNotificationPreferences(raw: unknown): NotificationPreferences {
 
   return {
     newAppointment:
-      typeof data.newAppointment === 'boolean'
-        ? data.newAppointment
-        : DEFAULT_NOTIFICATION_PREFERENCES.newAppointment,
+      typeof data.newAppointment === 'boolean' ? data.newAppointment : DEFAULT_NOTIFICATION_PREFERENCES.newAppointment,
     appointmentCanceled:
       typeof data.appointmentCanceled === 'boolean'
         ? data.appointmentCanceled
@@ -184,23 +175,15 @@ function mapNotificationPreferences(raw: unknown): NotificationPreferences {
         ? data.appointmentRescheduled
         : DEFAULT_NOTIFICATION_PREFERENCES.appointmentRescheduled,
     preReminder:
-      typeof data.preReminder === 'boolean'
-        ? data.preReminder
-        : DEFAULT_NOTIFICATION_PREFERENCES.preReminder,
-    syncError:
-      typeof data.syncError === 'boolean' ? data.syncError : DEFAULT_NOTIFICATION_PREFERENCES.syncError,
+      typeof data.preReminder === 'boolean' ? data.preReminder : DEFAULT_NOTIFICATION_PREFERENCES.preReminder,
+    syncError: typeof data.syncError === 'boolean' ? data.syncError : DEFAULT_NOTIFICATION_PREFERENCES.syncError,
     googleExpired:
-      typeof data.googleExpired === 'boolean'
-        ? data.googleExpired
-        : DEFAULT_NOTIFICATION_PREFERENCES.googleExpired,
+      typeof data.googleExpired === 'boolean' ? data.googleExpired : DEFAULT_NOTIFICATION_PREFERENCES.googleExpired,
     quietHoursEnabled:
       typeof data.quietHoursEnabled === 'boolean'
         ? data.quietHoursEnabled
         : DEFAULT_NOTIFICATION_PREFERENCES.quietHoursEnabled,
-    quietHoursStart: parseQuietHours(
-      data.quietHoursStart,
-      DEFAULT_NOTIFICATION_PREFERENCES.quietHoursStart
-    ),
+    quietHoursStart: parseQuietHours(data.quietHoursStart, DEFAULT_NOTIFICATION_PREFERENCES.quietHoursStart),
     quietHoursEnd: parseQuietHours(data.quietHoursEnd, DEFAULT_NOTIFICATION_PREFERENCES.quietHoursEnd),
     preReminderMinutes:
       typeof data.preReminderMinutes === 'number' &&
@@ -230,9 +213,7 @@ interface SubscribeNotificationsParams {
   limitCount?: number;
 }
 
-export async function listUserNotifications(
-  params: SubscribeNotificationsParams
-): Promise<AppNotification[]> {
+export async function listUserNotifications(params: SubscribeNotificationsParams): Promise<AppNotification[]> {
   const normalizedUserId = params.userId.trim();
   if (!normalizedUserId) {
     return [];
@@ -318,6 +299,7 @@ export function subscribeUnreadNotificationsCount(
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
     where('createdAt', '>=', retentionCutoff),
+    orderBy('createdAt', 'desc'),
     limit(500)
   );
 
@@ -343,6 +325,7 @@ export async function getUnreadNotificationsCount(userId: string): Promise<numbe
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
     where('createdAt', '>=', retentionCutoff),
+    orderBy('createdAt', 'desc'),
     limit(500)
   );
 
@@ -355,9 +338,7 @@ interface MarkNotificationAsReadParams {
   notificationId: string;
 }
 
-export async function markNotificationAsRead(
-  params: MarkNotificationAsReadParams
-): Promise<boolean> {
+export async function markNotificationAsRead(params: MarkNotificationAsReadParams): Promise<boolean> {
   const normalizedUserId = params.userId.trim();
   const normalizedNotificationId = params.notificationId.trim();
 
@@ -392,6 +373,7 @@ export async function markAllNotificationsAsRead(userId: string): Promise<number
     where('userId', '==', normalizedUserId),
     where('read', '==', false),
     where('createdAt', '>=', retentionCutoff),
+    orderBy('createdAt', 'desc'),
     limit(500)
   );
 
@@ -444,9 +426,7 @@ export function subscribeNotificationPreferences(
   );
 }
 
-export async function getNotificationPreferences(
-  userId: string
-): Promise<NotificationPreferences> {
+export async function getNotificationPreferences(userId: string): Promise<NotificationPreferences> {
   const normalizedUserId = userId.trim();
   if (!normalizedUserId) {
     return DEFAULT_NOTIFICATION_PREFERENCES;

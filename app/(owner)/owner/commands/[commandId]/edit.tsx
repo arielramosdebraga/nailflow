@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 
 import { CommandForm } from '@/components/features/commands/CommandForm';
@@ -11,6 +11,13 @@ import { useCommand } from '@/hooks/commands/useCommand';
 import { useUpdateCommandMutation } from '@/hooks/commands/useCommandMutations';
 import { useManicures } from '@/hooks/users/useManicures';
 import { type UpsertCommandInput } from '@/schemas/commands/command.schema';
+
+const commandsListRoute = '/owner/commands' satisfies Href;
+
+const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]',
+  params: { commandId },
+});
 
 export default function OwnerEditCommandScreen() {
   const router = useRouter();
@@ -39,7 +46,7 @@ export default function OwnerEditCommandScreen() {
       data,
     });
 
-    router.replace('../');
+    router.replace(getOwnerCommandDetailsRoute(commandId));
   }
 
   if (commandQuery.isLoading || appointmentsQuery.isLoading || clientsQuery.isLoading || manicuresQuery.isLoading) {
@@ -62,7 +69,7 @@ export default function OwnerEditCommandScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../../')} />
+          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -79,7 +86,14 @@ export default function OwnerEditCommandScreen() {
       manicures={manicuresQuery.data ?? []}
       initialCommand={commandQuery.data}
       onSubmit={handleSubmit}
-      onCancel={() => router.replace('../')}
+      onCancel={() => {
+        if (commandId) {
+          router.replace(getOwnerCommandDetailsRoute(commandId));
+          return;
+        }
+
+        router.replace(commandsListRoute);
+      }}
     />
   );
 }

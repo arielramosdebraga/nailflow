@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { NotificationsBellButton } from '@/components/features/notifications';
 import { GoogleCalendarSyncStatusTag } from '@/components/features/google';
@@ -21,10 +21,20 @@ import type { Appointment } from '@/schemas/appointments/appointment.schema';
 import { useSessionStore } from '@/stores/sessionStore';
 import { getAgendaInterval, getReferenceDate, type AgendaViewMode } from '@/utils/dates/agenda-range';
 
-function mapAppointmentToCardItem(
-  appointment: Appointment,
-  clientsById: Map<string, string>,
-): AppointmentCardItem {
+const nailTechnicianRoutes = {
+  appointments: '/nail-technician/appointments',
+  newAppointment: '/nail-technician/appointments/new',
+  clients: '/nail-technician/clients',
+  googleCalendar: '/nail-technician/google-calendar',
+  notifications: '/nail-technician/notifications',
+} as const satisfies Record<string, Href>;
+
+const getAppointmentDetailsRoute = (appointmentId: string): Href => ({
+  pathname: '/nail-technician/appointments/[appointmentId]',
+  params: { appointmentId },
+});
+
+function mapAppointmentToCardItem(appointment: Appointment, clientsById: Map<string, string>): AppointmentCardItem {
   return {
     id: appointment.id,
     clientId: appointment.clientId,
@@ -71,12 +81,12 @@ export default function NailTechnicianAgendaScreen() {
 
   const clientsById = useMemo(
     () => new Map((clientsQuery.data ?? []).map((client) => [client.id, client.name])),
-    [clientsQuery.data],
+    [clientsQuery.data]
   );
 
   const appointmentItems = useMemo(
     () => (appointmentsQuery.data ?? []).map((item) => mapAppointmentToCardItem(item, clientsById)),
-    [appointmentsQuery.data, clientsById],
+    [appointmentsQuery.data, clientsById]
   );
 
   const isLoading = appointmentsQuery.isLoading || clientsQuery.isLoading;
@@ -95,7 +105,7 @@ export default function NailTechnicianAgendaScreen() {
             </View>
             <NotificationsBellButton
               unreadCount={unreadNotifications.unreadCount}
-              onPress={() => router.push('./notifications')}
+              onPress={() => router.push(nailTechnicianRoutes.notifications)}
             />
           </View>
         </View>
@@ -106,7 +116,9 @@ export default function NailTechnicianAgendaScreen() {
         <Card className="gap-3">
           <View className="flex-row items-center justify-between gap-3">
             <View className="flex-1 gap-1">
-              <Text className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Sincronização Google Agenda</Text>
+              <Text className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                Sincronização Google Agenda
+              </Text>
               <Text className="text-sm text-zinc-600 dark:text-zinc-300">
                 {getGoogleStatusDescription(googleConnection.syncIndicator)}
               </Text>
@@ -121,26 +133,30 @@ export default function NailTechnicianAgendaScreen() {
           <Button
             label="Gerenciar Google Agenda"
             variant="secondary"
-            onPress={() => router.push('./google-calendar')}
+            onPress={() => router.push(nailTechnicianRoutes.googleCalendar)}
           />
         </Card>
 
         <View className="flex-row gap-2">
-          <Button label="Novo atendimento" className="flex-1" onPress={() => router.push('./appointments/new')} />
           <Button
-            label="Atendimentos"
+            label="Criar atendimento"
+            className="flex-1"
+            onPress={() => router.push(nailTechnicianRoutes.newAppointment)}
+          />
+          <Button
+            label="Ver atendimentos"
             className="flex-1"
             variant="secondary"
-            onPress={() => router.push('./appointments')}
+            onPress={() => router.push(nailTechnicianRoutes.appointments)}
           />
         </View>
 
         <View className="flex-row gap-2">
           <Button
-            label="Acessar clientes"
+            label="Gerenciar clientes"
             className="flex-1"
             variant="ghost"
-            onPress={() => router.push('./clients')}
+            onPress={() => router.push(nailTechnicianRoutes.clients)}
           />
         </View>
 
@@ -174,7 +190,7 @@ export default function NailTechnicianAgendaScreen() {
             renderItem={({ item }) => (
               <AppointmentCard
                 appointment={item}
-                onPress={(appointmentId) => router.push(`./appointments/${appointmentId}`)}
+                onPress={(appointmentId) => router.push(getAppointmentDetailsRoute(appointmentId))}
               />
             )}
           />

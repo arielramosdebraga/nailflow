@@ -1,10 +1,17 @@
 import { Alert, Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useClient } from '@/hooks/clients/useClient';
 import { useDeleteClientMutation } from '@/hooks/clients/useClientMutations';
+
+const clientsListRoute = '/nail-technician/clients' satisfies Href;
+
+const getClientEditRoute = (clientId: string): Href => ({
+  pathname: '/nail-technician/clients/[clientId]/edit',
+  params: { clientId },
+});
 
 export default function ClientDetailsScreen() {
   const router = useRouter();
@@ -26,7 +33,7 @@ export default function ClientDetailsScreen() {
         onPress: async () => {
           try {
             await deleteClientMutation.mutateAsync(clientId);
-            router.replace('../');
+            router.replace(clientsListRoute);
           } catch (error) {
             Alert.alert('Erro', error instanceof Error ? error.message : 'Falha ao excluir cliente.');
           }
@@ -54,7 +61,7 @@ export default function ClientDetailsScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
         </View>
       </View>
     );
@@ -68,7 +75,7 @@ export default function ClientDetailsScreen() {
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">Cliente nao encontrado.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
         </View>
       </View>
     );
@@ -101,14 +108,14 @@ export default function ClientDetailsScreen() {
       </View>
 
       <View className="gap-2">
-        <Button label="Editar cliente" onPress={() => router.push('./edit')} />
+        <Button label="Editar cliente" onPress={() => router.push(getClientEditRoute(client.id))} />
         <Button
           label={deleteClientMutation.isPending ? 'Excluindo...' : 'Excluir cliente'}
           variant="danger"
           onPress={handleDelete}
           disabled={deleteClientMutation.isPending}
         />
-        <Button label="Voltar para lista" variant="ghost" onPress={() => router.replace('../')} />
+        <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
       </View>
     </View>
   );

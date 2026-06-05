@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useSalons } from '@/hooks/salons/useSalons';
+
+const adminDashboardRoute = '/admin/dashboard' satisfies Href;
 
 export default function AdminSalonsScreen() {
   const router = useRouter();
@@ -49,9 +51,7 @@ export default function AdminSalonsScreen() {
             <Card className="gap-1">
               <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{item.name}</Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">ID: {item.id}</Text>
-              <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-                Owner: {item.ownerId ?? 'Nao vinculado'}
-              </Text>
+              <Text className="text-xs text-zinc-600 dark:text-zinc-300">Owner: {item.ownerId ?? 'Nao vinculado'}</Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-300">
                 Timezone: {item.timezone} • Moeda: {item.currency}
               </Text>
@@ -64,7 +64,7 @@ export default function AdminSalonsScreen() {
       ) : null}
 
       <View className="pt-2">
-        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace('../dashboard')} />
+        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace(adminDashboardRoute)} />
       </View>
     </View>
   );

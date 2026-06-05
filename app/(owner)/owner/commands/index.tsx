@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 
 import { CommandCard } from '@/components/features/commands/CommandCard';
@@ -14,6 +14,15 @@ import { useManicures } from '@/hooks/users/useManicures';
 import { type CommandStatus } from '@/schemas/commands/command.schema';
 
 type StatusFilter = 'all' | CommandStatus;
+
+const ownerCommandRoutes = {
+  newCommand: '/owner/commands/new',
+} as const satisfies Record<string, Href>;
+
+const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]',
+  params: { commandId },
+});
 
 export default function OwnerCommandsListScreen() {
   const router = useRouter();
@@ -68,8 +77,7 @@ export default function OwnerCommandsListScreen() {
 
   const isLoading =
     commandsQuery.isLoading || clientsQuery.isLoading || manicuresQuery.isLoading || appointmentsQuery.isLoading;
-  const error =
-    commandsQuery.error ?? clientsQuery.error ?? manicuresQuery.error ?? appointmentsQuery.error ?? null;
+  const error = commandsQuery.error ?? clientsQuery.error ?? manicuresQuery.error ?? appointmentsQuery.error ?? null;
 
   return (
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
@@ -108,7 +116,7 @@ export default function OwnerCommandsListScreen() {
             />
           </View>
 
-          <Button label="Nova comanda" onPress={() => router.push('./new')} />
+          <Button label="Abrir nova comanda" onPress={() => router.push(ownerCommandRoutes.newCommand)} />
         </View>
 
         {isLoading ? (
@@ -142,7 +150,7 @@ export default function OwnerCommandsListScreen() {
                   clientName={clientsById.get(command.clientId)?.name}
                   manicureName={manicureById.get(command.manicureId)?.displayName}
                   appointmentStartTime={appointment?.startTime ?? null}
-                  onPress={() => router.push(`./${command.id}`)}
+                  onPress={() => router.push(getOwnerCommandDetailsRoute(command.id))}
                 />
               );
             })}

@@ -1,11 +1,20 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useClients } from '@/hooks/clients/useClients';
+
+const clientsRoutes = {
+  newClient: '/nail-technician/clients/new',
+} as const satisfies Record<string, Href>;
+
+const getClientDetailsRoute = (clientId: string): Href => ({
+  pathname: '/nail-technician/clients/[clientId]',
+  params: { clientId },
+});
 
 export default function ClientsListScreen() {
   const router = useRouter();
@@ -31,7 +40,7 @@ export default function ClientsListScreen() {
           autoCapitalize="words"
           returnKeyType="search"
         />
-        <Button label="Novo cliente" onPress={() => router.push('./new')} />
+        <Button label="Cadastrar novo cliente" onPress={() => router.push(clientsRoutes.newClient)} />
       </View>
 
       {clientsQuery.isLoading ? (
@@ -62,7 +71,7 @@ export default function ClientsListScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
           renderItem={({ item }) => (
-            <Pressable onPress={() => router.push(`./${item.id}`)}>
+            <Pressable onPress={() => router.push(getClientDetailsRoute(item.id))}>
               <Card className="gap-2">
                 <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{item.name}</Text>
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">{item.phone}</Text>

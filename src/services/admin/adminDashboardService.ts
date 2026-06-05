@@ -1,8 +1,9 @@
 import { FirebaseError } from 'firebase/app';
+import { collection, getCountFromServer, query, where, type QueryConstraint } from 'firebase/firestore';
 import { Functions, getFunctions, httpsCallable } from 'firebase/functions';
 import { z } from 'zod';
 
-import { assertFirebaseConfigured, firebaseApp } from '@/services/firebase';
+import { assertFirebaseConfigured, db, firebaseApp } from '@/services/firebase';
 
 const FUNCTIONS_REGION = 'southamerica-east1';
 const DEFAULT_CALLABLE_TIMEOUT_MS = 15_000;
@@ -79,11 +80,11 @@ function normalizeCallableError(error: unknown, fallbackMessage: string): Error 
   return new Error(fallbackMessage);
 }
 
-async function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  timeoutMessage: string
-): Promise<T> {
+function shouldUseFirestoreFallback(error: unknown): boolean {
+  return error instanceof FirebaseError && error.code === 'functions/not-found';
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   const timeoutPromise = new Promise<T>((_, reject) => {
@@ -109,9 +110,66 @@ function resolveTimeout(timeoutMs: number | undefined): number {
   return Math.floor(timeoutMs);
 }
 
-export async function getGlobalDashboard(
-  params?: GetGlobalDashboardParams
+async function getCollectionCount(collectionName: string, constraints: QueryConstraint[] = []): Promise<number> {
+  assertFirebaseConfigured();
+  if (!db) {
+    throw new Error('Banco Firestore indisponivel.');
+  }
+
+  const collectionQuery = query(collection(db, collectionName), ...constraints);
+  const snapshot = await getCountFromServer(collectionQuery);
+  return snapshot.data().count;
+}
+
+async function getSalonsCount(includeInactiveSalons: boolean): Promise<{
+  totalSalons: number;
+  activeSalons: number;
+}> {
+  const activeSalons = await getCollectionCount('salons', [where('active', '==', true)]);
+
+  if (!includeInactiveSalons) {
+    return {
+      totalSalons: activeSalons,
+      activeSalons,
+    };
+  }
+
+  return {
+    totalSalons: await getCollectionCount('salons'),
+    activeSalons,
+  };
+}
+
+async function getGlobalDashboardFromFirestore(
+  payload: z.infer<typeof GetGlobalDashboardInputSchema>
 ): Promise<GetGlobalDashboardResponse> {
+  const [salonsCount, totalUsers, superAdmins, salonOwners, nailTechnicians, totalClients, totalAppointments] =
+    await Promise.all([
+      getSalonsCount(payload.includeInactiveSalons),
+      getCollectionCount('users'),
+      getCollectionCount('users', [where('role', '==', 'super_admin')]),
+      getCollectionCount('users', [where('role', '==', 'salon_owner')]),
+      getCollectionCount('users', [where('role', 'in', ['nail_technician', 'manicure'])]),
+      getCollectionCount('clients'),
+      getCollectionCount('appointments'),
+    ]);
+
+  return {
+    summary: {
+      totalSalons: salonsCount.totalSalons,
+      activeSalons: salonsCount.activeSalons,
+      totalUsers,
+      superAdmins,
+      salonOwners,
+      nailTechnicians,
+      totalClients,
+      totalAppointments,
+    },
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+export async function getGlobalDashboard(params?: GetGlobalDashboardParams): Promise<GetGlobalDashboardResponse> {
   const payload = GetGlobalDashboardInputSchema.parse({
     includeInactiveSalons: params?.includeInactiveSalons ?? true,
   });
@@ -133,6 +191,10 @@ export async function getGlobalDashboard(
 
     return parsed.data;
   } catch (error) {
+    if (shouldUseFirestoreFallback(error)) {
+      return getGlobalDashboardFromFirestore(payload);
+    }
+
     throw normalizeCallableError(error, 'Falha ao carregar dashboard global.');
   }
 }
