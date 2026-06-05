@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import {getAuth} from "firebase-admin/auth";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
@@ -16,7 +17,7 @@ function getSuperAdminAllowlist(): Set<string> {
 export const onUserCreated = functions.auth.user().onCreate(async (user) => {
   const allowlist = getSuperAdminAllowlist();
   const email = (user.email ?? "").toLowerCase();
-  const role = allowlist.has(email) ? "super_admin" : "manicure";
+  const role = allowlist.has(email) ? "super_admin" : "nail_technician";
 
   await getFirestore().collection("users").doc(user.uid).set(
     {
@@ -35,6 +36,10 @@ export const onUserCreated = functions.auth.user().onCreate(async (user) => {
         preReminder: true,
         syncError: true,
         googleExpired: true,
+        quietHoursEnabled: false,
+        quietHoursStart: "22:00",
+        quietHoursEnd: "07:00",
+        preReminderMinutes: 60,
       },
       fcmTokens: [],
       createdAt: FieldValue.serverTimestamp(),

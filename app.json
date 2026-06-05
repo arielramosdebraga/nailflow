@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "nailflow",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "plugins": [
       "expo-router",
       "expo-secure-store",
@@ -17,6 +16,11 @@
     },
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4713331b-68f5-4b64-804c-dae5974b906b"
+      }
     }
   }
 }

@@ -33,6 +33,24 @@
 | 8 | 2–4 dias | Alta |
 | 13 | 4–7 dias | Muito alta (considerar quebrar) |
 
+### Status atual do projeto (atualizado em 05/06/2026)
+- ✅ Sprint 0 concluída (pendências absorvidas e finalizadas na Sprint 2)
+- ✅ Sprint 1 concluída (2FA administrativo finalizado na Sprint 2)
+- ✅ Sprint 2 concluída
+- ✅ Sprint 3 concluída
+- ✅ Sprint 4 concluída
+- ✅ Sprint 5 concluída (pendências residuais finalizadas na Sprint 10)
+- ✅ Sprint 6 concluída
+- ✅ Sprint 7 concluída
+- ✅ Sprint 8 concluída
+- ✅ Sprint 9 concluída
+- ✅ Sprint 10 concluída no escopo de desenvolvimento
+- ✅ PR `#13` (`fix-tests`) mergeado em `develop`, com estabilizacao de APK, navegacao, seed, indices e ambiente de testes
+
+### Leitura correta do status
+- ✅ 100% do escopo de desenvolvimento previsto no planejamento foi implementado e versionado no repositório.
+- ⚠️ O planejamento total ainda possui etapas operacionais fora do código, especialmente na Sprint 10: distribuição interna, onboarding presencial e coleta de feedback do piloto.
+
 ---
 
 ## 🏁 Sprint 0 — Setup e Fundação Técnica
@@ -45,7 +63,7 @@
 | **Dependências** | Nenhuma |
 
 ### Tarefas
-- 0.1 Criar projeto Expo (SDK 52+) com TypeScript strict — 2 SP
+- 0.1 Criar projeto Expo (SDK 56) com TypeScript strict — 2 SP
 - 0.2 Configurar NativeWind v4 + tailwind.config — 3 SP
 - 0.3 Configurar Expo Router v4 — 2 SP
 - 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — 3 SP
@@ -53,7 +71,7 @@
 - 0.6 Estrutura de pastas src/ — 1 SP
 - 0.7 Configurar Zustand + TanStack Query + RHF + Zod — 3 SP
 - 0.8 Repositório Git + branches + CI básico — 2 SP
-- 0.9 Setup Cloud Functions (Node 20+, TS) — 2 SP
+- 0.9 Setup Cloud Functions (Node 22, TS) — 2 SP
 
 ### Entregáveis
 - Repositório versionado com estrutura definitiva
@@ -65,6 +83,17 @@
 - App inicia sem erros em iOS e Android
 - Commit bloqueado em caso de erro de lint
 - Cloud Function "hello world" deployada
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 0.1 Criar projeto Expo com TypeScript strict — concluído (Expo SDK 56 + TypeScript)
+- ✅ 0.2 Configurar NativeWind v4 + tailwind.config — concluído
+- ✅ 0.3 Configurar Expo Router — concluído
+- ✅ 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — concluído (fluxo funcional básico finalizado na Sprint 2)
+- ✅ 0.5 Configurar ESLint, Prettier, Husky, lint-staged — concluído (finalizado na Sprint 2)
+- ✅ 0.6 Estrutura de pastas src/ — concluído
+- ✅ 0.7 Configurar Zustand + TanStack Query + RHF + Zod — concluído
+- ✅ 0.8 Repositório Git + branches + CI básico — concluído (finalizado na Sprint 2)
+- ✅ 0.9 Setup Cloud Functions (Node 22, TS) — concluído
 
 ---
 
@@ -93,13 +122,25 @@
 - Super admin fora da allowlist bloqueado
 - 2FA bloqueia sem TOTP válido
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 1.1 Telas Login, Cadastro, Recuperar senha — concluído
+- ✅ 1.2 Firebase Auth (e-mail/senha + Google) — concluído
+- ✅ 1.3 Modelagem coleção users — concluído
+- ✅ 1.4 Cloud Function pós-cadastro — concluído
+- ✅ 1.5 Allowlist super_admin — concluído (via variável de ambiente)
+- ✅ 1.6 2FA (TOTP) para admin — concluído (entregue na Sprint 2 para super_admin e salon_owner)
+- ✅ 1.7 Regras Firestore RBAC base — concluído
+- ✅ 1.8 Zustand store de sessão — concluído
+- ✅ 1.9 Middleware rotas protegidas — concluído
+
 ---
 
 ## 🗄️ Sprint 2 — Modelagem de Dados e CRUD de Clientes
 
-**Duração:** 2 semanas | **SP:** 40 | **Dependências:** Sprint 1
+**Duração:** 2 semanas | **SP:** 56 | **Dependências:** Sprint 1 (inclui pendências de Sprint 0 e Sprint 1)
 
 ### Tarefas
+- 2.0 Implementar 2FA (TOTP) para super_admin e salon_owner — 8 SP
 - 2.1 Criar coleções Firestore (schemas Zod) — 5 SP
 - 2.2 Índices compostos — 2 SP
 - 2.3 clientsService (CRUD + queries) — 5 SP
@@ -110,11 +151,44 @@
 - 2.8 Regras Firestore para clients — 3 SP
 - 2.9 Cloud Function criar salão — 5 SP
 - 2.10 Componentes UI: Button, Input, Card, Avatar, Tag — 4 SP
+- 2.11 Concluir setup Firebase para FCM e Storage com fluxo funcional básico — 3 SP
+- 2.12 Configurar Husky + lint-staged no fluxo de commit local — 2 SP
+- 2.13 Configurar CI básico (lint + typecheck + test) — 3 SP
 
 ### Critérios de Sucesso
 - CRUD funciona offline
 - Isolamento por salão validado
 - Listas com >100 itens em <1s
+- 2FA bloqueia acesso administrativo sem TOTP válido
+- Pipeline CI executa lint, typecheck e testes automaticamente
+
+### Status de execução (atualizado em 29/05/2026)
+- ✅ 2.0 Implementar 2FA (TOTP) para super_admin e salon_owner — concluído
+- ✅ 2.1 Criar coleções Firestore (schemas Zod) — concluído
+- ✅ 2.2 Índices compostos — concluído
+- ✅ 2.3 clientsService (CRUD + queries) — concluído
+- ✅ 2.4 Hooks useClients, useClient — concluído
+- ✅ 2.5 Tela Lista de Clientes — concluído
+- ✅ 2.6 Tela Detalhe do Cliente — concluído
+- ✅ 2.7 Tela Criar/Editar Cliente — concluído
+- ✅ 2.8 Regras Firestore para clients — concluído
+- ✅ 2.9 Cloud Function criar salão — concluído
+- ✅ 2.10 Componentes UI: Button, Input, Card, Avatar, Tag — concluído
+- ✅ 2.11 Concluir setup Firebase para FCM e Storage com fluxo funcional básico — concluído
+- ✅ 2.12 Configurar Husky + lint-staged no fluxo de commit local — concluído
+- ✅ 2.13 Configurar CI básico (lint + typecheck + test) — concluído
+
+### Evidências de fechamento da Sprint 2
+- ✅ Validações locais executadas com sucesso:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `npm run lint` (em `functions/`)
+  - `npm run build` (em `functions/`)
+- ✅ Fluxo de autenticação com 2FA TOTP ativo para perfis administrativos.
+- ✅ CRUD de clientes implementado com service + hooks + telas.
+- ✅ Setup inicial de push token (FCM via Expo) e Storage implementado.
+- ✅ Pipeline de qualidade ativo no GitHub Actions e pre-commit local.
 
 ---
 
@@ -138,6 +212,17 @@
 - Conflito de horário bloqueado
 - Agenda carrega em <2s
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 3.1 appointmentsService — concluído
+- ✅ 3.2 Hooks useAppointments — concluído
+- ✅ 3.3 react-native-calendars (mês/semana/dia) — concluído
+- ✅ 3.4 Home da Manicure — concluído
+- ✅ 3.5 Criar/Editar Atendimento — concluído
+- ✅ 3.6 Detalhe do Atendimento — concluído
+- ✅ 3.7 Validação de conflitos — concluído
+- ✅ 3.8 Estados de atendimento — concluído
+- ✅ 3.9 Regras Firestore appointments — concluído
+
 ---
 
 ## 💼 Sprint 4 — Comandas e Painel Salon Owner
@@ -158,6 +243,16 @@
 - Comanda fechada não reabre sem admin
 - Dono visualiza agendas das 2 manicures
 - Cálculos financeiros corretos
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 4.1 commandsService + hooks — concluído
+- ✅ 4.2 Listar Comandas — concluído
+- ✅ 4.3 Abrir/Editar Comanda — concluído
+- ✅ 4.4 Fechar Comanda — concluído
+- ✅ 4.5 Dashboard Salon Owner — concluído
+- ✅ 4.6 Gerenciar Manicures — concluído
+- ✅ 4.7 Visão consolidada de agendas — concluído
+- ✅ 4.8 Relatório financeiro básico — concluído
 
 ---
 
@@ -180,6 +275,17 @@
 - Logs com quem/o quê/quando/IP
 - Apenas super admin lê auditLogs
 - Sessão expira em 1h de inatividade
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 5.1 Dashboard global — concluído
+- ✅ 5.2 Gerenciar Salões — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.3 Gerenciar Usuários — concluído (listagem administrativa entregue na Sprint 9)
+- ✅ 5.4 Helper auditLogs — concluído
+- ✅ 5.5 Instrumentar ações sensíveis — concluído
+- ✅ 5.6 Tela de logs — concluído
+- ✅ 5.7 Sessão admin 1h — concluído
+- ✅ 5.8 Configurações globais — concluído na Sprint 10
+- ✅ 5.9 Exportação LGPD — concluído na Sprint 10
 
 ---
 
@@ -204,6 +310,18 @@
 - Atendimento no Google em <10s
 - refresh_token criptografado
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 6.1 Projeto Google Cloud + OAuth (Testing) — concluído
+- ✅ 6.2 Tela Conectar Google — concluído
+- ✅ 6.3 OAuth com expo-auth-session — concluído
+- ✅ 6.4 Cloud Function tokens + criptografia — concluído
+- ✅ 6.5 Criar calendário dedicado — concluído
+- ✅ 6.6 Trigger onCreate → Google — concluído
+- ✅ 6.7 Trigger onUpdate → Google — concluído
+- ✅ 6.8 Trigger onDelete → Google — concluído
+- ✅ 6.9 googleEventId + syncStatus — concluído
+- ✅ 6.10 Indicador de status — concluído
+
 ---
 
 ## 🔄 Sprint 7 — Sync Google→App + Reconciliação
@@ -226,6 +344,17 @@
 - Conflitos logados
 - Webhook auto-renovado
 - Zero perda em 7 dias contínuos
+
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 7.1 Watch channel (webhook) — concluído
+- ✅ 7.2 HTTP function recebe webhooks — concluído
+- ✅ 7.3 Sync incremental via syncToken — concluído
+- ✅ 7.4 Mapeamento Google → Firestore — concluído
+- ✅ 7.5 Last-write-wins — concluído
+- ✅ 7.6 Renovação diária webhooks — concluído
+- ✅ 7.7 Reconciliação 3h da manhã — concluído
+- ✅ 7.8 syncQueue (Pub/Sub) — concluído
+- ✅ 7.9 Token revogado/expirado — concluído
 
 ---
 
@@ -272,6 +401,18 @@
 - Crash-free >99.5%
 - iOS 15+ e Android 10+
 
+### Status de execução (atualizado em 01/06/2026)
+- ✅ 9.1 Setup Maestro — concluído
+- ✅ 9.2 E2E fluxos críticos — concluído no repositório com runner Maestro e smoke flow de autenticação/LGPD; execução local depende da CLI instalada
+- ✅ 9.3 Unitários Cloud Functions — concluído
+- ✅ 9.4 Auditoria de performance — concluído no escopo de desenvolvimento com revisão técnica e baseline documental
+- ✅ 9.5 Otimização queries — concluído
+- ✅ 9.6 Acessibilidade básica — concluído
+- ✅ 9.7 Dark mode validado — concluído
+- ✅ 9.8 Estados erro/loading/vazio — concluído
+- ✅ 9.9 Privacy + LGPD telas — concluído
+- ✅ 9.10 Documentação de uso — concluído
+
 ---
 
 ## 🚀 Sprint 10 — Piloto e Estabilização
@@ -292,6 +433,19 @@
 - NPS >50
 - Retenção >90% em 30 dias
 
+### Status de execução (atualizado em 02/06/2026)
+- ✅ 10.1 Build EAS iOS + Android — concluído no escopo de desenvolvimento com `app.config.ts`, `eas.json`, scripts e preflight versionados
+- ⚠️ 10.2 Distribuição interna — preparada no escopo de desenvolvimento; execução operacional manual pendente
+- ⚠️ 10.3 Onboarding presencial — documentado; execução operacional manual pendente
+- ✅ 10.4 Monitoramento ativo — concluído no escopo de desenvolvimento com health check e tela de readiness do `super_admin`
+- ⚠️ 10.5 Coleta de feedback (7 dias) — preparada documentalmente; execução operacional manual pendente
+- ✅ 10.6 Hotfix bucket — reservado e pronto para uso após feedback do piloto
+- ✅ 10.7 Relatório + handoff Fase B — concluído com documentação de release e handoff
+
+### Observação de encerramento
+- A Sprint 10 está concluída no escopo de desenvolvimento versionado no repositório.
+- As etapas restantes dependem de operação externa ao código: credenciais do EAS, distribuição dos binários, onboarding em campo e coleta de feedback real.
+
 ---
 
 ## 📊 Resumo Consolidado
@@ -300,7 +454,7 @@
 |---|---|---|---|---|
 | 0 | Setup | 1 sem | 20 | 🟢 Baixo |
 | 1 | Auth + RBAC | 2 sem | 38 | 🟡 Médio |
-| 2 | Modelagem + Clientes | 2 sem | 40 | 🟢 Baixo |
+| 2 | Modelagem + Clientes + Pendências S0/S1 | 2 sem | 56 | 🟡 Médio |
 | 3 | Agenda + Atendimentos | 2 sem | 42 | 🟡 Médio |
 | 4 | Comandas + Owner | 2 sem | 40 | 🟢 Baixo |
 | 5 | Super Admin + Auditoria | 2 sem | 38 | 🟡 Médio |
@@ -309,7 +463,7 @@
 | 8 | Notificações | 2 sem | 40 | 🟡 Médio |
 | 9 | Testes + Performance | 2 sem | 38 | 🟢 Baixo |
 | 10 | Piloto | 2 sem | 30 | 🟡 Médio |
-| **Total** | — | **21 sem** | **412 SP** | — |
+| **Total** | — | **21 sem** | **428 SP** | — |
 
 ---
 
@@ -328,11 +482,11 @@
 
 ## 🎯 Próximos Passos
 
-1. Validar este plano com Ariel (PO)
-2. Iniciar Sprint 0
-3. Configurar ferramentas (Linear, Jira ou GitHub Projects)
-4. Agendar cerimônias recorrentes
-5. Definir canal de comunicação (Slack/Discord)
+1. Executar `pnpm release:preflight` com as variáveis finais do ambiente
+2. Gerar builds EAS internos para Android e iOS
+3. Distribuir os binários do piloto e conduzir onboarding presencial
+4. Coletar feedback operacional do piloto e usar o hotfix bucket se necessário
+5. Consolidar aprendizados do piloto para priorização da Fase B
 
 ---
 

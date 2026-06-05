@@ -1,0 +1,11 @@
+appId: host.exp.exponent
+tags:
+  - authenticated
+  - notifications
+---
+- launchApp
+- tapOn: "Abrir central de notificacoes"
+- assertVisible: "Notificacoes"
+- assertVisible: "Nao lidas"
+- tapOn: "Abrir configuracoes de notificacao"
+- assertVisible: "Configuracoes de notificacao"

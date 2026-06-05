@@ -1,0 +1,13 @@
+appId: host.exp.exponent
+tags:
+  - authenticated
+  - admin
+---
+- launchApp
+- assertVisible: "Painel do Superadministrador"
+- assertVisible: "Governança"
+- tapOn: "Exportacao LGPD"
+- assertVisible: "Exportacao LGPD"
+- assertVisible: "Gerar exportacao"
+- tapOn: "Voltar as configuracoes"
+- assertVisible: "Configuracoes globais"

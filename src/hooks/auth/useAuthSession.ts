@@ -18,6 +18,10 @@ export function useAuthSession() {
       isLoading,
       status: session.status,
       role: session.role,
+      secondFactorRequired: session.secondFactorRequired,
+      secondFactorVerified: session.secondFactorVerified,
+      isSecondFactorPending: session.status === 'pending_2fa',
+      completeSecondFactor: session.completeSecondFactor,
       async signIn(params: { email: string; password: string }) {
         setIsLoading(true);
         try {
@@ -28,7 +32,12 @@ export function useAuthSession() {
             throw new Error('Perfil do usuario nao encontrado. Contate o suporte.');
           }
 
-          session.signIn({ userId: identity.uid, role: profile.role });
+          session.signIn({
+            userId: identity.uid,
+            role: profile.role,
+            salonId: profile.salonId,
+            secondFactorRequired: profile.secondFactorRequired,
+          });
         } finally {
           setIsLoading(false);
         }
@@ -41,9 +50,14 @@ export function useAuthSession() {
             uid: identity.uid,
             email: identity.email,
             displayName: params.displayName,
-            role: 'manicure',
+            role: 'nail_technician',
           });
-          session.signIn({ userId: identity.uid, role: 'manicure' });
+          session.signIn({
+            userId: identity.uid,
+            role: 'nail_technician',
+            salonId: null,
+            secondFactorRequired: false,
+          });
         } finally {
           setIsLoading(false);
         }

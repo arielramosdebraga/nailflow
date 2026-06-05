@@ -26,12 +26,63 @@ service cloud.firestore {
       return isAuthenticated() && userRole() == 'salon_owner';
     }
 
-    function isManicure() {
-      return isAuthenticated() && userRole() == 'manicure';
+    function isNailTechnician() {
+      return isAuthenticated() && (userRole() == 'nail_technician' || userRole() == 'manicure');
+    }
+
+    function isSelf(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function canReadUserFromSameSalon() {
+      return isSalonOwner()
+        && resource.data.salonId == userSalonId()
+        && (resource.data.role == 'nail_technician' || resource.data.role == 'manicure');
+    }
+
+    function selfUserUpdateHasNoSensitiveFieldChange() {
+      return !request.resource.data
+        .diff(resource.data)
+        .affectedKeys()
+        .hasAny([
+          'uid',
+          'email',
+          'role',
+          'salonId',
+          'googleCalendar',
+          'twoFactor',
+          'createdAt',
+          'updatedAt',
+        ]);
+    }
+
+    function selfUserCreateIsSafe(userId) {
+      return isSelf(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.role == 'nail_technician'
+        && request.resource.data.salonId == null
+        && !request.resource.data.keys().hasAny(['twoFactor']);
     }
 
     function belongsToSalon(salonId) {
       return isAuthenticated() && userSalonId() == salonId;
+    }
+
+    function notificationReadUpdateIsSafe() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'read',
+          'readAt',
+          'updatedAt',
+        ])
+        && request.resource.data.read == true
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.salonId == resource.data.salonId
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.title == resource.data.title
+        && request.resource.data.body == resource.data.body
+        && request.resource.data.data == resource.data.data
+        && request.resource.data.createdAt == resource.data.createdAt;
     }
 
     match /salons/{salonId} {
@@ -41,13 +92,12 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSuperAdmin()
-        || (isAuthenticated() && request.auth.uid == userId)
-        || (isSalonOwner() && resource.data.salonId == userSalonId());
+        || isSelf(userId)
+        || canReadUserFromSameSalon();
 
-      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if selfUserCreateIsSafe(userId);
       allow update: if isSuperAdmin()
-        || (isAuthenticated() && request.auth.uid == userId)
-        || (isSalonOwner() && resource.data.salonId == userSalonId());
+        || (isSelf(userId) && selfUserUpdateHasNoSensitiveFieldChange());
       allow delete: if isSuperAdmin();
     }
 
@@ -62,14 +112,14 @@ service cloud.firestore {
     match /appointments/{appointmentId} {
       allow read: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(resource.data.salonId))
-        || (isManicure() && resource.data.manicureId == request.auth.uid);
+        || (isNailTechnician() && resource.data.manicureId == request.auth.uid);
 
       allow create: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(request.resource.data.salonId));
 
       allow update, delete: if isSuperAdmin()
         || (isAuthenticated() && belongsToSalon(resource.data.salonId))
-        || (isManicure() && resource.data.manicureId == request.auth.uid);
+        || (isNailTechnician() && resource.data.manicureId == request.auth.uid);
     }
 
     match /commands/{commandId} {
@@ -83,7 +133,8 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       allow read: if isSuperAdmin()
         || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow write: if false;
+      allow update: if isAuthenticated() && notificationReadUpdateIsSafe();
+      allow create, delete: if false;
     }
 
     match /auditLogs/{logId} {
@@ -92,6 +143,10 @@ service cloud.firestore {
     }
 
     match /syncQueue/{taskId} {
+      allow read, write: if false;
+    }
+
+    match /syncQueueDeadLetter/{taskId} {
       allow read, write: if false;
     }
   }

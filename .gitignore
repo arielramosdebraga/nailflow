@@ -49,6 +49,8 @@ expo-go-qr*.png
 # local logs and temporary diagnostics
 logs/
 expo-dev*.log
+firestore-debug.log
+coverage/
 
 # local secrets
 secrets/

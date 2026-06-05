@@ -1,6 +1,7 @@
 import { FirebaseApp, getApps, initializeApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
+import { FirebaseStorage, getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -20,9 +21,10 @@ const app: FirebaseApp | null = hasFirebaseConfig
 export const firebaseApp = app;
 export const auth: Auth | null = app ? getAuth(app) : null;
 export const db: Firestore | null = app ? getFirestore(app) : null;
+export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 
 export function assertFirebaseConfigured(): void {
-  if (!firebaseApp || !auth || !db) {
+  if (!firebaseApp || !auth || !db || !storage) {
     throw new Error(
       'Firebase nao configurado. Defina as variaveis EXPO_PUBLIC_FIREBASE_* no ambiente.'
     );

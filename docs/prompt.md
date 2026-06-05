@@ -47,10 +47,10 @@ O **NailFlow** é um aplicativo mobile multiplataforma (iOS e Android) para gest
 
 | Categoria | Tecnologia | Versão |
 |---|---|---|
-| Framework | React Native | 0.76+ |
-| Plataforma | Expo SDK | 52+ |
-| Linguagem | TypeScript | 5+ |
-| Roteamento | Expo Router | v4+ (file-based) |
+| Framework | React Native | 0.85.3 |
+| Plataforma | Expo SDK | 56 |
+| Linguagem | TypeScript | 6.0.x |
+| Roteamento | Expo Router | 56.x (file-based) |
 | Estilização | **NativeWind** | v4 |
 | Componentes UI | React Native Reusables | latest |
 | Estado global | Zustand | latest |
@@ -67,7 +67,7 @@ O **NailFlow** é um aplicativo mobile multiplataforma (iOS e Android) para gest
 |---|---|
 | Autenticação | Firebase Authentication |
 | Banco de dados | Cloud Firestore |
-| Funções serverless | Cloud Functions for Firebase (Node.js 20+, TypeScript) |
+| Funções serverless | Cloud Functions for Firebase (Node.js 22, TypeScript) |
 | Push notifications | Firebase Cloud Messaging (FCM) |
 | Storage | Firebase Storage |
 | Fila assíncrona | Cloud Pub/Sub |
@@ -526,7 +526,7 @@ Integrado ao próprio app (não há painel web separado na Fase A). Acessível a
 - Configurações de notificação
 
 ### Mês 5 — Testes, Refinamentos e Piloto
-- Testes E2E (Detox ou Maestro)
+- Testes E2E (Maestro)
 - Testes manuais com piloto
 - Performance e otimização
 - Acessibilidade básica

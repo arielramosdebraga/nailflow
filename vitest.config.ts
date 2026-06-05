@@ -10,5 +10,23 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    include: ['src/**/*.test.ts', 'functions/src/**/*.test.ts'],
+    exclude: [
+      '**/*.integration.test.ts',
+      'functions/lib/**',
+      '**/node_modules/**',
+      '.expo/**',
+      'dist/**',
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      thresholds: {
+        statements: 20,
+        branches: 10,
+        functions: 20,
+        lines: 20,
+      },
+    },
   },
 });
