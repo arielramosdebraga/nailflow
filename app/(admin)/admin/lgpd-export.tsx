@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, Share, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { buildLgpdExportPackageAsync, type LgpdExportPackage } from '@/services/admin/lgpdExportService';
+
+const adminSettingsRoute = '/admin/settings' satisfies Href;
 
 export default function AdminLgpdExportScreen() {
   const router = useRouter();
@@ -76,12 +78,8 @@ export default function AdminLgpdExportScreen() {
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
               Gerado em: {new Date(exportPackage.generatedAt).toLocaleString('pt-BR')}
             </Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Usuarios: {exportPackage.summary.users}
-            </Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Saloes: {exportPackage.summary.salons}
-            </Text>
+            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Usuarios: {exportPackage.summary.users}</Text>
+            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Saloes: {exportPackage.summary.salons}</Text>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
               Logs de auditoria: {exportPackage.summary.auditLogs}
             </Text>
@@ -112,7 +110,7 @@ export default function AdminLgpdExportScreen() {
           }}
           disabled={!jsonPreview || loading}
         />
-        <Button label="Voltar as configuracoes" variant="ghost" onPress={() => router.replace('./settings')} />
+        <Button label="Voltar as configuracoes" variant="ghost" onPress={() => router.replace(adminSettingsRoute)} />
       </View>
     </View>
   );

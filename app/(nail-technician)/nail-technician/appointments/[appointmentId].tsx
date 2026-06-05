@@ -1,5 +1,5 @@
 import { Alert, Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import {
   AppointmentCard,
@@ -10,16 +10,18 @@ import {
 } from '@/components/features/appointments';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import {
-  useAppointment,
-  useDeleteAppointmentMutation,
-  useUpdateAppointmentStatusMutation,
-} from '@/hooks/appointments';
+import { useAppointment, useDeleteAppointmentMutation, useUpdateAppointmentStatusMutation } from '@/hooks/appointments';
 import { useClient } from '@/hooks/clients/useClient';
 import { type AppointmentStatus } from '@/schemas/appointments/appointment.schema';
 import { useSessionStore } from '@/stores/sessionStore';
 
 const statusOptions: AppointmentStatus[] = ['scheduled', 'confirmed', 'completed', 'cancelled'];
+const agendaRoute = '/nail-technician/agenda' satisfies Href;
+
+const getAppointmentEditRoute = (appointmentId: string): Href => ({
+  pathname: '/nail-technician/appointments/[appointmentId]/edit',
+  params: { appointmentId },
+});
 
 export default function NailTechnicianAppointmentDetailsScreen() {
   const router = useRouter();
@@ -61,7 +63,7 @@ export default function NailTechnicianAppointmentDetailsScreen() {
         onPress: async () => {
           try {
             await deleteAppointmentMutation.mutateAsync(appointmentId);
-            router.replace('../../agenda');
+            router.replace(agendaRoute);
           } catch (error) {
             Alert.alert('Erro', error instanceof Error ? error.message : 'Falha ao excluir atendimento.');
           }
@@ -90,7 +92,7 @@ export default function NailTechnicianAppointmentDetailsScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -103,7 +105,7 @@ export default function NailTechnicianAppointmentDetailsScreen() {
           <Text className="text-sm text-error">Este atendimento nao pertence a profissional logada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} />
+          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -158,14 +160,23 @@ export default function NailTechnicianAppointmentDetailsScreen() {
       </View>
 
       <View className="gap-2 pt-4">
-        <Button label="Editar atendimento" onPress={() => router.push('./edit')} disabled={isMutating} />
+        <Button
+          label="Editar atendimento"
+          onPress={() => router.push(getAppointmentEditRoute(appointment.id))}
+          disabled={isMutating}
+        />
         <Button
           label={deleteAppointmentMutation.isPending ? 'Excluindo...' : 'Excluir atendimento'}
           variant="danger"
           onPress={handleDeleteAppointment}
           disabled={isMutating}
         />
-        <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace('../../agenda')} disabled={isMutating} />
+        <Button
+          label="Voltar para agenda"
+          variant="ghost"
+          onPress={() => router.replace(agendaRoute)}
+          disabled={isMutating}
+        />
       </View>
     </View>
   );

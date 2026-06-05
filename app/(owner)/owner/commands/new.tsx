@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 
 import { CommandForm } from '@/components/features/commands/CommandForm';
@@ -10,6 +10,13 @@ import { useClients } from '@/hooks/clients/useClients';
 import { useCreateCommandMutation } from '@/hooks/commands/useCommandMutations';
 import { useManicures } from '@/hooks/users/useManicures';
 import { type UpsertCommandInput } from '@/schemas/commands/command.schema';
+
+const commandsListRoute = '/owner/commands' satisfies Href;
+
+const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]',
+  params: { commandId },
+});
 
 export default function OwnerNewCommandScreen() {
   const router = useRouter();
@@ -26,7 +33,7 @@ export default function OwnerNewCommandScreen() {
 
   async function handleSubmit(data: Omit<UpsertCommandInput, 'salonId'>) {
     const commandId = await createCommandMutation.mutateAsync(data);
-    router.replace(`../${commandId}`);
+    router.replace(getOwnerCommandDetailsRoute(commandId));
   }
 
   if (appointmentsQuery.isLoading || clientsQuery.isLoading || manicuresQuery.isLoading) {
@@ -44,10 +51,12 @@ export default function OwnerNewCommandScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar dados.'}</Text>
+          <Text className="text-sm text-error">
+            {error instanceof Error ? error.message : 'Falha ao carregar dados.'}
+          </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -63,7 +72,7 @@ export default function OwnerNewCommandScreen() {
       clients={clientsQuery.data ?? []}
       manicures={manicuresQuery.data ?? []}
       onSubmit={handleSubmit}
-      onCancel={() => router.replace('../')}
+      onCancel={() => router.replace(commandsListRoute)}
     />
   );
 }

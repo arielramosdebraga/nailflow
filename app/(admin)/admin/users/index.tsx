@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -12,6 +12,7 @@ const roleLabels: Record<string, string> = {
   salon_owner: 'Dono de salao',
   nail_technician: 'Profissional',
 };
+const adminDashboardRoute = '/admin/dashboard' satisfies Href;
 
 export default function AdminUsersScreen() {
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function AdminUsersScreen() {
       ) : null}
 
       <View className="pt-2">
-        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace('../dashboard')} />
+        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace(adminDashboardRoute)} />
       </View>
     </View>
   );

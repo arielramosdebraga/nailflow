@@ -1,7 +1,9 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 import { NotificationCenter } from '@/components/features/notifications';
+
+const notificationSettingsRoute = '/nail-technician/notifications/settings' satisfies Href;
 
 export default function NailTechnicianNotificationsScreen() {
   const router = useRouter();
@@ -11,7 +13,7 @@ export default function NailTechnicianNotificationsScreen() {
       <NotificationCenter
         title="Notificacoes"
         subtitle="Acompanhe alertas de agenda, sincronizacao e lembretes."
-        onOpenSettings={() => router.push('./settings')}
+        onOpenSettings={() => router.push(notificationSettingsRoute)}
       />
       <View className="px-6 pb-6 pt-2">
         <Pressable

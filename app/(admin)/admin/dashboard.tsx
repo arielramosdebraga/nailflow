@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 
 import { AdminHeader, AdminKpiCards } from '@/components/features/admin';
@@ -7,6 +7,13 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAdminSessionGuard, useGlobalDashboard } from '@/hooks/admin';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
+
+const adminRoutes = {
+  auditLogs: '/admin/audit-logs',
+  notifications: '/admin/notifications',
+  salons: '/admin/salons',
+  users: '/admin/users',
+} as const satisfies Record<string, Href>;
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
@@ -23,7 +30,7 @@ export default function AdminDashboardScreen() {
         accessory={
           <NotificationsBellButton
             unreadCount={unreadNotifications.unreadCount}
-            onPress={() => router.push('./notifications')}
+            onPress={() => router.push(adminRoutes.notifications)}
           />
         }
       />
@@ -47,13 +54,13 @@ export default function AdminDashboardScreen() {
             label="Central de notificacoes"
             variant="secondary"
             className="flex-1"
-            onPress={() => router.push('./notifications')}
+            onPress={() => router.push(adminRoutes.notifications)}
           />
           <Button
             label="Auditoria"
             variant="ghost"
             className="flex-1"
-            onPress={() => router.push('./audit-logs')}
+            onPress={() => router.push(adminRoutes.auditLogs)}
           />
         </View>
 
@@ -82,10 +89,14 @@ export default function AdminDashboardScreen() {
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
             Consulte saloes, usuarios administrativos, notificacoes e logs de auditoria em um unico lugar.
           </Text>
-          <Button label="Abrir saloes" onPress={() => router.push('./salons')} />
-          <Button label="Abrir usuarios" variant="secondary" onPress={() => router.push('./users')} />
-          <Button label="Abrir logs de auditoria" variant="ghost" onPress={() => router.push('./audit-logs')} />
-          <Button label="Central de notificacoes" variant="secondary" onPress={() => router.push('./notifications')} />
+          <Button label="Gerenciar saloes" onPress={() => router.push(adminRoutes.salons)} />
+          <Button label="Gerenciar usuarios" variant="secondary" onPress={() => router.push(adminRoutes.users)} />
+          <Button label="Ver logs de auditoria" variant="ghost" onPress={() => router.push(adminRoutes.auditLogs)} />
+          <Button
+            label="Abrir central de notificacoes"
+            variant="secondary"
+            onPress={() => router.push(adminRoutes.notifications)}
+          />
         </Card>
       </View>
     </ScrollView>

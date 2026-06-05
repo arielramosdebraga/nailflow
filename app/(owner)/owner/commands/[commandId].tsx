@@ -1,5 +1,5 @@
 import { Alert, Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -15,6 +15,13 @@ import {
   formatCurrency,
   formatDateTime,
 } from '@/components/features/commands/commandFormatters';
+
+const commandsListRoute = '/owner/commands' satisfies Href;
+
+const getOwnerCommandEditRoute = (commandId: string): Href => ({
+  pathname: '/owner/commands/[commandId]/edit',
+  params: { commandId },
+});
 
 export default function OwnerCommandDetailsScreen() {
   const router = useRouter();
@@ -79,10 +86,12 @@ export default function OwnerCommandDetailsScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar comanda.'}</Text>
+          <Text className="text-sm text-error">
+            {error instanceof Error ? error.message : 'Falha ao carregar comanda.'}
+          </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -95,7 +104,7 @@ export default function OwnerCommandDetailsScreen() {
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">Comanda nao encontrada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar" variant="ghost" onPress={() => router.replace('../')} />
+          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -114,7 +123,9 @@ export default function OwnerCommandDetailsScreen() {
 
         <Card className="gap-2">
           <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Resumo</Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Status: {formatCommandStatus(command.status)}</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+            Status: {formatCommandStatus(command.status)}
+          </Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
             Pagamento: {formatCommandPaymentMethod(command.paymentMethod)}
           </Text>
@@ -158,7 +169,7 @@ export default function OwnerCommandDetailsScreen() {
       </View>
 
       <View className="gap-2 pt-4">
-        <Button label="Editar comanda" onPress={() => router.push('./edit')} />
+        <Button label="Editar comanda" onPress={() => router.push(getOwnerCommandEditRoute(command.id))} />
 
         {command.status === 'open' ? (
           <Button
@@ -169,7 +180,7 @@ export default function OwnerCommandDetailsScreen() {
           />
         ) : null}
 
-        <Button label="Voltar para lista" variant="ghost" onPress={() => router.replace('../')} />
+        <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
       </View>
     </View>
   );
