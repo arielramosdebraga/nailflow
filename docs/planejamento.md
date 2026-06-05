@@ -33,7 +33,7 @@
 | 8 | 2–4 dias | Alta |
 | 13 | 4–7 dias | Muito alta (considerar quebrar) |
 
-### Status atual do projeto (atualizado em 02/06/2026)
+### Status atual do projeto (atualizado em 05/06/2026)
 - ✅ Sprint 0 concluída (pendências absorvidas e finalizadas na Sprint 2)
 - ✅ Sprint 1 concluída (2FA administrativo finalizado na Sprint 2)
 - ✅ Sprint 2 concluída
@@ -45,6 +45,7 @@
 - ✅ Sprint 8 concluída
 - ✅ Sprint 9 concluída
 - ✅ Sprint 10 concluída no escopo de desenvolvimento
+- ✅ PR `#13` (`fix-tests`) mergeado em `develop`, com estabilizacao de APK, navegacao, seed, indices e ambiente de testes
 
 ### Leitura correta do status
 - ✅ 100% do escopo de desenvolvimento previsto no planejamento foi implementado e versionado no repositório.
@@ -62,7 +63,7 @@
 | **Dependências** | Nenhuma |
 
 ### Tarefas
-- 0.1 Criar projeto Expo (SDK 52+) com TypeScript strict — 2 SP
+- 0.1 Criar projeto Expo (SDK 56) com TypeScript strict — 2 SP
 - 0.2 Configurar NativeWind v4 + tailwind.config — 3 SP
 - 0.3 Configurar Expo Router v4 — 2 SP
 - 0.4 Setup Firebase (Auth, Firestore, Functions, FCM, Storage) — 3 SP
@@ -70,7 +71,7 @@
 - 0.6 Estrutura de pastas src/ — 1 SP
 - 0.7 Configurar Zustand + TanStack Query + RHF + Zod — 3 SP
 - 0.8 Repositório Git + branches + CI básico — 2 SP
-- 0.9 Setup Cloud Functions (Node 20+, TS) — 2 SP
+- 0.9 Setup Cloud Functions (Node 22, TS) — 2 SP
 
 ### Entregáveis
 - Repositório versionado com estrutura definitiva
@@ -92,7 +93,7 @@
 - ✅ 0.6 Estrutura de pastas src/ — concluído
 - ✅ 0.7 Configurar Zustand + TanStack Query + RHF + Zod — concluído
 - ✅ 0.8 Repositório Git + branches + CI básico — concluído (finalizado na Sprint 2)
-- ✅ 0.9 Setup Cloud Functions (Node 20+, TS) — concluído
+- ✅ 0.9 Setup Cloud Functions (Node 22, TS) — concluído
 
 ---
 

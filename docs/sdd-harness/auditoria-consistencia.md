@@ -1,54 +1,64 @@
 # Auditoria de consistencia - NailFlow
 
-Fonte obrigatoria: `docs/sdd-harness/00-contexto-repo.md` e artefatos em `docs/sdd-harness/`.
+Fonte obrigatoria: `docs/sdd-harness/00-contexto-repo.md`.
 
 ## Resumo executivo
-O repositorio esta consistente com a conclusao de desenvolvimento da Fase A, mas o harness ainda nao cumpre todos os gates definidos. Os maiores riscos sao ausencia de coverage gate, ausencia de integracao com Firebase Emulator, E2E parcial, criterios criticos sem teste e divergencias documentais/legadas que podem confundir manutencao futura.
 
-## Tabela de achados
+O repositorio esta consistente com a Fase A e com a estabilizacao pos-Sprint 10, mas ainda existem pendencias operacionais relevantes: deploy de Functions bloqueado por Blaze, integracao fora do CI, E2E ainda em nivel smoke e alguns pontos documentais/legados que exigem cuidado em evolucoes futuras.
 
-| ID | Categoria | Achado | Gate | Severidade | Evidencia | Recomendacao |
-|---|---|---|---|---|---|---|
-| AUD-001 | Versoes | Docs narrativos citam Expo SDK 52+, mas stack real e Expo `~56.0.6` | - | Media | `package.json`, `docs/adr/ADR-0002-upgrade-expo-sdk-52-56.md` | Atualizar docs narrativos que ainda citam SDK antigo |
-| AUD-002 | Runtime | Docs narrativos citam Node 20+, mas Functions usam Node `22` | - | Media | `functions/package.json` | Padronizar documentacao operacional para Node 22 |
-| AUD-003 | Dados | Instrucoes citam 8 colecoes oficiais, mas existe `syncQueueDeadLetter` | - | Media | `firestore.rules`, `firestore.indexes.json` | Oficializar `syncQueueDeadLetter` ou documentar como excecao |
-| AUD-004 | Nomenclatura | `nail_technician` e canonico, mas `manicure`/`manicureId` ainda existem | - | Media | `src/schemas/users/user.schema.ts`, `firestore.rules`, `functions/src/shared/user-context.ts` | Manter como legado documentado ou planejar migracao |
-| AUD-005 | Pacotes | Raiz usa pnpm; Functions tem package-lock e scripts internos npm | - | Baixa | `pnpm-lock.yaml`, `functions/package-lock.json`, `functions/package.json` | Decidir padrao unico ou documentar motivo da excecao |
-| AUD-006 | CA sem teste | 2FA sem TOTP valido nao tem teste especifico | G1 | Alta | `docs/sdd-harness/harness.md` | Criar teste unitario/callable para fluxo TOTP |
-| AUD-007 | CA sem teste | Isolamento por salao nao tem teste de rules/emulador | G1/G5 | Alta | `firestore.rules`, ausencia de integration tests | Criar tests com Firebase Emulator/rules-unit-testing |
-| AUD-008 | CA sem teste | Conflito de agenda nao tem teste especifico | G1 | Alta | `src/services/appointments/conflictValidation.ts` | Criar teste unitario para conflictValidation |
-| AUD-009 | CA sem teste | Comanda fechada nao reabre sem admin sem teste especifico | G1 | Alta | `src/services/commands/**` | Criar teste de regra de negocio/permissao |
-| AUD-010 | CA sem teste | Exportacao LGPD nao tem teste de callable | G1 | Alta | `functions/src/admin/export-lgpd-data.ts` | Criar teste unitario/integracao da callable |
-| AUD-011 | Coverage | Nao ha META de cobertura | G2 | Alta | `vitest.config.ts` | Definir thresholds |
-| AUD-012 | Coverage | Nao ha coverage atual medido | G2 | Alta | ausencia de `coverage/coverage-summary.json` | Criar script coverage e publicar summary |
-| AUD-013 | CI | CI nao possui coverage gate | G2 | Alta | `.github/workflows/ci.yml` | Adicionar step que falha abaixo da meta |
-| AUD-014 | Piramide | Camada de integracao ausente | G3 | Alta | ausencia de `*.integration.test.ts` | Criar suite de integracao com emulator |
-| AUD-015 | Functions | Functions nao sao testadas contra emulador | G5 | Media | `.github/workflows/ci.yml`, `firebase.json` | Configurar emuladores e rodar no CI |
-| AUD-016 | E2E | Maestro cobre apenas auth smoke | G6 | Media | `.maestro/auth-smoke.yaml` | Criar flows para agenda, comandas, notificacoes, Google e admin |
-| AUD-017 | Release | Preflight de release nao tem teste automatizado | - | Baixa | `scripts/release-preflight.mjs` | Criar teste de script ou modularizar validador |
+## Achados atuais
+
+| ID | Categoria | Achado | Severidade | Evidencia | Recomendacao |
+|---|---|---|---|---|---|
+| AUD-001 | Backend | Deploy de Functions bloqueado sem Firebase Blaze | Alta | erro da Firebase CLI, docs de release | Decidir Blaze; depois publicar Functions |
+| AUD-002 | CI | `pnpm test:integration` existe, mas nao roda no CI | Media | `.github/workflows/ci.yml` | Adicionar job/step de integracao quando a esteira suportar emuladores |
+| AUD-003 | E2E | Maestro cobre smoke, nao jornadas completas do piloto | Media | `.maestro/*.yaml` | Expandir para jornadas por perfil |
+| AUD-004 | Coverage | Coverage gate existe, mas thresholds sao baixos | Media | `vitest.config.ts` | Subir thresholds por modulo conforme cobertura amadurecer |
+| AUD-005 | Nomenclatura | `nail_technician` e canonico, mas `manicure`/`manicureId` continuam como legado | Media | schemas, rules, functions | Manter compatibilidade documentada ate migracao dedicada |
+| AUD-006 | Pacotes | Raiz usa pnpm; Functions mantem `package-lock.json` e scripts com `npm run` | Baixa | `functions/package.json`, `functions/package-lock.json` | Padronizar futuramente ou manter excecao documentada |
+| AUD-007 | Storage | App tem dependencias Firebase Storage, mas `storage.rules` nao esta versionado | Baixa | `package.json`, `firebase.json` | Versionar rules se Storage passar a ser usado diretamente |
+| AUD-008 | Google Calendar | SLA de sync real nao tem medicao automatizada | Media | specs/harness | Criar teste/E2E ou observabilidade apos Functions publicadas |
+| AUD-009 | Release | `gh` nao esta instalado localmente | Baixa | ambiente local | Usar GitHub web/plugin ou instalar `gh` se for necessario atualizar PR via CLI |
+
+## Achados resolvidos desde auditoria anterior
+
+| Tema | Estado atual |
+|---|---|
+| Expo SDK antigo em docs principais | Atualizado para SDK 56 |
+| Node Functions antigo | Atualizado para Node 22 |
+| `syncQueueDeadLetter` ausente | Documentado como collection operacional |
+| Teste de 2FA/TOTP | Existe `functions/src/auth/totp-callables.test.ts` |
+| Teste de conflito de agenda | Existe `src/services/appointments/conflictValidation.test.ts` |
+| Teste de reabertura de comanda | Existe `src/services/commands/command-reopen.test.ts` |
+| Teste de LGPD callable | Existe `functions/src/admin/export-lgpd-data.integration.test.ts` |
+| Coverage ausente | `test:coverage` e thresholds existem |
+| Emuladores ausentes | `firebase.json` declara Auth/Firestore/Functions/UI |
+| Integracao ausente | `pnpm test:integration` existe |
 
 ## Status dos gates G1-G7
 
 | Gate | Status | Evidencia |
 |---|---|---|
-| G1 | Nao cumprido parcialmente | Criterios criticos sem teste em `docs/sdd-harness/harness.md` |
-| G2 | Nao cumprido | `vitest.config.ts` sem thresholds e CI sem coverage |
-| G3 | Nao cumprido | Sem camada de integracao |
-| G4 | Cumprido | `.github/workflows/ci.yml` |
-| G5 | Nao cumprido | Sem Firebase Emulator tests |
-| G6 | Parcial | `.maestro/auth-smoke.yaml` cobre apenas auth |
-| G7 | Cumprido | `.husky/pre-commit`, `.lintstagedrc.cjs` |
+| G1 | Parcial | CAs criticos principais possuem testes, mas ainda ha gaps E2E/rules |
+| G2 | Cumprido gradual | `vitest.config.ts` possui thresholds e CI roda coverage |
+| G3 | Parcial | Unit, integracao e E2E existem; integracao/E2E fora do CI |
+| G4 | Cumprido | CI roda qualidade e build de Functions |
+| G5 | Parcial | Emulador e testes existem localmente; nao rodam no CI |
+| G6 | Parcial | Smoke Maestro existe; jornadas completas pendentes |
+| G7 | Cumprido | Husky/lint-staged/typecheck |
 
-## Top 5 riscos
-1. Falta de teste automatizado para criterios criticos de seguranca e RBAC.
-2. Sem coverage gate, regressao de cobertura nao bloqueia PR.
-3. Sem teste de integracao, regras Firestore nao sao comprovadas automaticamente.
-4. E2E nao cobre fluxos principais do piloto.
-5. Legado `manicure` pode gerar confusao em evolucoes futuras.
+## Top riscos para o piloto
 
-## Boas praticas sugeridas
-- `SUGESTAO`: criar `test:coverage` e thresholds graduais.
-- `SUGESTAO`: adicionar suite `integration` separada para Firestore Rules e Functions callables.
-- `SUGESTAO`: expandir Maestro por fluxo do `docs/guia-de-uso-piloto.md`.
-- `SUGESTAO`: criar ADR curta para permanencia temporaria de `manicureId`.
-- `SUGESTAO`: padronizar o gerenciador das Functions ou documentar a excecao.
+1. Functions nao publicadas impedem 2FA real, Google Calendar, LGPD callable, triggers e schedulers.
+2. Testes manuais ainda sao necessarios para validar APK em aparelho real.
+3. Integracao Firebase fora do CI pode deixar regressao de rules/callables passar.
+4. E2E smoke nao cobre todos os passos de usuarios reais.
+5. Legado `manicureId` pode confundir novas implementacoes se nao for respeitado.
+
+## Proximos passos sugeridos
+
+- Ativar Blaze somente com decisao do owner e alertas de billing configurados.
+- Publicar Functions e revalidar fluxos dependentes.
+- Adicionar `pnpm test:integration` ao CI.
+- Transformar smoke Maestro em jornadas completas por perfil.
+- Criar plano de migracao futura para `manicureId` -> `nailTechnicianId`, se o custo justificar.

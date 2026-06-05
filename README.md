@@ -1,156 +1,156 @@
 # NailFlow
 
-Aplicativo mobile (iOS e Android) para gestão de salão, com foco em autenticação segura, agenda e operação do dia a dia.
+Aplicativo mobile para gestao de salao, com foco em autenticacao segura, agenda, clientes, comandas, notificacoes e operacao do dia a dia.
 
-## Visão geral
+## Visao geral
 
-- Plataforma: React Native + Expo
-- Backend: Firebase (Auth, Firestore, Functions)
-- Arquitetura: Expo Router + camada `services` + `hooks` + schemas Zod
-- Idioma da interface: português (pt-BR)
+- Plataforma: Expo SDK 56 + React Native
+- Backend: Firebase Auth, Firestore e Cloud Functions
+- Arquitetura: Expo Router + `services` + `hooks` + schemas Zod
+- Interface: portugues (pt-BR)
+- Testes do piloto: APK/development build, nao Expo Go
 
-## Status atual do projeto
+## Status atual
 
-- Sprint 0: concluída
-- Sprint 1: concluída
-- Sprint 2: concluída
-  - modelagem e CRUD de clientes
-  - 2FA (TOTP) para `super_admin` e `salon_owner`
-  - Cloud Function `createSalon`
-  - setup funcional básico de FCM/Storage
-  - Husky + lint-staged + CI (lint/typecheck/test)
-- Sprint 3: concluída
-- Sprint 4: concluída
-- Sprint 5: concluída
-  - governança principal de `super_admin` entregue na Sprint 9
-  - pendências residuais finalizadas na Sprint 10
-- Sprint 6: concluída
-- Sprint 7: concluída
-- Sprint 8: concluída
-- Sprint 9: concluída
-- Sprint 10: concluída no escopo de desenvolvimento
-  - readiness de release com `app.config.ts`, `eas.json` e preflight versionados
-  - configurações globais do `super_admin`
-  - exportação LGPD via Cloud Function com trilha de auditoria
-  - documentação operacional de release, piloto e handoff da Fase B
+- Sprint 0 a Sprint 10 concluidas no escopo de desenvolvimento.
+- Branch `fix-tests` mergeada em `develop` em 05/06/2026 via PR `#13`.
+- APK Android preview gerado e finalizado no EAS para testes internos.
+- Indices Firestore publicados no ambiente de testes.
+- Seed de contas e entidades de teste disponivel.
+- Deploy de Cloud Functions bloqueado ate o projeto Firebase estar no plano Blaze.
 
-Observação:
-- A execução operacional do piloto continua manual: gerar builds no EAS, distribuir internamente, conduzir onboarding e coletar feedback em campo.
-- Em outras palavras: 100% do desenvolvimento versionado no repositório foi concluído; o que resta é execução operacional do piloto.
+Pendencia externa principal:
 
-Para detalhes completos, consulte:
-- [docs/planejamento.md](./docs/planejamento.md)
-- [docs/AGENTS.md](./docs/AGENTS.md)
-- [docs/guia-de-uso-piloto.md](./docs/guia-de-uso-piloto.md)
-- [docs/release-operacional.md](./docs/release-operacional.md)
-- [docs/handoff-fase-b.md](./docs/handoff-fase-b.md)
+- Sem Blaze, Functions nao publicam; isso limita 2FA real, Google Calendar real, LGPD callable, triggers, schedulers e parte das notificacoes/backend.
 
 ## Stack principal
 
-- Expo SDK 56
-- React Native 0.85
-- TypeScript (strict)
-- Expo Router
+- Expo `~56.0.8`
+- React Native `0.85.3`
+- React `19.2.3`
+- Expo Router `^56.2.8`
+- TypeScript `~6.0.3`
 - NativeWind
 - Zustand
 - TanStack Query
 - React Hook Form + Zod
-- Firebase JS SDK + Cloud Functions
+- Firebase JS SDK `^12.13.0`
+- React Native Firebase `^24.0.0`
+- Cloud Functions Node `22`
 
-## Pré-requisitos
+Antes de mudancas estruturais em Expo, consulte a documentacao versionada:
 
-- Node.js 22+
-- pnpm 10+
-- Android Studio com SDK Android para builds locais
-- JDK 21 LTS
-- Projeto Firebase configurado
+- https://docs.expo.dev/versions/v56.0.0/
 
-## Configuração de ambiente
+## Pre-requisitos
 
-Crie um arquivo `.env` na raiz com as variáveis:
+- Node.js 22.13.x ou superior dentro da faixa suportada pelo Expo SDK 56.
+- pnpm 9.x, alinhado ao CI e ao lockfile.
+- JDK 21 LTS.
+- Android Studio com Android SDK/API 36 para build local/emulador.
+- Conta EAS para builds remotas.
+- Firebase CLI no PATH para deploy e `pnpm test:integration`.
+- Projeto Firebase configurado.
 
-```env
-EXPO_PUBLIC_FIREBASE_API_KEY=
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-EXPO_PUBLIC_FIREBASE_APP_ID=
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
-EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
-EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
-EXPO_PUBLIC_GOOGLE_CALENDAR_BEGIN_CALLABLE=beginGoogleCalendarConnection
-EXPO_PUBLIC_GOOGLE_CALENDAR_CONFIRM_CALLABLE=completeGoogleCalendarConnection
-EXPO_PUBLIC_EAS_PROJECT_ID=
-EXPO_PUBLIC_FUNCTIONS_HEALTH_URL=
-EXPO_OWNER=
-NAILFLOW_IOS_BUNDLE_IDENTIFIER=app.nailflow.mobile
-NAILFLOW_ANDROID_PACKAGE=app.nailflow.mobile
-NAILFLOW_IOS_BUILD_NUMBER=1
-NAILFLOW_ANDROID_VERSION_CODE=1
+## Ambiente
+
+Copie o template versionado e preencha os valores reais localmente:
+
+```bash
+cp .env.template .env
 ```
 
-Observações:
-- Não versione arquivos sensíveis.
-- Credenciais de admin local devem ficar em `secrets/` (ignorado por Git).
-- Use [`.env.example`](./.env.example) como baseline único para app e functions.
+No Windows PowerShell:
 
-## Executando o app
+```powershell
+Copy-Item .env.template .env
+```
 
-Instalação:
+Regras:
+
+- `.env` nao deve ser versionado.
+- `.env.template` e o baseline sem segredos.
+- Credenciais admin locais ficam em `secrets/` ou em `GOOGLE_APPLICATION_CREDENTIALS`.
+- Nunca exponha valores reais de Firebase, Google, service account ou tokens em commits/docs/logs.
+
+## Instalar dependencias
 
 ```bash
 pnpm install
 ```
 
-Subir servidor de desenvolvimento:
+## Desenvolvimento
 
 ```bash
 pnpm start
-```
-
-Gerar build Android de teste:
-
-```bash
-pnpm build:preview:android
-```
-
-Outros alvos:
-
-```bash
 pnpm android
 pnpm ios
 pnpm web
 ```
 
-## Qualidade e testes
+Observacao:
 
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm test:e2e
-```
+- `pnpm start` abre o servidor Expo, mas o piloto nao deve ser validado pelo Expo Go.
+- Use APK EAS ou development build para recursos nativos/push.
 
-Observação:
-- `pnpm test:e2e` executa os fluxos Maestro versionados em `.maestro/`.
-- A execução local depende da CLI do Maestro instalada no ambiente.
-
-## Scripts úteis
-
-Seed de contas de teste:
-
-```bash
-pnpm seed:test-accounts
-```
-
-Release e distribuição:
+## Build Android de teste
 
 ```bash
 pnpm release:preflight
-pnpm release:env:pull:preview
 pnpm build:preview:android
+```
+
+Build Android preview de referencia:
+
+- ID: `95bf855a-29e4-447c-9caf-4d4865358d2a`
+- Status: `FINISHED`
+- Commit: `7da07de`
+- `appBuildVersion`: `3`
+- URL: `https://expo.dev/accounts/guhzynhuh/projects/nailflow/builds/95bf855a-29e4-447c-9caf-4d4865358d2a`
+
+Perfis EAS disponiveis:
+
+- `development`: build interna com development client.
+- `preview`: build interna para APK/testes Android.
+- `pilot`: build interna para rodada de piloto.
+- `production`: build/submissao para lojas.
+
+Todos usam `autoIncrement: true`.
+
+## Qualidade e testes
+
+Obrigatorio apos mudancas:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test
+```
+
+Complementar:
+
+```bash
+pnpm format
+pnpm test:coverage
+pnpm test:integration
+pnpm test:e2e
+pnpm --dir functions lint
+pnpm --dir functions build
+npx expo-doctor
+```
+
+Notas:
+
+- `pnpm test:integration` usa Firebase Emulator.
+- A Firebase CLI precisa estar instalada/disponivel como `firebase`.
+- `pnpm test:e2e` usa Maestro e depende de ambiente mobile preparado.
+- Rode `npx expo-doctor` ao mudar Expo, dependencias, EAS, configs nativas ou build.
+
+Scripts EAS uteis:
+
+```bash
+pnpm release:env:pull:preview
+pnpm release:env:pull:production
 pnpm build:preview:ios
 pnpm build:pilot:all
 pnpm build:production:all
@@ -158,43 +158,57 @@ pnpm submit:production:ios
 pnpm submit:production:android
 ```
 
-## Cloud Functions
-
-As funções ficam em [`functions/`](./functions) e podem ser operadas pelo workspace com `pnpm`.
+## Seed de dados de teste
 
 ```bash
-pnpm --dir functions lint
-pnpm --dir functions build
-pnpm --dir functions serve
+pnpm seed:test-accounts
 ```
 
-### Variáveis de ambiente das Functions (Sprints 6 e 7)
+Pre-requisitos:
 
-Defina no ambiente das funções:
+- `.env` com `EXPO_PUBLIC_FIREBASE_PROJECT_ID` apontando para o projeto correto.
+- Credencial Admin local em `secrets/firebase/firebase-adminsdk*.json`, ou `GOOGLE_APPLICATION_CREDENTIALS` apontando para a credencial.
+- Rodar somente no Firebase de teste/piloto autorizado, porque o script cria/atualiza Auth e Firestore.
 
-```env
-GOOGLE_CALENDAR_CLIENT_ID=
-GOOGLE_CALENDAR_CLIENT_SECRET=
-GOOGLE_CALENDAR_REDIRECT_URI=
-GOOGLE_TOKEN_ENCRYPTION_SECRET=
-GOOGLE_CALENDAR_STATE_TTL_SECONDS=600
-GOOGLE_CALENDAR_WEBHOOK_URL=
-GOOGLE_CALENDAR_WATCH_TOKEN_SECRET=
-GOOGLE_CALENDAR_WATCH_RENEW_AHEAD_SECONDS=21600
-GOOGLE_CALENDAR_RECONCILE_LOOKBACK_DAYS=90
-SUPER_ADMIN_ALLOWLIST=
-TOTP_ISSUER=NailFlow
-SCHEDULER_TIMEZONE=America/Sao_Paulo
-TEST_ACCOUNT_PASSWORD=
+Contas criadas/atualizadas:
+
+| Perfil | E-mail | Role |
+|---|---|---|
+| Profissional | `manicure.teste@nailflow.app` | `nail_technician` |
+| Dono do salao | `owner.teste@nailflow.app` | `salon_owner` |
+| Admin global | `admin.teste@nailflow.app` | `super_admin` |
+
+Senha padrao:
+
+```text
+Nailflow@123
 ```
 
-Deploy de functions:
+ou `TEST_ACCOUNT_PASSWORD`.
+
+O seed tambem cria salao, cliente, atendimento, comandas, notificacoes, audit log e dead-letter de sync.
+
+## Firebase
+
+Deploy de indices:
 
 ```bash
-pnpm --dir functions deploy
+npx firebase-tools deploy --only firestore:indexes --project nailflow-8776c
 ```
 
-## Estrutura de pastas (resumo)
+Deploy de Functions:
+
+```bash
+npx firebase-tools deploy --only functions --project nailflow-8776c
+```
+
+Importante:
+
+- Cloud Functions exigem Firebase Blaze.
+- Sem Blaze, o deploy falha ao tentar habilitar APIs como Cloud Build/Artifact Registry.
+- Nao ativar Blaze automaticamente; e decisao de billing do owner.
+
+## Estrutura de pastas
 
 ```text
 app/
@@ -202,6 +216,7 @@ app/
   (nail-technician)/
   (owner)/
   (admin)/
+  google-calendar/
 
 src/
   components/
@@ -210,25 +225,41 @@ src/
   schemas/
   services/
   stores/
+  styles/
+  types/
+  utils/
 
 functions/
+  src/
+
+tests/
+  integration/
+
 docs/
 scripts/
 ```
 
-## Fluxo Git adotado
+Arquivos de configuracao como `app.config.ts`, `eas.json`, `firebase.json`, `metro.config.js`, `tailwind.config.js`, `vitest*.config.ts` e `tsconfig.json` permanecem na raiz por exigencia das ferramentas.
 
-- Branch por sprint
-- Commits semânticos (Conventional Commits) em português
-- PR sempre para `develop`
-- Nome de branch de sprint: `Sprint-X-descricao-curta`
+## Documentacao principal
 
-## Segurança
+- [docs/AGENTS.md](./docs/AGENTS.md)
+- [docs/handoff-desenvolvimento.md](./docs/handoff-desenvolvimento.md)
+- [docs/guia-de-uso-piloto.md](./docs/guia-de-uso-piloto.md)
+- [docs/release-operacional.md](./docs/release-operacional.md)
+- [docs/sdd-harness/00-contexto-repo.md](./docs/sdd-harness/00-contexto-repo.md)
+- [docs/sdd-harness/harness.md](./docs/sdd-harness/harness.md)
 
-- Nunca versionar segredos
-- Aplicar princípio do menor privilégio nas regras do Firestore
-- Em mudanças de auth/RBAC, validar impacto em regras e claims
+## Fluxo Git
 
----
+- Commits semanticos em portugues.
+- Corpo obrigatorio com `O que foi feito:` e `Por que foi feito:`.
+- PR sempre para `develop`.
+- PRs devem ter descricao atualizada a cada commit relevante.
 
-Em caso de dúvida de arquitetura ou processo, usar `docs/AGENTS.md` como referência principal de execução.
+## Seguranca
+
+- Nunca versionar segredos.
+- Aplicar menor privilegio nas regras Firestore.
+- Revisar rules/indexes ao alterar entidades ou consultas.
+- Em auth/RBAC/2FA, priorizar seguranca e menor escopo.

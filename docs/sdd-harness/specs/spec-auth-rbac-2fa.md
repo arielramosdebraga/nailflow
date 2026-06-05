@@ -12,11 +12,13 @@ Garantir acesso seguro ao NailFlow por e-mail/senha, Google Auth, roles de domin
 - Como usuario nao autenticado, quero ser redirecionado para login para evitar acesso indevido.
 
 ## 3. Regras de negocio
-1. `super_admin` e `salon_owner` exigem 2FA.
+1. `super_admin` e `salon_owner` devem usar 2FA no produto.
 2. `nail_technician` e o papel canonico do profissional.
 3. `manicure` e legado aceito/normalizado para compatibilidade.
 4. Usuario nao autenticado deve ir para `/login`.
 5. Rotas admin aceitam apenas `super_admin`.
+6. A implementacao atual so bloqueia a sessao quando `twoFactor.totp.enabled === true`.
+7. Enrollment e validacao TOTP real dependem de Functions publicadas.
 
 ## 4. Criterios de aceite
 - CA-01: Usuario nao autenticado acessando rota protegida e redirecionado para login.
@@ -46,9 +48,9 @@ Garantir acesso seguro ao NailFlow por e-mail/senha, Google Auth, roles de domin
 | Schemas | `src/schemas/auth/**`, `src/schemas/users/user.schema.ts` |
 | Functions | `functions/src/auth/**`, `functions/src/shared/user-context.ts` |
 | Rules | `firestore.rules` |
-| Testes | `src/schemas/auth/auth.schema.test.ts`, `src/schemas/users/user.schema.test.ts`, `.maestro/auth-smoke.yaml` |
+| Testes | `src/schemas/auth/auth.schema.test.ts`, `src/schemas/users/user.schema.test.ts`, `functions/src/auth/totp-callables.test.ts`, `.maestro/auth-smoke.yaml` |
 
 ## 8. Lacunas de teste
 - `⚠️ [LACUNA: teste automatizado especifico para redirecionamento de nao autenticado nao encontrado]`.
-- `⚠️ [LACUNA: teste automatizado especifico para bloqueio por TOTP invalido nao encontrado]`.
-- `⚠️ [LACUNA: teste de rules/emulador para RBAC ausente]`.
+- `⚠️ [LACUNA: teste de rules/emulador para RBAC administrativo completo ausente]`.
+- `⚠️ [LACUNA: E2E completo de enrollment/validacao 2FA depende de Functions publicadas]`.
