@@ -123,8 +123,9 @@ Possiveis migracoes:
 | Risco | Estado |
 |---|---|
 | Migracao Firestore -> PostgreSQL | Divida planejada em ADR-0001 |
-| Serverless/cold start | Risco inerente de Functions; sem metrica atual no contexto |
-| Coverage ausente | `vitest.config.ts` nao tem thresholds e nao existe coverage atual |
-| Piramide incompleta | Sem integracao com Firebase Emulator |
-| E2E parcial | Maestro cobre auth, nao todos os fluxos do piloto |
+| Serverless/cold start | Risco inerente de Functions; deploy real bloqueado por Blaze |
+| Blaze pendente | Sem Blaze, Functions de 2FA, Google Calendar, LGPD, triggers e schedulers nao publicam |
+| Coverage gradual | Thresholds existem, mas ainda baixos |
+| Integracao fora do CI | `pnpm test:integration` existe localmente, mas nao roda no CI |
+| E2E parcial | Maestro cobre smoke, nao jornadas completas do piloto |
 | Legado `manicure` | Ainda existe em campos internos e compatibilidade de role |

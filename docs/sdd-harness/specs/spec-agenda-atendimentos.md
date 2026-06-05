@@ -44,9 +44,8 @@ Permitir que profissionais e saloes gerenciem atendimentos com agenda, validacao
 | Services | `src/services/appointments/appointmentsService.ts`, `src/services/appointments/conflictValidation.ts` |
 | Schemas | `src/schemas/appointments/**` |
 | Functions | `functions/src/google/appointment-triggers.ts`, `functions/src/notifications/triggers.ts` |
-| Testes | `src/schemas/appointments/appointment.schema.test.ts` |
+| Testes | `src/schemas/appointments/appointment.schema.test.ts`, `src/services/appointments/conflictValidation.test.ts`, `.maestro/agenda-smoke.yaml` |
 
 ## 8. Lacunas de teste
-- `⚠️ [LACUNA: teste automatizado especifico de conflictValidation nao encontrado]`.
-- `⚠️ [LACUNA: teste de rules/emulador para isolamento por salao ausente]`.
-- `⚠️ [LACUNA: E2E de criar/editar/cancelar atendimento ausente]`.
+- `⚠️ [LACUNA: teste de rules/emulador para isolamento completo de appointments por salao/profissional ausente]`.
+- `⚠️ [LACUNA: E2E completo de criar/editar/cancelar atendimento ausente; existe apenas smoke]`.

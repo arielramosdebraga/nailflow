@@ -40,7 +40,7 @@ Você (GPT-5.5) deve implementar os itens abaixo **no repositório real do NailF
 |---|-----------------|-------------|------|
 | B1 | `firebase.json` (bloco `emulators`) | Infra base | G5 |
 | B2 | `vitest.integration.config.ts` + scripts | Infra base | G3/G5 |
-| B5 | `firestore.rules.integration.test.ts` | Isolamento por salão (AUD-007) | G1/G5 |
+| B5 | `tests/integration/firestore.rules.integration.test.ts` | Isolamento por salão (AUD-007) | G1/G5 |
 | B6 | `functions/src/admin/export-lgpd-data.integration.test.ts` | Exportação LGPD callable (AUD-010) | G1/G5 |
 
 ## Onda 3 — Coverage (G2) + E2E (G6)
@@ -131,7 +131,7 @@ export default defineConfig({
 }
 ```
 
-## B5 — Modelo `firestore.rules.integration.test.ts` (Isolamento por salão)
+## B5 — Modelo `tests/integration/firestore.rules.integration.test.ts` (Isolamento por salão)
 
 ```typescript
 import {

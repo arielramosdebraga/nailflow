@@ -45,9 +45,8 @@ Permitir governanca administrativa com logs de auditoria e exportacao LGPD, mant
 | Schemas | `src/schemas/audit/audit-log.schema.ts`, `src/schemas/admin/lgpd-export.schema.ts` |
 | Functions | `functions/src/audit/**`, `functions/src/admin/export-lgpd-data.ts` |
 | Rules | `firestore.rules` |
-| Testes | `functions/src/audit/audit-log.schema.test.ts` |
+| Testes | `functions/src/audit/audit-log.schema.test.ts`, `functions/src/admin/export-lgpd-data.integration.test.ts`, `.maestro/admin-smoke.yaml` |
 
 ## 8. Lacunas de teste
-- `⚠️ [LACUNA: teste callable/exportLgpdData ausente]`.
 - `⚠️ [LACUNA: teste de rules/emulador para leitura exclusiva super_admin ausente]`.
-- `⚠️ [LACUNA: E2E de exportacao LGPD ausente]`.
+- `⚠️ [LACUNA: E2E completo de exportacao LGPD depende de Functions publicadas]`.

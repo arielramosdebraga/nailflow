@@ -44,9 +44,8 @@ Controlar comandas do salao, incluindo abertura, edicao, calculo financeiro, fec
 | Hooks | `src/hooks/commands/**` |
 | Services | `src/services/commands/**` |
 | Schemas | `src/schemas/commands/**` |
-| Testes | `src/schemas/commands/command.schema.test.ts`, `src/services/commands/command-totals.test.ts` |
+| Testes | `src/schemas/commands/command.schema.test.ts`, `src/services/commands/command-totals.test.ts`, `src/services/commands/command-reopen.test.ts`, `.maestro/commands-smoke.yaml` |
 
 ## 8. Lacunas de teste
-- `⚠️ [LACUNA: teste automatizado especifico de comanda fechada nao reabrir sem admin nao encontrado]`.
 - `⚠️ [LACUNA: teste de rules/emulador para permissoes de comanda ausente]`.
-- `⚠️ [LACUNA: E2E de abrir/editar/fechar comanda ausente]`.
+- `⚠️ [LACUNA: E2E completo de abrir/editar/fechar comanda ausente; existe apenas smoke]`.

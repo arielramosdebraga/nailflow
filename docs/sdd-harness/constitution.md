@@ -4,86 +4,78 @@ Fonte obrigatoria: `docs/sdd-harness/00-contexto-repo.md`.
 
 ## 1. Principios inegociaveis
 
-### Regras existentes com evidencia
-1. TypeScript faz parte da base do projeto.
-   - Evidencia: `package.json`, `tsconfig.json`, `pnpm typecheck`.
+1. A Fase A usa Expo + Firebase.
+   - Evidencia: `package.json`, `firebase.json`, `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`.
 
-2. A Fase A usa Firebase + Expo.
-   - Evidencia: `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`, `package.json`, `firebase.json`.
+2. Alteracoes estruturais em Expo devem considerar a documentacao versionada do SDK 56.
+   - Evidencia: `AGENTS.md`, `docs/adr/ADR-0002-upgrade-expo-sdk-52-56.md`.
 
-3. O acesso a dados no app passa por services e hooks.
-   - Evidencia: `src/services/**`, `src/hooks/**`, rotas em `app/**`.
+3. TypeScript strict faz parte da base do projeto.
+   - Evidencia: `tsconfig.json`, `pnpm typecheck`.
 
-4. Schemas Zod existem para entidades centrais.
+4. Acesso a dados no app deve passar por services/hooks.
+   - Evidencia: `src/services/**`, `src/hooks/**`.
+
+5. Schemas Zod sao fonte de contratos das entidades centrais.
    - Evidencia: `src/schemas/**`.
 
-5. 2FA e obrigatorio para papeis administrativos.
-   - Evidencia: `src/stores/sessionStore.ts`, `src/hooks/auth/useTotpAuth.ts`, `functions/src/auth/totp-callables.ts`.
+6. Segredos nunca devem ser versionados.
+   - Evidencia: `.gitignore`, `.env.template`, `docs/release-operacional.md`.
 
-6. Segredos nao devem ser versionados.
-   - Evidencia: `.gitignore`, `.env.example`, `docs/release-operacional.md`.
+7. Expo Go nao e alvo de validacao do piloto.
+   - Evidencia: `docs/guia-de-uso-piloto.md`.
 
-### Regras sugeridas por lacuna
-1. `SUGERIDA`: criar testes automatizados especificos para 2FA administrativo.
-   - Motivo: `00-contexto-repo.md` marca criterios de aceite de 2FA sem teste dedicado.
-
-2. `SUGERIDA`: adicionar coverage thresholds no `vitest.config.ts`.
-   - Motivo: `00-contexto-repo.md` registra ausencia de META de cobertura.
+8. Decisoes de billing/Blaze pertencem ao owner.
+   - Evidencia: `docs/release-operacional.md`, `docs/handoff-desenvolvimento.md`.
 
 ## 2. Restricoes de arquitetura
 
-### Existentes
-1. Backend serverless na Fase A.
-   - Evidencia: `functions/src/**`, `firebase.json`, `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`.
+1. Backend da Fase A e serverless em Firebase.
+   - Evidencia: `functions/src/**`, `firebase.json`.
 
 2. Cloud Functions ficam em `functions/`.
-   - Evidencia: `firebase.json`, `functions/package.json`.
+   - Evidencia: `functions/package.json`, `functions/src/index.ts`.
 
-3. Firestore e a base de dados operacional da Fase A.
-   - Evidencia: `firestore.rules`, `firestore.indexes.json`, `src/services/**`.
-
-4. Stack Postgres/NestJS/Next.js pertence a Fase B.
-   - Evidencia: `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`, `docs/handoff-fase-b.md`.
-
-5. Papel canonico do profissional e `nail_technician`.
-   - Evidencia: `src/schemas/users/user.schema.ts`, `docs/handoff-fase-b.md`.
-
-### Divergencias e lacunas
-1. `⚠️ [DIVERGENCIA]` Instrucoes citam 8 colecoes oficiais, mas o repositorio usa tambem `syncQueueDeadLetter`.
+3. Firestore e a base operacional da Fase A.
    - Evidencia: `firestore.rules`, `firestore.indexes.json`.
 
-2. `⚠️ [DIVERGENCIA]` `manicure` ainda existe como papel/termo legado aceito e como campo tecnico `manicureId`.
-   - Evidencia: `firestore.rules`, `functions/src/shared/user-context.ts`, `src/schemas/users/user.schema.ts`.
+4. Stack PostgreSQL/NestJS/Next.js pertence a Fase B.
+   - Evidencia: `docs/nailflow-infraestrutura.md`, `docs/handoff-fase-b.md`.
+
+5. Papel canonico do profissional e `nail_technician`.
+   - Evidencia: `src/schemas/users/user.schema.ts`.
+
+6. `manicure` e `manicureId` sao legado/compatibilidade ate migracao dedicada.
+   - Evidencia: `docs/adr/ADR-0004-nail-technician-legado-manicure.md`.
+
+7. `syncQueueDeadLetter` e collection operacional oficial.
+   - Evidencia: `docs/adr/ADR-0003-sync-queue-dead-letter.md`.
 
 ## 3. Padroes de qualidade
 
-### Gates existentes
-1. CI em PR roda lint, typecheck, test e build de functions.
-   - Evidencia: `.github/workflows/ci.yml`.
+Gates existentes:
 
-2. Pre-commit roda lint-staged e typecheck.
-   - Evidencia: `.husky/pre-commit`, `.lintstagedrc.cjs`.
+- CI roda lint, typecheck, unit tests, coverage, functions lint e functions build.
+- Pre-commit roda lint-staged e typecheck.
+- Unitarios cobrem schemas, services e helpers de Functions.
+- Integracao Firebase existe localmente com emuladores.
+- E2E Maestro existe como smoke por fluxo.
 
-3. Testes unitarios existem para schemas, services e helpers de functions.
-   - Evidencia: arquivos `*.test.ts` listados em `00-contexto-repo.md`.
+Lacunas atuais:
 
-4. E2E Maestro existe para smoke de autenticacao.
-   - Evidencia: `.maestro/auth-smoke.yaml`, `scripts/run-maestro.mjs`.
-
-### Lacunas vinculantes do harness
-1. `⚠️ [LACUNA]` Coverage META nao existe em `vitest.config.ts`.
-2. `⚠️ [LACUNA]` Coverage ATUAL nao existe porque `coverage/coverage-summary.json` nao foi encontrado.
-3. `⚠️ [LACUNA]` Nao ha teste de integracao com emulador Firebase.
-4. `⚠️ [LACUNA]` E2E cobre auth, mas nao todos os fluxos do piloto.
+- Integracao Firebase ainda nao roda no CI.
+- E2E ainda e smoke e nao jornada completa.
+- Coverage thresholds existem, mas sao graduais e baixos.
+- Deploy de Functions nao foi comprovado em ambiente real por bloqueio Blaze.
 
 ## 4. DoD do harness
 
 | Gate | Status atual | Regra |
 |---|---|---|
-| G1 | Parcial / nao cumprido | Feature critica so deve fechar quando todo CA critico tiver teste mapeado |
-| G2 | Nao cumprido | CI deve falhar quando cobertura atual ficar abaixo da meta configurada |
-| G3 | Nao cumprido | Piramide deve ter unit, integracao e E2E |
-| G4 | Cumprido | PR deve rodar lint, typecheck, test e build |
-| G5 | Nao cumprido | Functions devem ter integracao contra emulador |
-| G6 | Parcial | Fluxos criticos do piloto devem ter flows Maestro |
-| G7 | Cumprido | Pre-commit deve bloquear lint/typecheck |
+| G1 | Parcial | CAs criticos devem manter teste unitario, integracao ou E2E mapeado |
+| G2 | Cumprido gradual | Coverage deve rodar no CI e thresholds devem evoluir |
+| G3 | Parcial | Unit, integracao e E2E existem; integracao deve entrar no CI |
+| G4 | Cumprido | PR deve manter lint/typecheck/test/coverage/functions build verdes |
+| G5 | Parcial | Rules/callables criticas devem ter cobertura em emulador |
+| G6 | Parcial | Fluxos criticos do piloto devem evoluir de smoke para jornada completa |
+| G7 | Cumprido | Pre-commit deve bloquear lint-staged/typecheck |

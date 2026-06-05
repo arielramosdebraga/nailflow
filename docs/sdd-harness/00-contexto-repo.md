@@ -1,138 +1,181 @@
 # 00 - Contexto real do repositorio
 
 ## Escopo
-Este documento registra o estado real do repositorio NailFlow na branch `Sprint-10-piloto-estabilizacao`.
 
-Fonte operacional desta geracao: `C:\Users\ariel\Documents\Projects\nailflow-s10`.
+Este documento registra o estado real do repositorio NailFlow apos o merge da branch `fix-tests` em `develop`.
 
-Observacao de destino: o documento de instrucoes cita `docs/sdd/` como local canonico, mas a instrucao do usuario pediu `docs/sdd-harness/`. Estes artefatos foram gerados em `docs/sdd-harness/`.
+Fonte operacional:
+
+- Workspace: `C:\Users\ariel\Documents\Projects\nailflow`
+- Branch base remota: `origin/develop`
+- PR de estabilizacao mais recente: `#13`, mergeado em 05/06/2026
+- Build Android preview mais recente conhecida: `95bf855a-29e4-447c-9caf-4d4865358d2a`
 
 ## Secao A - Stack e estrutura
 
 ### Versoes reais
-Fonte vencedora: `package.json`.
+
+Fonte vencedora: `package.json`, `functions/package.json` e Expo SDK 56.
 
 | Item | Valor real | Evidencia |
 |---|---:|---|
-| Expo SDK | `~56.0.6` | `package.json` |
+| Expo SDK | `~56.0.8` | `package.json` |
 | React Native | `0.85.3` | `package.json` |
 | React | `19.2.3` | `package.json` |
-| Expo Router | `^56.2.7` | `package.json` |
-| TypeScript | `~5.9.3` | `package.json` |
+| Expo Router | `^56.2.8` | `package.json` |
+| TypeScript | `~6.0.3` | `package.json` |
 | Firebase JS SDK | `^12.13.0` | `package.json` |
+| React Native Firebase | `^24.0.0` | `package.json` |
 | Cloud Functions runtime | `node: 22` | `functions/package.json` |
+| Firebase Admin | `^13.6.0` | `functions/package.json` |
+| Firebase Functions | `^7.0.0` | `functions/package.json` |
 
-### Divergencias resolvidas por arquivo de configuracao
-- `AGENTS.md` e `prompt.md` indicam Expo SDK `52+`; `package.json` e `docs/adr/ADR-0002-upgrade-expo-sdk-52-56.md` comprovam Expo SDK 56. Fonte vencedora: `package.json`.
-- `AGENTS.md`/docs narrativos indicam Node `20+`; `functions/package.json` define `node: 22`. Fonte vencedora: `functions/package.json`.
-- A Fase A usa Firebase + Expo conforme `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`. A stack Postgres/NestJS/Next.js aparece como Fase B em `docs/nailflow-infraestrutura.md` e `docs/handoff-fase-b.md`.
+### Config Expo/EAS
+
+Fonte: `app.config.ts`, `app.json`, `eas.json`.
+
+- `app.config.ts` e a configuracao efetiva.
+- Nome: `NailFlow`.
+- Slug: `nailflow`.
+- Versao: `1.0.0`.
+- Scheme: `nailflow`.
+- `runtimeVersion.policy`: `appVersion`.
+- `experiments.typedRoutes`: `true`.
+- Plugins: `expo-router`, `expo-secure-store`, `expo-notifications`.
+- Perfis EAS: `development`, `preview`, `pilot`, `production`.
+- `appVersionSource`: `remote`.
+- `autoIncrement`: `true` nos perfis de build.
 
 ### Gerenciador de pacotes
-- Raiz: `pnpm`, evidenciado por `pnpm-lock.yaml`, `pnpm-workspace.yaml` e scripts no CI.
-- Functions: pacote dentro do workspace, com `package-lock.json` presente e scripts internos usando `npm run` em `functions/package.json`.
-- `⚠️ [DIVERGENCIA: functions tem package-lock.json e scripts internos npm, enquanto CI executa pnpm --dir functions]`.
+
+- Raiz: `pnpm`, com `pnpm-lock.yaml` e `pnpm-workspace.yaml`.
+- Functions: possui `package-lock.json` e scripts internos com `npm run`.
+- CI executa functions via `pnpm --dir functions`.
+
+Essa diferenca e documentada como excecao operacional, nao como bloqueio.
 
 ### Estrutura de pastas
-Top-level relevante:
+
 - `app/`: rotas Expo Router.
-- `src/`: componentes, hooks, providers, schemas, services e stores.
+- `src/`: componentes, hooks, providers, schemas, services, stores e utils.
 - `functions/`: Cloud Functions TypeScript.
-- `docs/`: planejamento, ADRs, guias, release e handoff.
+- `docs/`: planejamento, ADRs, guias, release, SDD harness e handoffs.
 - `.github/workflows/`: CI.
-- `.husky/`: gates locais.
-- `.maestro/`: flows E2E.
+- `.husky/`: hooks locais.
+- `.maestro/`: flows E2E smoke.
 - `scripts/`: seed, Maestro runner e release preflight.
 
-Segundo nivel relevante:
-- `app/(auth)`, `app/(admin)`, `app/(nail-technician)`, `app/(owner)`, `app/google-calendar`.
-- `src/components`, `src/hooks`, `src/providers`, `src/schemas`, `src/services`, `src/stores`.
-- `functions/src/admin`, `functions/src/audit`, `functions/src/auth`, `functions/src/google`, `functions/src/notifications`, `functions/src/salons`, `functions/src/shared`.
+Rotas principais:
 
-### Colecoes Firestore reais
-Evidencias: `firestore.rules`, `firestore.indexes.json`, `src/services/**`, `functions/src/**`.
-
-| Colecao | Evidencia principal | Observacao |
-|---|---|---|
-| `salons` | `firestore.rules`, `src/services/salons/salonService.ts` | Governanca e vinculo com owner |
-| `users` | `firestore.rules`, `src/services/users/userService.ts` | RBAC, Google Calendar e notificacoes |
-| `clients` | `firestore.rules`, `src/services/clients/clientsService.ts` | CRUD por salao |
-| `appointments` | `firestore.rules`, `src/services/appointments/appointmentsService.ts` | Agenda e sync Google |
-| `commands` | `firestore.rules`, `src/services/commands/commandsService.ts` | Comandas e financeiro basico |
-| `notifications` | `firestore.rules`, `src/services/notifications/inAppNotificationsService.ts` | Central in-app |
-| `auditLogs` | `firestore.rules`, `src/services/audit/auditLogService.ts`, `functions/src/audit/write-audit-log.ts` | Leitura apenas super_admin |
-| `syncQueue` | `firestore.rules`, `functions/src/google/sync-queue.ts` | Fila de sync |
-| `syncQueueDeadLetter` | `firestore.rules`, `firestore.indexes.json` | Dead-letter de sync |
-
-`⚠️ [DIVERGENCIA: instrucoes citam 8 colecoes oficiais, mas o repositorio tambem usa syncQueueDeadLetter]`.
-
-### Indices compostos
-Fonte: `firestore.indexes.json`.
-
-| Collection group | Campos |
-|---|---|
-| `appointments` | `salonId + startTime`, `manicureId + startTime`, `clientId + startTime` |
-| `clients` | `salonId + name`, `salonId + lastVisit desc` |
-| `commands` | `salonId + createdAt desc`, `salonId + status + createdAt desc`, `salonId + manicureId + createdAt desc`, `salonId + clientId + createdAt desc`, `salonId + appointmentId + createdAt desc` |
-| `notifications` | `userId + createdAt desc`, `userId + read + createdAt desc` |
-| `auditLogs` | `userId + timestamp desc`, `targetId + timestamp desc` |
-| `syncQueue` | `userId + status` |
-| `syncQueueDeadLetter` | `status + failedAt desc`, `userId + failedAt desc` |
-
-### Features por sprint
-Fonte canonica de status: `docs/planejamento.md`.
-
-| Sprint | Tema | Status real |
-|---|---|---|
-| 0 | Setup e fundacao tecnica | Concluida; pendencias absorvidas na Sprint 2 |
-| 1 | Auth e RBAC | Concluida; 2FA administrativo finalizado na Sprint 2 |
-| 2 | Modelagem, clientes, 2FA e CI | Concluida |
-| 3 | Agenda e atendimentos | Concluida |
-| 4 | Comandas e painel owner | Concluida |
-| 5 | Super admin e auditoria | Concluida; pendencias finalizadas na Sprint 10 |
-| 6 | Google OAuth e sync App para Google | Concluida |
-| 7 | Sync Google para App e reconciliacao | Concluida |
-| 8 | Notificacoes | Concluida |
-| 9 | Testes, performance e refinamentos | Concluida |
-| 10 | Piloto e estabilizacao | Concluida no escopo de desenvolvimento; operacao do piloto pendente fora do codigo |
+- `app/(auth)`: login, cadastro, recuperacao, 2FA, documentos legais.
+- `app/(admin)`: dashboard, saloes, usuarios, auditoria, logs, settings, LGPD, notificacoes.
+- `app/(owner)`: dashboard, agenda, comandas, profissionais, notificacoes.
+- `app/(nail-technician)`: agenda, atendimentos, clientes, Google Calendar, notificacoes.
+- `app/google-calendar`: retorno OAuth.
 
 ### RBAC ativo
-Papeis canonicos no produto:
+
+Roles canonicas:
+
 - `super_admin`
 - `salon_owner`
 - `nail_technician`
 
-Legado ainda aceito/normalizado:
+Legado aceito:
+
 - `manicure`
 
 Evidencias:
+
 - `src/schemas/users/user.schema.ts` normaliza `manicure` para `nail_technician`.
-- `functions/src/shared/user-context.ts` ainda aceita `manicure`.
-- `firestore.rules` ainda permite `manicure` em `isNailTechnician()`.
-- Existem campos internos `manicureId` em appointments/commands/sync.
+- `functions/src/shared/user-context.ts` aceita legado.
+- `firestore.rules` ainda permite legado em helpers.
+- Campos internos `manicureId` permanecem em agenda/comandas/sync.
 
-`⚠️ [DIVERGENCIA: papel canonico e nail_technician, mas nomes legados manicure/manicureId ainda existem como compatibilidade interna]`.
+### Colecoes Firestore reais
 
-### Documentos de planejamento
-- `docs/planejamento.md`
-- `docs/AGENTS.md`
-- `docs/adr/ADR-0001-estrategia-stack-duas-fases.md`
-- `docs/adr/ADR-0002-upgrade-expo-sdk-52-56.md`
-- `docs/guia-de-uso-piloto.md`
-- `docs/release-operacional.md`
-- `docs/handoff-fase-b.md`
-- `docs/TODO.md`
-- `docs/nailflow-infraestrutura.md`
+Evidencias: `firestore.rules`, `firestore.indexes.json`, `src/services/**`, `functions/src/**`.
 
-## Secao B - Harness
+| Colecao | Uso |
+|---|---|
+| `salons` | Governanca e vinculo com owner |
+| `users` | RBAC, 2FA, Google Calendar e notificacoes |
+| `clients` | Clientes por salao |
+| `appointments` | Agenda, atendimento e sync Google |
+| `commands` | Comandas e financeiro basico |
+| `notifications` | Central in-app |
+| `auditLogs` | Auditoria administrativa |
+| `syncQueue` | Fila de sync Google |
+| `syncQueueDeadLetter` | Falhas recorrentes de sync |
+
+`syncQueueDeadLetter` e collection operacional oficializada por ADR.
+
+### Indices compostos
+
+Fonte: `firestore.indexes.json`.
+
+O arquivo possui indices para:
+
+- `appointments`
+- `clients`
+- `commands`
+- `notifications`
+- `users`
+- `auditLogs`
+- `syncQueue`
+- `syncQueueDeadLetter`
+
+Consultas novas devem ser revisadas contra `firestore.indexes.json` antes de merge.
+
+### Funcoes exportadas
+
+Fonte: `functions/src/index.ts`.
+
+- `health`
+- `onUserCreated`
+- `createSalon`
+- `exportLgpdData`
+- `getGlobalDashboard`
+- `getTotpStatus`
+- `beginTotpEnrollment`
+- `confirmTotpEnrollment`
+- `verifyTotpCode`
+- `getGoogleCalendarStatus`
+- `beginGoogleCalendarConnection`
+- `completeGoogleCalendarConnection`
+- `refreshGoogleCalendarWatch`
+- `onAppointmentCreatedSyncGoogleCalendar`
+- `onAppointmentUpdatedSyncGoogleCalendar`
+- `onAppointmentDeletedSyncGoogleCalendar`
+- `receiveGoogleCalendarWatchWebhook`
+- `onGoogleCalendarSyncQueueCreated`
+- `renewGoogleCalendarWatchChannels`
+- `reconcileGoogleCalendarAtNight`
+- `onAppointmentCreatedNotifyUsers`
+- `onAppointmentUpdatedNotifyUsers`
+- `onUserGoogleStatusUpdatedNotifyUsers`
+- `sendPreReminderNotifications`
+
+Configuracao global:
+
+- Regiao: `southamerica-east1`
+- `maxInstances`: `10`
+
+Pendencia real:
+
+- Deploy de Functions bloqueado sem Firebase Blaze.
+
+## Secao B - Scripts e comandos
 
 ### Scripts reais da raiz
+
 Fonte: `package.json`.
 
-| Script | Comando exato |
+| Script | Comando |
 |---|---|
 | `start` | `expo start` |
-| `android` | `expo start --android` |
-| `ios` | `expo start --ios` |
+| `android` | `expo run:android` |
+| `ios` | `expo run:ios` |
 | `web` | `expo start --web` |
 | `release:preflight` | `node scripts/release-preflight.mjs` |
 | `release:env:pull:preview` | `npx eas-cli@latest env:pull --environment preview` |
@@ -143,19 +186,21 @@ Fonte: `package.json`.
 | `build:production:all` | `npx eas-cli@latest build --platform all --profile production` |
 | `submit:production:ios` | `npx eas-cli@latest submit --platform ios --profile production` |
 | `submit:production:android` | `npx eas-cli@latest submit --platform android --profile production` |
-| `lint` | `expo lint` |
-| `lint-staged` | `lint-staged` |
+| `lint` | `eslint app src scripts --max-warnings=0` |
 | `format` | `prettier --check .` |
 | `typecheck` | `tsc --noEmit` |
 | `test` | `vitest run` |
+| `test:coverage` | `vitest run --coverage` |
+| `test:integration` | `firebase emulators:exec --only firestore,auth "vitest run --config vitest.integration.config.ts"` |
 | `test:e2e` | `node scripts/run-maestro.mjs` |
 | `seed:test-accounts` | `node scripts/seed-test-accounts.mjs` |
 | `prepare` | `husky` |
 
 ### Scripts reais das Functions
+
 Fonte: `functions/package.json`.
 
-| Script | Comando exato |
+| Script | Comando |
 |---|---|
 | `lint` | `eslint src --max-warnings=0` |
 | `build` | `tsc` |
@@ -166,118 +211,171 @@ Fonte: `functions/package.json`.
 | `deploy` | `firebase deploy --only functions` |
 | `logs` | `firebase functions:log` |
 
-### Config de teste
-Fonte: `vitest.config.ts`.
+## Secao C - Testes, CI e emuladores
 
-- Ambiente: `node`.
-- Alias: `@` para `./src`.
-- Exclude: `functions/lib/**`, `node_modules/**`, `.expo/**`, `dist/**`.
-- `setupFiles`: nao configurado.
-- `include`: nao configurado explicitamente.
-- Coverage provider: nao configurado.
-- Coverage thresholds: nao configurados.
+### Unitarios
 
-META de cobertura:
-- `⚠️ [LACUNA: vitest.config.ts nao define coverage.thresholds]`.
+`pnpm test` roda testes unitarios em `src/**/*.test.ts` e `functions/src/**/*.test.ts`, excluindo `*.integration.test.ts`.
 
-### Cobertura atual
-- `coverage/coverage-summary.json`: ausente.
-- `⚠️ [LACUNA: rodar comando de coverage para medir cobertura ATUAL]`.
-- O repositorio tambem nao possui script dedicado de coverage em `package.json`.
+Arquivos unitarios atuais:
 
-### Testes existentes por camada
+- `src/schemas/auth/auth.schema.test.ts`
+- `src/schemas/users/user.schema.test.ts`
+- `src/schemas/clients/client.schema.test.ts`
+- `src/schemas/appointments/appointment.schema.test.ts`
+- `src/schemas/audit/audit.schema.test.ts`
+- `src/schemas/commands/command.schema.test.ts`
+- `src/services/appointments/conflictValidation.test.ts`
+- `src/services/commands/command-totals.test.ts`
+- `src/services/commands/command-reopen.test.ts`
+- `src/services/google/googleCalendarService.test.ts`
+- `src/services/notifications/pushNotificationsService.test.ts`
+- `functions/src/auth/totp-callables.test.ts`
+- `functions/src/google/sync-queue.test.ts`
+- `functions/src/notifications/models.test.ts`
+- `functions/src/notifications/preferences.test.ts`
+- `functions/src/audit/audit-log.schema.test.ts`
+- `functions/src/shared/timezone.test.ts`
 
-Unitarios Vitest (12 arquivos):
-- Auth/RBAC: `src/schemas/auth/auth.schema.test.ts`
-- Users/RBAC: `src/schemas/users/user.schema.test.ts`
-- Clientes: `src/schemas/clients/client.schema.test.ts`
-- Agenda/appointments: `src/schemas/appointments/appointment.schema.test.ts`
-- Comandas: `src/schemas/commands/command.schema.test.ts`, `src/services/commands/command-totals.test.ts`
-- Google Calendar: `src/services/google/googleCalendarService.test.ts`, `functions/src/google/sync-queue.test.ts`
-- Notificacoes: `functions/src/notifications/models.test.ts`, `functions/src/notifications/preferences.test.ts`
-- Auditoria: `functions/src/audit/audit-log.schema.test.ts`
-- Shared/timezone: `functions/src/shared/timezone.test.ts`
+Ultima execucao documentada no PR `#13`: `17` arquivos, `71` testes.
 
-Integracao:
-- Nenhum arquivo `*.integration.test.ts` encontrado.
-- Nenhuma evidencia de `@firebase/rules-unit-testing`.
-- `⚠️ [LACUNA: camada de integracao com emulador Firebase ausente]`.
+### Integracao
 
-E2E:
-- `.maestro/auth-smoke.yaml`: cobre tela de login, cadastro, politica de privacidade, termos e recuperacao de senha.
-- `scripts/run-maestro.mjs`: runner de `maestro test .maestro`.
+`pnpm test:integration` usa Firebase Emulator e `vitest.integration.config.ts`.
 
-### CI real
+Arquivos:
+
+- `tests/integration/firestore.rules.integration.test.ts`
+- `functions/src/admin/export-lgpd-data.integration.test.ts`
+
+Emuladores em `firebase.json`:
+
+- Auth: `9099`
+- Firestore: `8080`
+- Functions: `5001`
+- UI: `4000`
+
+### Coverage
+
+`vitest.config.ts` define coverage com provider `v8`, reporters `text` e `json-summary`.
+
+Thresholds atuais graduais:
+
+- statements: `20`
+- branches: `10`
+- functions: `20`
+- lines: `20`
+
+### E2E
+
+Flows Maestro:
+
+- `.maestro/auth-smoke.yaml`
+- `.maestro/agenda-smoke.yaml`
+- `.maestro/commands-smoke.yaml`
+- `.maestro/google-calendar-smoke.yaml`
+- `.maestro/notifications-smoke.yaml`
+- `.maestro/admin-smoke.yaml`
+
+`pnpm test:e2e` depende da CLI Maestro e de ambiente mobile preparado.
+
+### CI
+
 Fonte: `.github/workflows/ci.yml`.
 
-- Gatilhos: `push`, `pull_request`.
-- Job: `quality`.
-- Runner: `ubuntu-latest`.
-- Node: `22`.
-- pnpm action: versao `9`.
-- Passos: checkout, setup pnpm, setup Node, `pnpm install --no-frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm --dir functions lint`, `pnpm --dir functions build`.
-- CI nao executa E2E Maestro.
-- CI nao sobe emulador Firebase.
-- CI nao possui coverage gate.
+O CI roda:
 
-### Gates locais
-Fonte: `.husky/pre-commit` e `.lintstagedrc.cjs`.
+- install;
+- lint;
+- typecheck;
+- test;
+- coverage;
+- functions lint;
+- functions build.
 
-- Pre-commit:
-  - `pnpm lint-staged`
-  - `pnpm typecheck`
-- Lint-staged:
-  - `functions/src/**/*.{js,ts}` -> `npm --prefix functions run lint`
-  - `*.{js,jsx,ts,tsx,mjs,cjs}` -> `pnpm exec eslint --max-warnings=0 --no-warn-ignored --ignore-pattern functions/**`
-- Pre-push: nao encontrado.
+O CI ainda nao roda `pnpm test:integration` nem `pnpm test:e2e`.
 
-### Firebase emulator
-Fonte: `firebase.json`.
+## Secao D - Firebase e release
 
-- Firestore rules/indexes configurados.
-- Functions source configurado.
-- Emuladores explicitamente configurados: nenhum.
-- `functions/package.json` possui `serve` com `firebase emulators:start --only functions`.
-- `⚠️ [LACUNA: firebase.json nao declara emuladores firestore/auth/functions com portas]`.
+### Firebase
 
-### Release preflight
-Fontes: `scripts/release-preflight.mjs`, `eas.json`, `.env.example`, `app.config.ts`.
+`firebase.json` configura:
 
-- `release:preflight` valida variaveis publicas Firebase e identifiers mobile.
-- `eas.json` possui perfis `development`, `preview`, `pilot`, `production`.
-- `.env.example` lista variaveis de app, EAS, Google Calendar e Functions.
-- `app.config.ts` define `name`, `slug`, `version`, `scheme`, identifiers iOS/Android, build numbers, assets, runtimeVersion e `extra.eas.projectId` quando informado.
+- Firestore rules;
+- Firestore indexes;
+- Functions source;
+- emuladores Auth/Firestore/Functions/UI.
 
-## Secao C - Matriz CA para teste
+Deploy de indices:
 
-| Feature | Criterio de aceite | Teste(s) que cobre | Camada | Coberto? |
-|---|---|---|---|---|
-| Auth/RBAC/2FA | Nao-autenticado redireciona para login | `⚠️ [LACUNA: teste automatizado especifico nao encontrado]` | - | Nao |
-| Auth/RBAC/2FA | 2FA bloqueia sem TOTP valido | `⚠️ [LACUNA: teste automatizado especifico nao encontrado]` | - | Nao |
-| Auth/RBAC/2FA | Cadastro/login e telas legais visiveis | `.maestro/auth-smoke.yaml` | E2E | Sim |
-| Clientes | Schemas validam dados de cliente | `src/schemas/clients/client.schema.test.ts` | Unit | Sim |
-| Clientes | Isolamento por salao validado | `⚠️ [LACUNA: teste de regras Firestore/emulador ausente]` | - | Nao |
-| Agenda | Conflito de horario bloqueado | `⚠️ [LACUNA: teste automatizado especifico de conflictValidation nao encontrado]` | - | Nao |
-| Agenda | Schema de appointment valida campos | `src/schemas/appointments/appointment.schema.test.ts` | Unit | Sim |
-| Comandas | Calculos financeiros corretos | `src/services/commands/command-totals.test.ts` | Unit | Sim |
-| Comandas | Comanda fechada nao reabre sem admin | `⚠️ [LACUNA: teste automatizado especifico nao encontrado]` | - | Nao |
-| Google Calendar | Sync queue e retries basicos | `functions/src/google/sync-queue.test.ts` | Unit | Sim |
-| Google Calendar | App -> Google em menos de 10s | `⚠️ [LACUNA: medicao automatizada ausente]` | - | Nao |
-| Google Calendar | Google -> App em menos de 10s | `⚠️ [LACUNA: teste E2E/integracao ausente]` | - | Nao |
-| Notificacoes | Preferencias de notificacao | `functions/src/notifications/preferences.test.ts` | Unit | Sim |
-| Notificacoes | Badge em tempo real e push <5s | `⚠️ [LACUNA: E2E/medicao ausente]` | - | Nao |
-| Auditoria/LGPD | Audit log schema valido | `functions/src/audit/audit-log.schema.test.ts` | Unit | Sim |
-| Auditoria/LGPD | Exportacao LGPD via super_admin | `⚠️ [LACUNA: teste callable/exportLgpdData ausente]` | - | Nao |
-| Release | Variaveis obrigatorias de build detectadas | `⚠️ [LACUNA: teste automatizado do preflight ausente]` | - | Nao |
+```bash
+npx firebase-tools deploy --only firestore:indexes --project nailflow-8776c
+```
 
-## Secao D - Status dos gates DoD
+Deploy de Functions:
 
-| Gate | Status | Evidencia |
+```bash
+npx firebase-tools deploy --only functions --project nailflow-8776c
+```
+
+Bloqueio conhecido:
+
+- Functions exigem Blaze para habilitar Cloud Build/Artifact Registry.
+
+### Seed
+
+Script: `pnpm seed:test-accounts`.
+
+Cria/atualiza:
+
+- usuarios Auth e docs `users`;
+- `salons/salon-teste-001`;
+- `clients/client-teste-001`;
+- `appointments/appointment-teste-001`;
+- duas `commands`;
+- tres `notifications`;
+- `auditLogs/audit-log-teste-001`;
+- `syncQueueDeadLetter/sync-dead-letter-teste-001`.
+
+Credencial admin local:
+
+- `GOOGLE_APPLICATION_CREDENTIALS`, ou
+- arquivo `firebase-adminsdk*.json` em `secrets/firebase`.
+
+Nao expor conteudo de credenciais.
+
+### Build EAS
+
+Build Android preview mais recente conhecida:
+
+- ID: `95bf855a-29e4-447c-9caf-4d4865358d2a`
+- Status: `FINISHED`
+- Commit: `7da07de`
+- `appBuildVersion`: `3`
+
+URL:
+
+```text
+https://expo.dev/accounts/guhzynhuh/projects/nailflow/builds/95bf855a-29e4-447c-9caf-4d4865358d2a
+```
+
+## Secao E - Gates DoD
+
+| Gate | Status atual | Evidencia |
 |---|---|---|
-| G1 - CA critico com >= 1 teste | Parcial / Nao cumprido | Matriz CA -> teste acima mostra criterios sem teste |
-| G2 - Coverage gate no CI | Nao cumprido | `.github/workflows/ci.yml` nao possui coverage gate; `vitest.config.ts` nao define thresholds |
-| G3 - Piramide Unit + Integracao + E2E | Nao cumprido | Unitarios e Maestro existem; integracao com emulador ausente |
-| G4 - CI em PR com lint/typecheck/test/build | Cumprido | `.github/workflows/ci.yml` roda lint, typecheck, test, functions lint e functions build em `pull_request` |
-| G5 - Functions vs emulador | Sem evidencia / Nao cumprido | Nao ha testes de integracao com emulador Firebase |
-| G6 - E2E fluxos do piloto | Parcial / Nao cumprido | `.maestro/auth-smoke.yaml` cobre auth; demais fluxos de `docs/guia-de-uso-piloto.md` nao tem flows |
-| G7 - Gates locais | Cumprido | `.husky/pre-commit` roda `pnpm lint-staged` e `pnpm typecheck` |
+| G1 - CA critico com teste | Parcial | Ha testes para 2FA, conflito, reopen, LGPD; ainda ha gaps E2E/rules por fluxo |
+| G2 - Coverage gate | Cumprido gradual | `test:coverage` e thresholds existem; thresholds ainda baixos |
+| G3 - Piramide Unit + Integracao + E2E | Parcial | Unit/integracao/E2E existem, mas integracao/E2E nao rodam no CI |
+| G4 - CI qualidade | Cumprido | CI roda lint/typecheck/test/coverage/functions lint/build |
+| G5 - Functions/rules com emulador | Parcial | Testes de integracao existem localmente; nao rodam no CI |
+| G6 - E2E fluxos do piloto | Parcial | Flows smoke existem; nao substituem jornada manual completa |
+| G7 - Gates locais | Cumprido | Husky/lint-staged/typecheck |
+
+## Secao F - Pendencias reais
+
+- Ativar Blaze se o piloto exigir 2FA, Google Calendar, LGPD callable, triggers e schedulers reais.
+- Rodar deploy de Functions apos Blaze.
+- Incluir `pnpm test:integration` no CI quando a esteira estiver pronta.
+- Evoluir thresholds de coverage.
+- Expandir E2E de smoke para jornadas completas.
+- Versionar `storage.rules` se Storage passar a ter uso direto relevante.

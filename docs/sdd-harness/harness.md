@@ -4,145 +4,183 @@ Fonte obrigatoria: `docs/sdd-harness/00-contexto-repo.md`.
 
 ## 1. Comandos canonicos
 
-Gerenciador principal detectado: `pnpm`.
+Gerenciador principal: `pnpm`.
 
-| Comando exato | O que faz | Quando rodar |
+| Comando | O que faz | Quando rodar |
 |---|---|---|
-| `pnpm lint` | Executa `expo lint` | Local / CI |
-| `pnpm typecheck` | Executa `tsc --noEmit` | Local / CI / pre-commit |
-| `pnpm test` | Executa `vitest run` | Local / CI |
-| `pnpm test:e2e` | Executa `node scripts/run-maestro.mjs` | Local, com Maestro instalado |
-| `pnpm --dir functions lint` | Lint das Functions | Local / CI |
-| `pnpm --dir functions build` | Build TypeScript das Functions | Local / CI |
-| `pnpm release:preflight` | Valida variaveis obrigatorias de release | Antes de build EAS |
-| `pnpm build:preview:android` | Build interno Android preview | Release |
-| `pnpm build:preview:ios` | Build interno iOS preview | Release |
-| `pnpm build:pilot:all` | Build piloto Android/iOS | Release |
-
-`⚠️ [DIVERGENCIA: functions/package.json possui scripts internos com npm run e package-lock.json, apesar do CI usar pnpm --dir functions]`.
+| `pnpm typecheck` | TypeScript sem emitir arquivos | Sempre apos mudancas |
+| `pnpm lint` | ESLint em `app`, `src` e `scripts` | Sempre apos mudancas |
+| `pnpm test` | Unitarios Vitest | Sempre apos mudancas |
+| `pnpm test:coverage` | Unitarios com cobertura V8 | Antes de PR / CI |
+| `pnpm test:integration` | Firebase Emulator + testes de integracao | Rules, callables, seguranca |
+| `pnpm test:e2e` | Smoke Maestro | Antes de build/piloto quando ambiente permitir |
+| `pnpm --dir functions lint` | Lint das Functions | Mudancas em Functions |
+| `pnpm --dir functions build` | Build TypeScript das Functions | Mudancas em Functions/backend |
+| `pnpm release:preflight` | Valida variaveis de release | Antes de build EAS |
+| `pnpm build:preview:android` | Gera APK Android interno | Testes Android |
+| `npx expo-doctor` | Valida stack Expo | Mudancas em Expo/deps/build |
 
 ## 2. Estrategia de teste real
 
-| Camada | Estado atual | Contagem |
-|---|---|---:|
-| Unit | Vitest para schemas, services e helpers | 12 arquivos |
-| Integracao | Firebase Emulator / rules-unit-testing | 0 arquivos |
-| E2E | Maestro smoke auth | 1 flow |
+| Camada | Estado atual | Observacao |
+|---|---|---|
+| Unit | Presente | Schemas, services e helpers de Functions |
+| Coverage | Presente | Thresholds graduais em `vitest.config.ts` |
+| Integracao | Presente localmente | Firebase Emulator; ainda fora do CI |
+| E2E | Presente como smoke | Maestro cobre fluxos principais de forma leve |
+| Manual APK | Necessario | Fluxos do piloto ainda exigem validacao manual |
 
-Arquivos unitarios:
+## 3. Testes unitarios
+
+Arquivos cobertos por `pnpm test`:
+
 - `src/schemas/auth/auth.schema.test.ts`
 - `src/schemas/users/user.schema.test.ts`
 - `src/schemas/clients/client.schema.test.ts`
 - `src/schemas/appointments/appointment.schema.test.ts`
+- `src/schemas/audit/audit.schema.test.ts`
 - `src/schemas/commands/command.schema.test.ts`
+- `src/services/appointments/conflictValidation.test.ts`
 - `src/services/commands/command-totals.test.ts`
+- `src/services/commands/command-reopen.test.ts`
 - `src/services/google/googleCalendarService.test.ts`
+- `src/services/notifications/pushNotificationsService.test.ts`
+- `functions/src/auth/totp-callables.test.ts`
 - `functions/src/google/sync-queue.test.ts`
 - `functions/src/notifications/models.test.ts`
 - `functions/src/notifications/preferences.test.ts`
 - `functions/src/audit/audit-log.schema.test.ts`
 - `functions/src/shared/timezone.test.ts`
 
-E2E:
-- `.maestro/auth-smoke.yaml`
+Ultima evidencia no PR `#13`: `17` arquivos, `71` testes.
 
-Lacunas:
-- `⚠️ [LACUNA: camada de integracao com Firebase Emulator ausente]`.
-- `⚠️ [LACUNA: flows E2E ausentes para agenda, comandas, notificacoes, Google Calendar, auditoria e LGPD]`.
+## 4. Integracao Firebase
 
-## 3. Cobertura
+Comando:
 
-META:
-- `⚠️ [LACUNA: vitest.config.ts nao define coverage.thresholds]`.
+```bash
+pnpm test:integration
+```
 
-ATUAL:
-- `⚠️ [LACUNA: coverage/coverage-summary.json ausente]`.
+Arquivos:
 
-GAP:
-- `⚠️ [LACUNA: nao e possivel calcular META - ATUAL sem thresholds e sem coverage-summary.json]`.
+- `tests/integration/firestore.rules.integration.test.ts`
+- `functions/src/admin/export-lgpd-data.integration.test.ts`
 
-Recomendacao acionavel:
-- Adicionar script `test:coverage` com Vitest coverage.
-- Configurar thresholds em `vitest.config.ts`.
-- Fazer CI falhar quando cobertura atual ficar abaixo da meta.
+Emuladores:
 
-## 4. Matriz CA para teste
+- Auth `9099`
+- Firestore `8080`
+- Functions `5001`
+- UI `4000`
 
-| Feature | Criterio de aceite | Teste(s) que cobre | Camada | Coberto? |
-|---|---|---|---|---|
-| Auth/RBAC/2FA | Nao-autenticado redireciona para login | `⚠️ [LACUNA]` | - | Nao |
-| Auth/RBAC/2FA | 2FA bloqueia sem TOTP valido | `⚠️ [LACUNA]` | - | Nao |
-| Auth/RBAC/2FA | Cadastro/login e telas legais visiveis | `.maestro/auth-smoke.yaml` | E2E | Sim |
-| Clientes | Schemas validam dados de cliente | `src/schemas/clients/client.schema.test.ts` | Unit | Sim |
-| Clientes | Isolamento por salao validado | `⚠️ [LACUNA: rules-unit-testing ausente]` | - | Nao |
-| Agenda | Conflito de horario bloqueado | `⚠️ [LACUNA]` | - | Nao |
-| Agenda | Schema de appointment valida campos | `src/schemas/appointments/appointment.schema.test.ts` | Unit | Sim |
-| Comandas | Calculos financeiros corretos | `src/services/commands/command-totals.test.ts` | Unit | Sim |
-| Comandas | Comanda fechada nao reabre sem admin | `⚠️ [LACUNA]` | - | Nao |
-| Google Calendar | Sync queue e retries basicos | `functions/src/google/sync-queue.test.ts` | Unit | Sim |
-| Google Calendar | App -> Google em menos de 10s | `⚠️ [LACUNA: medicao ausente]` | - | Nao |
-| Google Calendar | Google -> App em menos de 10s | `⚠️ [LACUNA: integracao/E2E ausente]` | - | Nao |
-| Notificacoes | Preferencias de notificacao | `functions/src/notifications/preferences.test.ts` | Unit | Sim |
-| Notificacoes | Badge em tempo real e push <5s | `⚠️ [LACUNA]` | - | Nao |
-| Auditoria/LGPD | Audit log schema valido | `functions/src/audit/audit-log.schema.test.ts` | Unit | Sim |
-| Auditoria/LGPD | Exportacao LGPD via super_admin | `⚠️ [LACUNA: teste callable/exportLgpdData ausente]` | - | Nao |
-| Release | Variaveis obrigatorias de build detectadas | `⚠️ [LACUNA: teste do preflight ausente]` | - | Nao |
+Limite atual:
 
-## 5. Emulador Firebase
+- Existe localmente, mas nao roda no CI.
 
-Estado real:
-- `firebase.json` configura `firestore.rules`, `firestore.indexes.json` e `functions.source`.
-- Nao declara bloco `emulators`.
-- `functions/package.json` possui `serve`: `npm run build && firebase emulators:start --only functions`.
+## 5. Coverage
 
-Lacunas:
-- `⚠️ [LACUNA: sem emuladores Firestore/Auth/Functions declarados com portas]`.
-- `⚠️ [LACUNA: sem testes de rules-unit-testing]`.
-- `⚠️ [LACUNA: CI nao sobe emulador Firebase]`.
+Comando:
 
-Passo sugerido:
-- Configurar `firebase.json` com emuladores.
-- Criar testes `*.integration.test.ts` para rules e callables criticas.
-- Adicionar job/step de integracao no CI.
+```bash
+pnpm test:coverage
+```
 
-## 6. Gates
+Configuracao atual:
 
-| Gate | Estado real | Evidencia |
+- provider: `v8`;
+- reporters: `text`, `json-summary`;
+- thresholds:
+  - statements `20`;
+  - branches `10`;
+  - functions `20`;
+  - lines `20`.
+
+Esses thresholds sao deliberadamente graduais. Aumentar conforme fluxos criticos ganharem cobertura.
+
+## 6. E2E Maestro
+
+Comando:
+
+```bash
+pnpm test:e2e
+```
+
+Flows:
+
+- `auth-smoke.yaml`
+- `agenda-smoke.yaml`
+- `commands-smoke.yaml`
+- `google-calendar-smoke.yaml`
+- `notifications-smoke.yaml`
+- `admin-smoke.yaml`
+
+Limites:
+
+- depende da CLI Maestro;
+- depende de app instalado/servidor preparado;
+- cobre smoke, nao jornada completa de piloto.
+
+## 7. Matriz CA para teste
+
+| Feature | Criterio | Evidencia automatizada | Status |
+|---|---|---|---|
+| Auth/RBAC | Schemas e role legado | `auth.schema.test.ts`, `user.schema.test.ts` | Coberto |
+| 2FA | TOTP callable e codigos invalidos | `totp-callables.test.ts` | Coberto unitario |
+| Clientes | Schema de cliente | `client.schema.test.ts` | Coberto |
+| Clientes | Isolamento por salao | `tests/integration/firestore.rules.integration.test.ts` | Parcial |
+| Agenda | Schema de atendimento | `appointment.schema.test.ts` | Coberto |
+| Agenda | Conflito de horario | `conflictValidation.test.ts` | Coberto |
+| Comandas | Totais financeiros | `command-totals.test.ts` | Coberto |
+| Comandas | Reabertura de comanda fechada | `command-reopen.test.ts` | Coberto |
+| Google Calendar | Service e sync queue | `googleCalendarService.test.ts`, `sync-queue.test.ts` | Coberto unitario |
+| Google Calendar | Sync real App <-> Google | - | Pendente por Functions/deploy/E2E |
+| Notificacoes | Preferencias/modelos/push service | `preferences.test.ts`, `models.test.ts`, `pushNotificationsService.test.ts` | Coberto unitario |
+| Auditoria/LGPD | Schema e exportacao callable | `audit-log.schema.test.ts`, `export-lgpd-data.integration.test.ts` | Coberto parcial |
+| Release | Preflight | - | Pendente teste dedicado |
+
+## 8. CI
+
+Workflow: `.github/workflows/ci.yml`.
+
+Roda:
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm test:coverage`
+- `pnpm --dir functions lint`
+- `pnpm --dir functions build`
+
+Nao roda ainda:
+
+- `pnpm test:integration`
+- `pnpm test:e2e`
+- `npx expo-doctor`
+
+## 9. Gates
+
+| Gate | Estado | Proximo passo |
 |---|---|---|
-| G1 | Parcial / nao cumprido | Matriz CA -> teste possui criterios sem teste |
-| G2 | Nao cumprido | Sem thresholds em `vitest.config.ts`; sem coverage gate em CI |
-| G3 | Nao cumprido | Unit + E2E existem; integracao ausente |
-| G4 | Cumprido | `.github/workflows/ci.yml` roda lint, typecheck, test, functions lint/build em PR |
-| G5 | Nao cumprido | Sem teste contra emulador Firebase |
-| G6 | Parcial / nao cumprido | `.maestro/auth-smoke.yaml` cobre auth; demais fluxos do piloto sem flow |
-| G7 | Cumprido | `.husky/pre-commit` roda `pnpm lint-staged` e `pnpm typecheck` |
+| G1 - CAs criticos testados | Parcial | Mapear gaps restantes por rules/E2E |
+| G2 - Coverage gate | Cumprido gradual | Subir thresholds progressivamente |
+| G3 - Unit + Integracao + E2E | Parcial | Levar integracao ao CI |
+| G4 - CI qualidade | Cumprido | Manter verde |
+| G5 - Functions/rules em emulador | Parcial | Rodar no CI |
+| G6 - E2E piloto | Parcial | Transformar smoke em jornadas reais |
+| G7 - Gates locais | Cumprido | Avaliar pre-push se necessario |
 
-## 7. Pre-flight de release
+## 10. Preflight de release
 
 Checklist executavel:
-1. Preencher variaveis em `.env` com base em `.env.example`.
+
+1. Preencher `.env` com base em `.env.template`.
 2. Rodar `pnpm release:preflight`.
-3. Rodar `pnpm lint`.
-4. Rodar `pnpm typecheck`.
+3. Rodar `pnpm typecheck`.
+4. Rodar `pnpm lint`.
 5. Rodar `pnpm test`.
-6. Rodar `pnpm --dir functions lint`.
+6. Rodar `pnpm test:coverage`.
 7. Rodar `pnpm --dir functions build`.
-8. Gerar build com perfil EAS adequado.
-9. Rodar smoke E2E com `pnpm test:e2e` em ambiente com Maestro instalado.
-
-Perfis EAS:
-- `development`
-- `preview`
-- `pilot`
-- `production`
-
-## 8. Lacunas de harness
-
-| Severidade | Gate | Lacuna | Recomendacao |
-|---|---|---|---|
-| Alta | G1 | Criterios criticos sem teste automatizado | Mapear cada CA para unit/integracao/E2E |
-| Alta | G2 | Sem coverage thresholds e sem coverage gate | Definir META e adicionar CI gate |
-| Alta | G3/G5 | Sem integracao com Firebase Emulator | Criar `*.integration.test.ts` e configurar emuladores |
-| Media | G6 | E2E cobre apenas auth | Criar flows Maestro para piloto |
-| Media | G2 | Coverage atual nao medido | Criar script `test:coverage` e gerar summary |
-| Baixa | G7 | Sem pre-push | Avaliar pre-push para testes mais caros |
+8. Rodar `npx expo-doctor`.
+9. Gerar build com perfil EAS adequado.
+10. Testar APK conforme `docs/guia-de-uso-piloto.md`.

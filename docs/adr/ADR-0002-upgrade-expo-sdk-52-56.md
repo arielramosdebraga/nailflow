@@ -8,10 +8,11 @@ Atualizar o Expo SDK da versão 52 para a 56, alinhando também versões de Reac
 
 ## Consequências
 - Dependências-chave atualizadas:
-  - `expo` para `~56.0.6`
+  - `expo` para a linha `~56.0.x`
   - `react-native` para `0.85.x`
   - `react` para `19.2.x`
   - `expo-router` para `56.x`
+  - `typescript` para a linha `6.0.x`
 - Ajustes técnicos aplicados durante a evolução:
   - compatibilização de rotas tipadas do Expo Router
   - atualização de plugins/babel para o stack Expo 56
@@ -22,5 +23,7 @@ Atualizar o Expo SDK da versão 52 para a 56, alinhando também versões de Reac
   - `pnpm lint`
   - `pnpm typecheck`
   - `pnpm test`
+  - `pnpm test:coverage`
   - `pnpm --dir functions lint`
   - `pnpm --dir functions build`
+  - `npx expo-doctor`
