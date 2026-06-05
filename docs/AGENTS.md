@@ -133,7 +133,6 @@ functions/
 docs/
   adr/
   sdd-harness/
-  sprints/
 ```
 
 Regras:
