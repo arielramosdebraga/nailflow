@@ -56,7 +56,12 @@ export function AppProviders({ children }: PropsWithChildren) {
           throw new Error('Falha ao carregar perfil do usuario.');
         }
 
-        signIn({ userId: user.uid, role: profile.role, salonId: profile.salonId });
+        signIn({
+          userId: user.uid,
+          role: profile.role,
+          salonId: profile.salonId,
+          secondFactorRequired: profile.secondFactorRequired,
+        });
         bootstrapPushToken(user.uid);
       } catch {
         signOut();

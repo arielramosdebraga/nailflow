@@ -36,6 +36,7 @@ export interface UserProfile {
   displayName: string;
   role: UserRole;
   salonId: string | null;
+  secondFactorRequired: boolean;
   phone: string | null;
   photoURL: string | null;
   googleCalendarConnected: boolean;
@@ -98,13 +99,21 @@ function mapUserSnapshot(snapshot: DocumentSnapshot<DocumentData>): UserProfile 
     typeof data.googleCalendar === 'object' && data.googleCalendar !== null
       ? (data.googleCalendar as { connected?: unknown })
       : null;
+  const twoFactorRaw =
+    typeof data.twoFactor === 'object' && data.twoFactor !== null
+      ? (data.twoFactor as { totp?: { enabled?: unknown } })
+      : null;
+  const role = normalizeUserRole(roleResult.data);
+  const totpEnabled = twoFactorRaw?.totp?.enabled === true;
 
   return {
     uid: snapshot.id,
     email: typeof data.email === 'string' ? data.email : '',
     displayName: typeof data.displayName === 'string' ? data.displayName : '',
-    role: normalizeUserRole(roleResult.data),
+    role,
     salonId: typeof data.salonId === 'string' ? data.salonId : null,
+    secondFactorRequired:
+      (role === 'super_admin' || role === 'salon_owner') && totpEnabled,
     phone: typeof data.phone === 'string' ? data.phone : null,
     photoURL: typeof data.photoURL === 'string' ? data.photoURL : null,
     googleCalendarConnected: Boolean(googleCalendarRaw?.connected),
@@ -144,6 +153,17 @@ export async function createUserProfile(params: CreateUserProfileParams): Promis
         quietHoursStart: '22:00',
         quietHoursEnd: '07:00',
         preReminderMinutes: 60,
+      },
+      twoFactor: {
+        totp: {
+          required: false,
+          enabled: false,
+          secret: null,
+          pendingSecret: null,
+          enrolledAt: null,
+          enrollmentStartedAt: null,
+          lastVerifiedAt: null,
+        },
       },
       fcmTokens: [],
       createdAt: serverTimestamp(),

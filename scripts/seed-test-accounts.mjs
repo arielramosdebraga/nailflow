@@ -129,6 +129,17 @@ async function main() {
           syncError: true,
           googleExpired: true,
         },
+        twoFactor: {
+          totp: {
+            required: false,
+            enabled: false,
+            secret: null,
+            pendingSecret: null,
+            enrolledAt: null,
+            enrollmentStartedAt: null,
+            lastVerifiedAt: null,
+          },
+        },
         fcmTokens: [],
         updatedAt: serverTimestamp(),
       },

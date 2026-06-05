@@ -4,10 +4,6 @@ import type { UserRole } from '@/schemas/users/user.schema';
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous' | 'pending_2fa';
 
-function shouldRequireSecondFactor(role: UserRole): boolean {
-  return role === 'super_admin' || role === 'salon_owner';
-}
-
 interface SessionState {
   status: AuthStatus;
   userId: string | null;
@@ -18,7 +14,12 @@ interface SessionState {
   lastActivityAt: number | null;
   setLoading: () => void;
   touchActivity: () => void;
-  signIn: (params: { userId: string; role: UserRole; salonId: string | null }) => void;
+  signIn: (params: {
+    userId: string;
+    role: UserRole;
+    salonId: string | null;
+    secondFactorRequired?: boolean;
+  }) => void;
   completeSecondFactor: () => void;
   signOut: () => void;
 }
@@ -46,9 +47,9 @@ export const useSessionStore = create<SessionState>((set) => ({
       };
     });
   },
-  signIn: ({ userId, role, salonId }) => {
+  signIn: ({ userId, role, salonId, secondFactorRequired: nextSecondFactorRequired }) => {
     set((state) => {
-      const secondFactorRequired = shouldRequireSecondFactor(role);
+      const secondFactorRequired = Boolean(nextSecondFactorRequired);
       const secondFactorVerified =
         !secondFactorRequired || (state.userId === userId && state.secondFactorVerified);
 
