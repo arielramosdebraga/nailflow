@@ -28,7 +28,7 @@ export default function NailTechnicianEditAppointmentScreen() {
 
   async function handleSubmit(data: Omit<UpsertAppointmentInput, 'salonId'>) {
     if (!appointmentId) {
-      throw new Error('ID do atendimento invalido.');
+      throw new Error('ID do atendimento inválido.');
     }
 
     await updateAppointmentMutation.mutateAsync({
@@ -56,11 +56,11 @@ export default function NailTechnicianEditAppointmentScreen() {
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
           <Text className="text-sm text-error">
-            {error instanceof Error ? error.message : 'Atendimento nao encontrado.'}
+            {error instanceof Error ? error.message : 'Atendimento não encontrado.'}
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -70,10 +70,10 @@ export default function NailTechnicianEditAppointmentScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-error">Este atendimento nao pertence a profissional logada.</Text>
+          <Text className="text-sm text-error">Este atendimento não pertence à profissional logada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -82,8 +82,8 @@ export default function NailTechnicianEditAppointmentScreen() {
   return (
     <AppointmentForm
       title="Editar atendimento"
-      description="Atualize data, horario, cliente e status do atendimento."
-      submitLabel="Salvar alteracoes"
+      description="Atualize data, horário, cliente e status do atendimento."
+      submitLabel="Salvar alterações"
       manicureId={userId}
       clients={clientsQuery.data ?? []}
       isSubmitting={updateAppointmentMutation.isPending}

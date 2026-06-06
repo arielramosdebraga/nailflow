@@ -53,7 +53,7 @@ export function useGoogleCalendarConnection() {
     enabled: sessionStatus === 'authenticated' && Boolean(userId),
     queryFn: async () => {
       if (!userId) {
-        throw new Error('Usuario nao identificado para consultar sincronizacao Google.');
+        throw new Error('Usuária não identificada para consultar a sincronização do Google.');
       }
 
       return getGoogleCalendarConnectionStatus(userId);
@@ -64,7 +64,7 @@ export function useGoogleCalendarConnection() {
   const connectMutation = useMutation({
     mutationFn: async (): Promise<ConnectOutcome> => {
       if (!userId) {
-        throw new Error('Usuario nao identificado para conectar Google Agenda.');
+        throw new Error('Usuária não identificada para conectar o Google Agenda.');
       }
 
       const fallbackRedirectUri = AuthSession.makeRedirectUri({
@@ -104,13 +104,13 @@ export function useGoogleCalendarConnection() {
 
         throw new Error(
           errorDescription ??
-            (errorCode ? `Google retornou erro de autorizacao (${errorCode}).` : 'Falha na autorizacao Google.')
+            (errorCode ? `Google retornou um erro de autorização (${errorCode}).` : 'Falha na autorização do Google.')
         );
       }
 
       const code = authResult.params.code;
       if (!code) {
-        throw new Error('Google nao retornou codigo de autorizacao para concluir a conexao.');
+        throw new Error('O Google não retornou um código de autorização para concluir a conexão.');
       }
 
       const confirm = await confirmGoogleCalendarConnection({
@@ -123,7 +123,7 @@ export function useGoogleCalendarConnection() {
     },
     onSuccess: async (result) => {
       if (result.outcome === 'cancelled') {
-        setLocalMessage('Conexao com Google Agenda cancelada.');
+        setLocalMessage('Conexão com Google Agenda cancelada.');
         setLocalError(null);
         return;
       }
@@ -133,7 +133,7 @@ export function useGoogleCalendarConnection() {
       await queryClient.invalidateQueries({ queryKey: ['google-calendar-connection-status'] });
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Falha ao conectar Google Agenda.';
+      const message = error instanceof Error ? error.message : 'Falha ao conectar o Google Agenda.';
       setLocalError(message);
       setLocalMessage(null);
     },
@@ -147,7 +147,11 @@ export function useGoogleCalendarConnection() {
     isConnecting: connectMutation.isPending,
     errorMessage:
       localError ??
-      (statusQuery.error instanceof Error ? statusQuery.error.message : statusQuery.error ? 'Falha ao ler status.' : null),
+      (statusQuery.error instanceof Error
+        ? statusQuery.error.message
+        : statusQuery.error
+          ? 'Falha ao consultar o status da integração.'
+          : null),
     feedbackMessage: localMessage,
     lastSyncedAt: statusQuery.data?.lastSyncedAt ?? null,
     lastErrorMessage: statusQuery.data?.lastErrorMessage ?? null,

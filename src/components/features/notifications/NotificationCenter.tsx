@@ -21,8 +21,8 @@ const TYPE_LABELS: Record<string, string> = {
   appointment_canceled: 'Atendimento cancelado',
   appointment_rescheduled: 'Atendimento remarcado',
   pre_reminder: 'Lembrete',
-  sync_error: 'Erro de sincronizacao',
-  google_expired: 'Conexao Google expirada',
+  sync_error: 'Erro de sincronização',
+  google_expired: 'Conexão Google expirada',
 };
 
 const SWIPE_ACTION_WIDTH = 108;
@@ -35,10 +35,10 @@ interface NotificationSection {
 }
 
 const STATE_MESSAGES = {
-  loading: 'Carregando notificacoes...',
-  empty: 'Nenhuma notificacao encontrada nos ultimos dias.',
-  feedError: 'Nao foi possivel carregar a lista de notificacoes.',
-  unreadError: 'Nao foi possivel atualizar o total de notificacoes nao lidas.',
+  loading: 'Carregando notificações...',
+  empty: 'Nenhuma notificação encontrada nos últimos dias.',
+  feedError: 'Não foi possível carregar a lista de notificações.',
+  unreadError: 'Não foi possível atualizar o total de notificações não lidas.',
 };
 
 function formatDateTime(date: Date | null): string {
@@ -251,8 +251,8 @@ export function NotificationCenter({
             onPress={onOpenSettings}
             className="h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
             accessibilityRole="button"
-            accessibilityLabel="Abrir configuracoes de notificacao"
-            accessibilityHint="Abre a tela para ajustar tipos de alerta e horarios."
+            accessibilityLabel="Abrir configurações de notificação"
+            accessibilityHint="Abre a tela para ajustar tipos de alerta e horários."
           >
             <Settings2 size={18} color="#52525b" />
           </Pressable>
@@ -261,10 +261,10 @@ export function NotificationCenter({
         <View
           className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
           accessible
-          accessibilityLabel={`Total de notificacoes nao lidas: ${unread.unreadCount}.`}
+          accessibilityLabel={`Total de notificações não lidas: ${unread.unreadCount}.`}
         >
           <View className="flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Nao lidas</Text>
+            <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Não lidas</Text>
             <Text
               className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
               accessibilityLiveRegion="polite"
@@ -282,8 +282,8 @@ export function NotificationCenter({
               onPress={() => void feed.markAllAsRead()}
               className="mt-3 h-10 items-center justify-center rounded-xl bg-primary px-4 active:opacity-90"
               accessibilityRole="button"
-              accessibilityLabel="Marcar todas as notificacoes como lidas"
-              accessibilityHint="Define todas as notificacoes da lista como lidas."
+              accessibilityLabel="Marcar todas as notificações como lidas"
+              accessibilityHint="Define todas as notificações da lista como lidas."
               accessibilityState={{ disabled: feed.isLoading }}
             >
               <Text className="text-sm font-semibold text-white">Marcar todas como lidas</Text>
@@ -324,7 +324,7 @@ export function NotificationCenter({
           keyExtractor={(item) => item.id}
           stickySectionHeadersEnabled={false}
           contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
-          accessibilityLabel="Lista de notificacoes"
+          accessibilityLabel="Lista de notificações"
           renderSectionHeader={({ section }) => (
             <Text
               className="pt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
@@ -334,7 +334,7 @@ export function NotificationCenter({
             </Text>
           )}
           renderItem={({ item }) => {
-            const typeLabel = TYPE_LABELS[item.type] ?? 'Atualizacao';
+            const typeLabelText = TYPE_LABELS[item.type] ?? 'Atualização';
 
             return (
               <SwipeToReadContainer
@@ -348,11 +348,11 @@ export function NotificationCenter({
                       : 'border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
                   }`}
                   accessible
-                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabel}. ${item.read ? 'Notificacao lida' : 'Notificacao nao lida'}.`}
+                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabelText}. ${item.read ? 'Notificação lida' : 'Notificação não lida'}.`}
                   accessibilityHint={
                     item.read
                       ? undefined
-                      : 'Deslize para a esquerda ou use o botao para marcar como lida.'
+                      : 'Deslize para a esquerda ou use o botão para marcar como lida.'
                   }
                 >
                   <View className="flex-row items-center justify-between gap-2">
@@ -360,7 +360,7 @@ export function NotificationCenter({
                       {item.title}
                     </Text>
                     <Text className="rounded-full bg-zinc-200 px-2 py-1 text-[10px] font-semibold uppercase text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
-                      {typeLabel}
+                      {typeLabelText}
                     </Text>
                   </View>
                   <Text className="text-sm text-zinc-600 dark:text-zinc-300">{item.body}</Text>
@@ -376,8 +376,8 @@ export function NotificationCenter({
                         onPress={() => void feed.markOneAsRead(item.id)}
                         className="rounded-lg border border-zinc-300 px-3 py-1 active:opacity-80 dark:border-zinc-700"
                         accessibilityRole="button"
-                        accessibilityLabel="Marcar notificacao como lida"
-                        accessibilityHint="Atualiza somente esta notificacao para status de lida."
+                        accessibilityLabel="Marcar notificação como lida"
+                        accessibilityHint="Atualiza somente esta notificação para o status de lida."
                       >
                         <Text className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
                           Marcar lida

@@ -88,11 +88,11 @@ export default function NailTechnicianAppointmentDetailsScreen() {
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
           <Text className="text-sm text-error">
-            {error instanceof Error ? error.message : 'Atendimento nao encontrado.'}
+            {error instanceof Error ? error.message : 'Atendimento não encontrado.'}
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -102,10 +102,10 @@ export default function NailTechnicianAppointmentDetailsScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-error">Este atendimento nao pertence a profissional logada.</Text>
+          <Text className="text-sm text-error">Este atendimento não pertence à profissional logada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -129,16 +129,16 @@ export default function NailTechnicianAppointmentDetailsScreen() {
         <Card className="gap-2">
           <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Resumo</Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Horario: {formatAppointmentTimeRange(appointment.startTime, appointment.endTime)}
+            Horário: {formatAppointmentTimeRange(appointment.startTime, appointment.endTime)}
           </Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
             Status atual: {formatAppointmentStatus(appointment.status)}
           </Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Sincronizacao: {formatAppointmentSyncStatus(appointment.syncStatus)}
+            Sincronização: {formatAppointmentSyncStatus(appointment.syncStatus)}
           </Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Observacoes: {appointment.notes || 'Sem observacoes'}
+            Observações: {appointment.notes || 'Sem observações'}
           </Text>
         </Card>
 
@@ -172,7 +172,7 @@ export default function NailTechnicianAppointmentDetailsScreen() {
           disabled={isMutating}
         />
         <Button
-          label="Voltar para agenda"
+          label="Voltar para a agenda"
           variant="ghost"
           onPress={() => router.replace(agendaRoute)}
           disabled={isMutating}
