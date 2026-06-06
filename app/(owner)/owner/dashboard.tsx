@@ -1,24 +1,27 @@
-import { useRouter, type Href } from 'expo-router';
+import { useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { endOfDay, startOfDay } from 'date-fns';
+import { useRouter, type Href } from 'expo-router';
+import { addDays, addMonths, startOfDay, startOfMonth } from 'date-fns';
 
 import { CommandCard } from '@/components/features/commands/CommandCard';
+import { formatCurrency } from '@/components/features/commands/commandFormatters';
 import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useClients } from '@/hooks/clients/useClients';
-import { useCommands } from '@/hooks/commands/useCommands';
+import { useCommands, useSalonFinancialSummary } from '@/hooks/commands';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useManicures } from '@/hooks/users/useManicures';
-import { formatCurrency } from '@/components/features/commands/commandFormatters';
 
 const ownerRoutes = {
   notifications: '/owner/notifications',
   commands: '/owner/commands',
   agenda: '/owner/agenda',
   manicures: '/owner/manicures',
+  finance: '/owner/finance',
+  salon: '/owner/salon',
   googleCalendar: '/nail-technician/google-calendar',
   login: '/login',
 } as const satisfies Record<string, Href>;
@@ -31,43 +34,71 @@ const getOwnerCommandDetailsRoute = (commandId: string): Href => ({
 export default function OwnerDashboardScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
-  const commandsQuery = useCommands({ limitCount: 300 });
+  const dateRanges = useMemo(() => {
+    const referenceDate = new Date();
+    const todayStart = startOfDay(referenceDate);
+    const currentMonthStart = startOfMonth(referenceDate);
+
+    return {
+      todayStart,
+      tomorrowStart: addDays(todayStart, 1),
+      currentMonthStart,
+      nextMonthStart: addMonths(currentMonthStart, 1),
+    };
+  }, []);
+
+  const recentCommandsQuery = useCommands({ limitCount: 20 });
+  const openCommandsQuery = useCommands({ status: 'open', limitCount: 300 });
   const appointmentsTodayQuery = useAppointments({
-    start: startOfDay(new Date()),
-    end: endOfDay(new Date()),
+    start: dateRanges.todayStart,
+    end: dateRanges.tomorrowStart,
     limitCount: 250,
   });
   const clientsQuery = useClients({ limitCount: 200 });
   const manicuresQuery = useManicures({ limitCount: 50 });
+  const currentMonthSummaryQuery = useSalonFinancialSummary({
+    start: dateRanges.currentMonthStart,
+    end: dateRanges.nextMonthStart,
+    granularity: 'day',
+    includeZeroRevenueProfessionals: true,
+  });
   const unreadNotifications = useUnreadNotificationsCount();
 
-  const commands = commandsQuery.data ?? [];
-  const closedCommands = commands.filter((item) => item.status === 'closed');
-  const openCommands = commands.filter((item) => item.status === 'open');
-  const closedRevenue = closedCommands.reduce((acc, item) => acc + item.total, 0);
+  const recentCommands = recentCommandsQuery.data ?? [];
+  const openCommands = openCommandsQuery.data ?? [];
   const appointmentsToday = appointmentsTodayQuery.data ?? [];
-
-  const recentCommands = commands.slice(0, 3);
+  const googleConnectedCount = (manicuresQuery.data ?? []).filter((item) => item.googleCalendarConnected).length;
   const clientsById = new Map((clientsQuery.data ?? []).map((client) => [client.id, client] as const));
   const manicuresById = new Map((manicuresQuery.data ?? []).map((manicure) => [manicure.uid, manicure] as const));
 
   const isLoading =
-    commandsQuery.isLoading || appointmentsTodayQuery.isLoading || clientsQuery.isLoading || manicuresQuery.isLoading;
-  const error = commandsQuery.error ?? appointmentsTodayQuery.error ?? clientsQuery.error ?? manicuresQuery.error;
+    recentCommandsQuery.isLoading ||
+    openCommandsQuery.isLoading ||
+    appointmentsTodayQuery.isLoading ||
+    clientsQuery.isLoading ||
+    manicuresQuery.isLoading ||
+    currentMonthSummaryQuery.isLoading;
+  const error =
+    recentCommandsQuery.error ??
+    openCommandsQuery.error ??
+    appointmentsTodayQuery.error ??
+    clientsQuery.error ??
+    manicuresQuery.error ??
+    currentMonthSummaryQuery.error;
 
   return (
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
         <View className="gap-2 pb-5">
           <View className="flex-row items-center justify-between gap-3">
-            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard do salao</Text>
+            <Text className="flex-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">Painel do salão</Text>
             <NotificationsBellButton
               unreadCount={unreadNotifications.unreadCount}
               onPress={() => router.push(ownerRoutes.notifications)}
             />
           </View>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Visao rapida de comandas, agenda do dia e equipe.
+            Visão rápida de comandas, agenda do dia e equipe.
           </Text>
         </View>
 
@@ -80,7 +111,7 @@ export default function OwnerDashboardScreen() {
         {error ? (
           <Card>
             <Text className="text-sm text-error">
-              {error instanceof Error ? error.message : 'Falha ao carregar painel.'}
+              {error instanceof Error ? error.message : 'Falha ao carregar o painel.'}
             </Text>
           </Card>
         ) : null}
@@ -93,16 +124,18 @@ export default function OwnerDashboardScreen() {
                 <Text className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{openCommands.length}</Text>
               </Card>
               <Card className="flex-1 gap-1">
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">Comandas fechadas</Text>
-                <Text className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{closedCommands.length}</Text>
+                <Text className="text-sm text-zinc-600 dark:text-zinc-300">Comandas fechadas no mês</Text>
+                <Text className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                  {currentMonthSummaryQuery.data?.totals.closedCommandsCount ?? 0}
+                </Text>
               </Card>
             </View>
 
             <View className="flex-row gap-3">
               <Card className="flex-1 gap-1">
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">Faturamento (fechadas)</Text>
+                <Text className="text-sm text-zinc-600 dark:text-zinc-300">Faturamento do mês</Text>
                 <Text className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                  {formatCurrency(closedRevenue)}
+                  {formatCurrency(currentMonthSummaryQuery.data?.totals.grossRevenue ?? 0)}
                 </Text>
               </Card>
               <Card className="flex-1 gap-1">
@@ -114,24 +147,50 @@ export default function OwnerDashboardScreen() {
             <Card className="gap-2">
               <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Equipe</Text>
               <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-                Manicures ativas: {(manicuresQuery.data ?? []).length}
+                Profissionais ativas: {(manicuresQuery.data ?? []).length}
               </Text>
               <Text className="text-sm text-zinc-600 dark:text-zinc-300">
                 Clientes cadastrados: {(clientsQuery.data ?? []).length}
               </Text>
+              <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+                Google Agenda conectada: {googleConnectedCount} profissional(is)
+              </Text>
             </Card>
 
             <View className="gap-2">
-              <Button label="Gerenciar comandas" onPress={() => router.push(ownerRoutes.commands)} />
               <Button
-                label="Agenda consolidada do dia"
+                label="Gerenciar comandas"
+                accessibilityHint="Abre a lista de comandas do salão."
+                onPress={() => router.push(ownerRoutes.commands)}
+              />
+              <Button
+                label="Agenda consolidada de hoje"
                 variant="secondary"
+                accessibilityHint="Abre a agenda consolidada do dia por profissional."
                 onPress={() => router.push(ownerRoutes.agenda)}
               />
-              <Button label="Lista de manicures" variant="ghost" onPress={() => router.push(ownerRoutes.manicures)} />
               <Button
-                label="Gerenciar Google Agenda"
+                label="Visão financeira"
+                variant="secondary"
+                accessibilityHint="Abre a visão financeira com resumo e desempenho por profissional."
+                onPress={() => router.push(ownerRoutes.finance)}
+              />
+              <Button
+                label="Equipe de profissionais"
                 variant="ghost"
+                accessibilityHint="Abre a lista de profissionais do salão."
+                onPress={() => router.push(ownerRoutes.manicures)}
+              />
+              <Button
+                label="Dados do salão"
+                variant="ghost"
+                accessibilityHint="Abre a visão operacional do salão atual."
+                onPress={() => router.push(ownerRoutes.salon)}
+              />
+              <Button
+                label="Minha conexão com Google Agenda"
+                variant="ghost"
+                accessibilityHint="Abre a tela de conexão da sua conta com o Google Agenda."
                 onPress={() => router.push(ownerRoutes.googleCalendar)}
               />
             </View>
@@ -140,7 +199,7 @@ export default function OwnerDashboardScreen() {
               <View className="gap-2 pt-2">
                 <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Comandas recentes</Text>
                 <View className="gap-3">
-                  {recentCommands.map((command) => (
+                  {recentCommands.slice(0, 3).map((command) => (
                     <CommandCard
                       key={command.id}
                       command={command}
@@ -160,6 +219,7 @@ export default function OwnerDashboardScreen() {
         <Button
           label={authSession.isLoading ? 'Saindo...' : 'Sair'}
           variant="ghost"
+          accessibilityHint="Encerra sua sessão e volta para a tela de login."
           onPress={async () => {
             await authSession.signOut();
             router.replace(ownerRoutes.login);

@@ -15,7 +15,7 @@ const TOGGLE_ITEMS: PreferenceToggleItem[] = [
   {
     key: 'newAppointment',
     label: 'Novo atendimento agendado',
-    description: 'Avisa quando um novo agendamento for criado para voce.',
+    description: 'Avisa quando um novo agendamento for criado para você.',
   },
   {
     key: 'appointmentCanceled',
@@ -25,28 +25,28 @@ const TOGGLE_ITEMS: PreferenceToggleItem[] = [
   {
     key: 'appointmentRescheduled',
     label: 'Atendimento remarcado',
-    description: 'Avisa quando horario ou data forem alterados.',
+    description: 'Avisa quando horário ou data forem alterados.',
   },
   {
     key: 'preReminder',
-    label: 'Lembrete pre-atendimento',
-    description: 'Dispara um lembrete antes do inicio do atendimento.',
+    label: 'Lembrete pré-atendimento',
+    description: 'Dispara um lembrete antes do início do atendimento.',
   },
   {
     key: 'syncError',
-    label: 'Erro de sincronizacao Google',
-    description: 'Notifica quando houver falha de sincronizacao.',
+    label: 'Erro de sincronização com o Google',
+    description: 'Notifica quando houver falha de sincronização.',
   },
   {
     key: 'googleExpired',
-    label: 'Conexao Google expirada',
-    description: 'Avisa quando for necessario reconectar o Google Calendar.',
+    label: 'Conexão com o Google expirada',
+    description: 'Avisa quando for necessário reconectar o Google Agenda.',
   },
 ];
 
 const STATE_MESSAGES = {
-  loading: 'Carregando preferencias de notificacao...',
-  error: 'Nao foi possivel carregar ou salvar as preferencias de notificacao.',
+  loading: 'Carregando preferências de notificações...',
+  error: 'Não foi possível carregar ou salvar as preferências de notificações.',
 };
 
 function parseMinutes(value: string, fallback: number): number {
@@ -147,7 +147,7 @@ export function NotificationPreferencesForm({
       {!preferencesQuery.isLoading ? (
         <View className="gap-3">
           <Card className="gap-3">
-            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Tipos de notificacao</Text>
+            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Tipos de notificação</Text>
             {toggles.map((item) => (
               <View
                 key={item.key}
@@ -186,14 +186,14 @@ export function NotificationPreferencesForm({
           </Card>
 
           <Card className="gap-3">
-            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Nao perturbe</Text>
+            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Não perturbe</Text>
             <View className="flex-row items-center justify-between rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
               <View className="flex-1 gap-1 pr-3">
                 <Text className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
                   Ativar modo silencioso
                 </Text>
                 <Text className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Durante este horario, os alertas nao devem incomodar.
+                  Durante este horário, os alertas não devem incomodar.
                 </Text>
               </View>
               <Pressable
@@ -201,7 +201,7 @@ export function NotificationPreferencesForm({
                 onPress={() =>
                   setDraftOverride((current) => ({
                     ...current,
-                    quietHoursEnabled: !current.quietHoursEnabled,
+                    quietHoursEnabled: !draft.quietHoursEnabled,
                   }))
                 }
                 className={`rounded-full px-3 py-2 ${
@@ -209,7 +209,7 @@ export function NotificationPreferencesForm({
                 } ${isBusy ? 'opacity-60' : 'active:opacity-90'}`}
                 accessibilityRole="switch"
                 accessibilityLabel="Ativar modo silencioso"
-                accessibilityHint="Quando ativado, evita alertas push no horario configurado."
+                accessibilityHint="Quando ativado, evita alertas push no horário configurado."
                 accessibilityState={{ checked: Boolean(draft.quietHoursEnabled), disabled: isBusy }}
               >
                 <Text
@@ -225,7 +225,7 @@ export function NotificationPreferencesForm({
             <View className="gap-3">
               <View className="gap-1">
                 <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                  Horario de inicio (HH:mm)
+                  Horário de início (HH:mm)
                 </Text>
                 <TextInput
                   value={draft.quietHoursStart}
@@ -243,7 +243,7 @@ export function NotificationPreferencesForm({
                   autoCorrect={false}
                   keyboardType="numbers-and-punctuation"
                   placeholder="22:00"
-                  accessibilityLabel="Horario de inicio do modo silencioso"
+                  accessibilityLabel="Horário de início do modo silencioso"
                   accessibilityHint="Informe no formato HH:mm. Exemplo: 22:00."
                   className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
                 />
@@ -251,7 +251,7 @@ export function NotificationPreferencesForm({
 
               <View className="gap-1">
                 <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                  Horario de fim (HH:mm)
+                  Horário de fim (HH:mm)
                 </Text>
                 <TextInput
                   value={draft.quietHoursEnd}
@@ -269,7 +269,7 @@ export function NotificationPreferencesForm({
                   autoCorrect={false}
                   keyboardType="numbers-and-punctuation"
                   placeholder="07:00"
-                  accessibilityLabel="Horario de fim do modo silencioso"
+                  accessibilityLabel="Horário de fim do modo silencioso"
                   accessibilityHint="Informe no formato HH:mm. Exemplo: 07:00."
                   className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
                 />
@@ -279,7 +279,7 @@ export function NotificationPreferencesForm({
 
           <Card className="gap-2">
             <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              Lembrete pre-atendimento
+              Lembrete pré-atendimento
             </Text>
             <Text className="text-xs text-zinc-500 dark:text-zinc-400">
               Defina em quantos minutos antes do atendimento o lembrete deve ser enviado.
@@ -300,7 +300,7 @@ export function NotificationPreferencesForm({
                 }));
               }}
               keyboardType="number-pad"
-              accessibilityLabel="Minutos de antecedencia do lembrete"
+              accessibilityLabel="Minutos de antecedência do lembrete"
               accessibilityHint="Defina entre 5 e 1440 minutos antes do atendimento."
               className="h-11 rounded-xl border border-zinc-300 px-3 text-zinc-900 dark:border-zinc-700 dark:text-zinc-100"
             />
@@ -313,7 +313,7 @@ export function NotificationPreferencesForm({
               isBusy || !hasChanges ? 'bg-zinc-300 dark:bg-zinc-700' : 'bg-primary active:opacity-90'
             }`}
             accessibilityRole="button"
-            accessibilityLabel="Salvar preferencias de notificacao"
+            accessibilityLabel="Salvar preferências de notificações"
             accessibilityHint="Aplica os ajustes desta tela."
             accessibilityState={{ disabled: isBusy || !hasChanges }}
           >
@@ -322,7 +322,7 @@ export function NotificationPreferencesForm({
                 isBusy || !hasChanges ? 'text-zinc-600 dark:text-zinc-300' : 'text-white'
               }`}
             >
-              {preferencesQuery.isSaving ? 'Salvando...' : 'Salvar preferencias'}
+              {preferencesQuery.isSaving ? 'Salvando...' : 'Salvar preferências'}
             </Text>
           </Pressable>
         </View>

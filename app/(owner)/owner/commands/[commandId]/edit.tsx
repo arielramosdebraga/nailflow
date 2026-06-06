@@ -38,7 +38,7 @@ export default function OwnerEditCommandScreen() {
 
   async function handleSubmit(data: Omit<UpsertCommandInput, 'salonId'>) {
     if (!commandId) {
-      throw new Error('ID da comanda invalido.');
+      throw new Error('ID da comanda inválido.');
     }
 
     await updateCommandMutation.mutateAsync({
@@ -69,7 +69,7 @@ export default function OwnerEditCommandScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
+          <Button label="Voltar para a lista" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -78,8 +78,8 @@ export default function OwnerEditCommandScreen() {
   return (
     <CommandForm
       title="Editar comanda"
-      description="Atualize os itens, profissional e status da comanda."
-      submitLabel="Salvar alteracoes"
+      description="Atualize os itens, a profissional e o status da comanda."
+      submitLabel="Salvar alterações"
       isSubmitting={updateCommandMutation.isPending}
       appointments={appointmentsQuery.data ?? []}
       clients={clientsQuery.data ?? []}

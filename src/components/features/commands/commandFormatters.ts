@@ -23,7 +23,7 @@ export function formatCommandStatus(status: CommandStatus): string {
 
 export function formatCommandPaymentMethod(paymentMethod: CommandPaymentMethod | null): string {
   if (!paymentMethod) {
-    return 'Nao informado';
+    return 'Não informado';
   }
 
   if (paymentMethod === 'cash') {
@@ -35,15 +35,15 @@ export function formatCommandPaymentMethod(paymentMethod: CommandPaymentMethod |
   }
 
   if (paymentMethod === 'credit') {
-    return 'Cartao de credito';
+    return 'Cartão de crédito';
   }
 
-  return 'Cartao de debito';
+  return 'Cartão de débito';
 }
 
 export function formatDateTime(value: Date | null): string {
   if (!value) {
-    return 'Nao informado';
+    return 'Não informado';
   }
 
   return value.toLocaleString('pt-BR', {

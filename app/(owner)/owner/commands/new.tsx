@@ -40,7 +40,7 @@ export default function OwnerNewCommandScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando dados da comanda...</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando dados da nova comanda...</Text>
         </Card>
       </View>
     );
@@ -52,11 +52,15 @@ export default function OwnerNewCommandScreen() {
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
           <Text className="text-sm text-error">
-            {error instanceof Error ? error.message : 'Falha ao carregar dados.'}
+            {error instanceof Error ? error.message : 'Falha ao carregar os dados da comanda.'}
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
+          <Button
+            label="Voltar para a lista"
+            variant="ghost"
+            onPress={() => router.replace(commandsListRoute)}
+          />
         </View>
       </View>
     );
