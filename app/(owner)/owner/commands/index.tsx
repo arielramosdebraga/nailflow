@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Bell, CalendarDays, LayoutGrid, ReceiptText, Search, UsersRound } from 'lucide-react-native';
+import { Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 
 import { CommandCard } from '@/components/features/commands/CommandCard';
+import { NotificationsBellButton } from '@/components/features/notifications';
+import { OperationalBottomNav, OperationalScreenShell } from '@/components/features/shared';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useClients } from '@/hooks/clients/useClients';
 import { useCommands } from '@/hooks/commands/useCommands';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useManicures } from '@/hooks/users/useManicures';
 import { type CommandStatus } from '@/schemas/commands/command.schema';
 
@@ -28,6 +32,7 @@ export default function OwnerCommandsListScreen() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const unreadNotifications = useUnreadNotificationsCount();
 
   const commandsQuery = useCommands({
     status: statusFilter === 'all' ? undefined : statusFilter,
@@ -80,19 +85,62 @@ export default function OwnerCommandsListScreen() {
   const error = commandsQuery.error ?? clientsQuery.error ?? manicuresQuery.error ?? appointmentsQuery.error ?? null;
 
   return (
-    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
-      <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
-        <View className="gap-3 pb-4">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Comandas</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Consulte, abra, edite e feche comandas da operacao do salao.
-          </Text>
-
+    <OperationalScreenShell
+      title="Comandas"
+      subtitle="Consulte, abra, edite e feche as comandas da operação do salão."
+      headerAccessory={
+        <NotificationsBellButton
+          unreadCount={unreadNotifications.unreadCount}
+          onPress={() => router.push('/owner/notifications')}
+        />
+      }
+      footer={
+        <OperationalBottomNav
+          items={[
+            {
+              key: 'dashboard',
+              label: 'Painel',
+              icon: LayoutGrid,
+              onPress: () => router.push('/owner/dashboard'),
+            },
+            {
+              key: 'agenda',
+              label: 'Agenda',
+              icon: CalendarDays,
+              onPress: () => router.push('/owner/agenda'),
+            },
+            {
+              key: 'manicures',
+              label: 'Equipe',
+              icon: UsersRound,
+              onPress: () => router.push('/owner/manicures'),
+            },
+            {
+              key: 'commands',
+              label: 'Comandas',
+              icon: ReceiptText,
+              active: true,
+              onPress: () => router.replace('/owner/commands'),
+            },
+            {
+              key: 'notifications',
+              label: 'Alertas',
+              icon: Bell,
+              onPress: () => router.push('/owner/notifications'),
+            },
+          ]}
+        />
+      }
+    >
+      <View className="gap-4">
+        <View className="gap-3">
           <Input
             value={searchTerm}
             onChangeText={setSearchTerm}
             placeholder="Buscar por cliente, profissional ou ID"
             returnKeyType="search"
+            inputWrapperClassName="rounded-2xl border-white/10 bg-white/5"
+            leftAdornment={<Search size={18} color="#a1a1aa" />}
           />
 
           <View className="flex-row flex-wrap gap-2">
@@ -100,40 +148,43 @@ export default function OwnerCommandsListScreen() {
               label="Todas"
               fullWidth={false}
               variant={statusFilter === 'all' ? 'primary' : 'ghost'}
+              className={statusFilter === 'all' ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
               onPress={() => setStatusFilter('all')}
             />
             <Button
               label="Abertas"
               fullWidth={false}
               variant={statusFilter === 'open' ? 'primary' : 'ghost'}
+              className={statusFilter === 'open' ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
               onPress={() => setStatusFilter('open')}
             />
             <Button
               label="Fechadas"
               fullWidth={false}
               variant={statusFilter === 'closed' ? 'primary' : 'ghost'}
+              className={statusFilter === 'closed' ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
               onPress={() => setStatusFilter('closed')}
             />
           </View>
 
-          <Button label="Abrir nova comanda" onPress={() => router.push(ownerCommandRoutes.newCommand)} />
+          <Button label="Abrir nova comanda" className="h-12 rounded-2xl" onPress={() => router.push(ownerCommandRoutes.newCommand)} />
         </View>
 
         {isLoading ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando comandas...</Text>
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">Carregando comandas...</Text>
           </Card>
         ) : null}
 
         {error ? (
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar.'}</Text>
           </Card>
         ) : null}
 
         {!isLoading && !error && commands.length === 0 ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">
               Nenhuma comanda encontrada para os filtros informados.
             </Text>
           </Card>
@@ -156,7 +207,7 @@ export default function OwnerCommandsListScreen() {
             })}
           </View>
         ) : null}
-      </ScrollView>
-    </View>
+      </View>
+    </OperationalScreenShell>
   );
 }

@@ -21,8 +21,8 @@ const TYPE_LABELS: Record<string, string> = {
   appointment_canceled: 'Atendimento cancelado',
   appointment_rescheduled: 'Atendimento remarcado',
   pre_reminder: 'Lembrete',
-  sync_error: 'Erro de sincronizacao',
-  google_expired: 'Conexao Google expirada',
+  sync_error: 'Erro de sincronização',
+  google_expired: 'Conexão com Google expirada',
 };
 
 const SWIPE_ACTION_WIDTH = 108;
@@ -35,10 +35,10 @@ interface NotificationSection {
 }
 
 const STATE_MESSAGES = {
-  loading: 'Carregando notificacoes...',
-  empty: 'Nenhuma notificacao encontrada nos ultimos dias.',
-  feedError: 'Nao foi possivel carregar a lista de notificacoes.',
-  unreadError: 'Nao foi possivel atualizar o total de notificacoes nao lidas.',
+  loading: 'Carregando notificações...',
+  empty: 'Nenhuma notificação encontrada nos últimos dias.',
+  feedError: 'Não foi possível carregar a lista de notificações.',
+  unreadError: 'Não foi possível atualizar o total de notificações não lidas.',
 };
 
 function formatDateTime(date: Date | null): string {
@@ -240,35 +240,32 @@ export function NotificationCenter({
   const hasNotifications = sections.some((section) => section.data.length > 0);
 
   return (
-    <View className="flex-1 gap-4 bg-zinc-50 p-6 pb-4 pt-10 dark:bg-zinc-950">
+    <View className="flex-1 gap-4 bg-zinc-950 p-6 pb-4 pt-10">
       <View className="gap-2">
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-4">
-            <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{title}</Text>
-            <Text className="text-base text-zinc-600 dark:text-zinc-300">{subtitle}</Text>
+            <Text className="text-3xl font-black text-zinc-50">{title}</Text>
+            <Text className="text-base leading-6 text-zinc-300">{subtitle}</Text>
           </View>
           <Pressable
             onPress={onOpenSettings}
-            className="h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
+            className="h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 active:opacity-90"
             accessibilityRole="button"
-            accessibilityLabel="Abrir configuracoes de notificacao"
-            accessibilityHint="Abre a tela para ajustar tipos de alerta e horarios."
+            accessibilityLabel="Abrir configurações de notificação"
+            accessibilityHint="Abre a tela para ajustar tipos de alerta e horários."
           >
-            <Settings2 size={18} color="#52525b" />
+            <Settings2 size={18} color="#e4e4e7" />
           </Pressable>
         </View>
 
         <View
-          className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+          className="rounded-[24px] border border-white/10 bg-white/5 p-4"
           accessible
-          accessibilityLabel={`Total de notificacoes nao lidas: ${unread.unreadCount}.`}
+          accessibilityLabel={`Total de notificações não lidas: ${unread.unreadCount}.`}
         >
           <View className="flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Nao lidas</Text>
-            <Text
-              className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
-              accessibilityLiveRegion="polite"
-            >
+            <Text className="text-sm font-semibold text-zinc-200">Não lidas</Text>
+            <Text className="text-lg font-black text-zinc-50" accessibilityLiveRegion="polite">
               {unread.unreadCount}
             </Text>
           </View>
@@ -280,10 +277,10 @@ export function NotificationCenter({
           {unread.unreadCount > 0 ? (
             <Pressable
               onPress={() => void feed.markAllAsRead()}
-              className="mt-3 h-10 items-center justify-center rounded-xl bg-primary px-4 active:opacity-90"
+              className="mt-3 h-11 items-center justify-center rounded-2xl bg-primary px-4 active:opacity-90"
               accessibilityRole="button"
-              accessibilityLabel="Marcar todas as notificacoes como lidas"
-              accessibilityHint="Define todas as notificacoes da lista como lidas."
+              accessibilityLabel="Marcar todas as notificações como lidas"
+              accessibilityHint="Define todas as notificações da lista como lidas."
               accessibilityState={{ disabled: feed.isLoading }}
             >
               <Text className="text-sm font-semibold text-white">Marcar todas como lidas</Text>
@@ -303,7 +300,7 @@ export function NotificationCenter({
       {feed.isLoading || unread.isLoading ? (
         <Card accessible accessibilityLabel={STATE_MESSAGES.loading}>
           <Text
-            className="text-sm text-zinc-600 dark:text-zinc-300"
+            className="text-sm text-zinc-300"
             accessibilityLiveRegion="polite"
           >
             {STATE_MESSAGES.loading}
@@ -313,8 +310,8 @@ export function NotificationCenter({
 
       {!feed.isLoading && !unread.isLoading && !hasNotifications ? (
         <Card className="items-center gap-2" accessible accessibilityLabel={STATE_MESSAGES.empty}>
-          <Bell size={20} color="#52525b" />
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">{STATE_MESSAGES.empty}</Text>
+          <Bell size={20} color="#a1a1aa" />
+          <Text className="text-sm text-zinc-300">{STATE_MESSAGES.empty}</Text>
         </Card>
       ) : null}
 
@@ -324,10 +321,10 @@ export function NotificationCenter({
           keyExtractor={(item) => item.id}
           stickySectionHeadersEnabled={false}
           contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
-          accessibilityLabel="Lista de notificacoes"
+          accessibilityLabel="Lista de notificações"
           renderSectionHeader={({ section }) => (
             <Text
-              className="pt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+              className="pt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500"
               accessibilityRole="header"
             >
               {section.title}
@@ -344,47 +341,47 @@ export function NotificationCenter({
                 <View
                   className={`gap-3 rounded-2xl border p-4 ${
                     item.read
-                      ? 'border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
-                      : 'border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
+                      ? 'border-white/10 bg-white/5'
+                      : 'border-primary/30 bg-primary/10'
                   }`}
                   accessible
-                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabel}. ${item.read ? 'Notificacao lida' : 'Notificacao nao lida'}.`}
+                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabel}. ${item.read ? 'Notificação lida' : 'Notificação não lida'}.`}
                   accessibilityHint={
                     item.read
                       ? undefined
-                      : 'Deslize para a esquerda ou use o botao para marcar como lida.'
+                      : 'Deslize para a esquerda ou use o botão para marcar como lida.'
                   }
                 >
                   <View className="flex-row items-center justify-between gap-2">
-                    <Text className="flex-1 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                    <Text className="flex-1 text-sm font-semibold text-zinc-100">
                       {item.title}
                     </Text>
-                    <Text className="rounded-full bg-zinc-200 px-2 py-1 text-[10px] font-semibold uppercase text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
+                    <Text className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase text-zinc-200">
                       {typeLabel}
                     </Text>
                   </View>
-                  <Text className="text-sm text-zinc-600 dark:text-zinc-300">{item.body}</Text>
+                  <Text className="text-sm leading-6 text-zinc-300">{item.body}</Text>
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-1">
                       <Clock3 size={14} color="#71717a" />
-                      <Text className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <Text className="text-xs text-zinc-500">
                         {formatDateTime(item.createdAt)}
                       </Text>
                     </View>
                     {!item.read ? (
                       <Pressable
                         onPress={() => void feed.markOneAsRead(item.id)}
-                        className="rounded-lg border border-zinc-300 px-3 py-1 active:opacity-80 dark:border-zinc-700"
+                        className="rounded-xl border border-white/10 px-3 py-1.5 active:opacity-80"
                         accessibilityRole="button"
-                        accessibilityLabel="Marcar notificacao como lida"
-                        accessibilityHint="Atualiza somente esta notificacao para status de lida."
+                        accessibilityLabel="Marcar notificação como lida"
+                        accessibilityHint="Atualiza somente esta notificação para o status de lida."
                       >
-                        <Text className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
+                        <Text className="text-xs font-semibold text-zinc-100">
                           Marcar lida
                         </Text>
                       </Pressable>
                     ) : (
-                      <Text className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                      <Text className="text-xs font-medium text-zinc-500">
                         Lida
                       </Text>
                     )}

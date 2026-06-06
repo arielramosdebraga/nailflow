@@ -21,13 +21,13 @@ export function CommandCard({
   onPress,
 }: CommandCardProps) {
   const content = (
-    <Card className="gap-3">
+    <Card className="gap-3 rounded-[20px] border-white/10 bg-white/5">
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1 gap-1">
-          <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <Text className="text-base font-semibold text-zinc-50">
             {clientName ?? command.clientId}
           </Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+          <Text className="text-sm text-zinc-300">
             Profissional: {manicureName ?? command.manicureId}
           </Text>
         </View>
@@ -35,15 +35,15 @@ export function CommandCard({
       </View>
 
       <View className="flex-row items-center justify-between">
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">Total</Text>
-        <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+        <Text className="text-sm text-zinc-400">Total</Text>
+        <Text className="text-base font-semibold text-zinc-50">
           {formatCurrency(command.total)}
         </Text>
       </View>
 
       <View className="gap-1">
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">Itens: {command.items.length}</Text>
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+        <Text className="text-sm text-zinc-300">Itens: {command.items.length}</Text>
+        <Text className="text-sm text-zinc-300">
           Atendimento: {formatDateTime(appointmentStartTime ?? null)}
         </Text>
       </View>

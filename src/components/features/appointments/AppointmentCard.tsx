@@ -66,29 +66,29 @@ export function AppointmentCard({
   const endDate = getEndDate(appointment);
   const notes = getNotes(appointment);
   const content = (
-    <View className="gap-1 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+    <View className="gap-2 rounded-[20px] border border-white/10 bg-white/5 p-4">
       <View className="flex-row items-center justify-between gap-3">
-        <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <Text className="text-sm font-semibold text-zinc-100">
           {formatAppointmentTimeRange(startDate, endDate)}
         </Text>
         <Text className={`text-xs font-semibold ${statusClassName}`}>{formatAppointmentStatus(appointment.status)}</Text>
       </View>
 
       {showDate ? (
-        <Text className="text-xs text-zinc-500 dark:text-zinc-400">{formatAppointmentDate(startDate)}</Text>
+        <Text className="text-xs text-zinc-500">{formatAppointmentDate(startDate)}</Text>
       ) : null}
 
-      <Text className="text-sm text-zinc-700 dark:text-zinc-200">Cliente: {getClientLabel(appointment, clientName)}</Text>
-      {manicureName ? <Text className="text-sm text-zinc-700 dark:text-zinc-200">Profissional: {manicureName}</Text> : null}
+      <Text className="text-sm text-zinc-300">Cliente: {getClientLabel(appointment, clientName)}</Text>
+      {manicureName ? <Text className="text-sm text-zinc-300">Profissional: {manicureName}</Text> : null}
 
       <View className="flex-row items-center justify-between pt-1">
-        <Text className="text-xs text-zinc-600 dark:text-zinc-300">Valor</Text>
-        <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <Text className="text-xs text-zinc-400">Valor</Text>
+        <Text className="text-sm font-semibold text-zinc-50">
           {formatAppointmentCurrencyFromCents(appointment.priceCents)}
         </Text>
       </View>
 
-      {notes ? <Text className="pt-1 text-xs text-zinc-600 dark:text-zinc-300">{notes}</Text> : null}
+      {notes ? <Text className="pt-1 text-xs leading-5 text-zinc-400">{notes}</Text> : null}
     </View>
   );
 

@@ -24,17 +24,17 @@ export function NotificationsBellButton({
   return (
     <Pressable
       onPress={onPress}
-      className="relative h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
+      className="relative h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 active:opacity-90"
       accessibilityRole="button"
-      accessibilityLabel="Abrir central de notificacoes"
-      accessibilityHint="Abre a lista de notificacoes e permite marcar como lida."
+      accessibilityLabel="Abrir central de notificações"
+      accessibilityHint="Abre a lista de notificações e permite marcar como lida."
       accessibilityValue={{
         text: hasUnread
-          ? `${unreadCount} notificacoes nao lidas`
-          : 'Sem notificacoes nao lidas',
+          ? `${unreadCount} notificações não lidas`
+          : 'Sem notificações não lidas',
       }}
     >
-      <Bell size={20} color="#27272a" />
+      <Bell size={20} color="#f4f4f5" />
       {hasUnread ? (
         <View
           className="absolute -right-1 -top-1 min-h-5 min-w-5 items-center justify-center rounded-full bg-error px-1"
