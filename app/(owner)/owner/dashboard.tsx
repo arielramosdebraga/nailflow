@@ -20,6 +20,7 @@ const ownerRoutes = {
   commands: '/owner/commands',
   agenda: '/owner/agenda',
   manicures: '/owner/manicures',
+  newManicure: '/owner/manicures/new' as Href,
   finance: '/owner/finance',
   salon: '/owner/salon',
   googleCalendar: '/nail-technician/google-calendar',
@@ -174,6 +175,12 @@ export default function OwnerDashboardScreen() {
                 variant="secondary"
                 accessibilityHint="Abre a visão financeira com resumo e desempenho por profissional."
                 onPress={() => router.push(ownerRoutes.finance)}
+              />
+              <Button
+                label="Nova profissional"
+                variant="secondary"
+                accessibilityHint="Abre o fluxo seguro para cadastrar uma nova profissional."
+                onPress={() => router.push(ownerRoutes.newManicure)}
               />
               <Button
                 label="Equipe de profissionais"

@@ -13,6 +13,7 @@ import { useManicures } from '@/hooks/users/useManicures';
 const ownerDashboardRoute = '/owner/dashboard' satisfies Href;
 const ownerFinanceRoute = '/owner/finance' satisfies Href;
 const ownerSalonRoute = '/owner/salon' satisfies Href;
+const ownerNewManicureRoute = '/owner/manicures/new' as Href;
 
 export default function OwnerManicuresListScreen() {
   const router = useRouter();
@@ -100,10 +101,10 @@ export default function OwnerManicuresListScreen() {
         </View>
 
         <Card className="mb-4 gap-2">
-          <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Escopo desta sprint</Text>
+          <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Onboarding seguro</Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Nesta etapa, a gestão da equipe foca leitura operacional e financeira. O onboarding seguro de novas
-            profissionais segue para a próxima sprint.
+            O cadastro de novas profissionais agora acontece em um fluxo seguro no backend, sem expor senha nem trocar
+            a sessao da owner.
           </Text>
         </Card>
 
@@ -121,6 +122,7 @@ export default function OwnerManicuresListScreen() {
         </View>
 
         <View className="gap-2 pb-4">
+          <Button label="Nova profissional" onPress={() => router.push(ownerNewManicureRoute)} />
           <Button label="Ver financeiro" variant="secondary" onPress={() => router.push(ownerFinanceRoute)} />
           <Button label="Dados do salão" variant="ghost" onPress={() => router.push(ownerSalonRoute)} />
         </View>
@@ -140,10 +142,11 @@ export default function OwnerManicuresListScreen() {
         ) : null}
 
         {!isLoading && !error && (manicuresQuery.data ?? []).length === 0 ? (
-          <Card>
+          <Card className="gap-3">
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
               Nenhuma profissional vinculada ao salão até o momento.
             </Text>
+            <Button label="Cadastrar primeira profissional" onPress={() => router.push(ownerNewManicureRoute)} />
           </Card>
         ) : null}
 

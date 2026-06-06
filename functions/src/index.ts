@@ -13,6 +13,7 @@ import {onRequest} from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 import {exportLgpdData} from "./admin/export-lgpd-data";
 import {getGlobalDashboard} from "./admin/get-global-dashboard";
+import {createNailTechnician} from "./admin/create-nail-technician";
 import {onUserCreated} from "./auth/on-user-created";
 import {
   beginTotpEnrollment,
@@ -61,6 +62,7 @@ export const health = onRequest((request, response) => {
 export {onUserCreated};
 export {
   createSalon,
+  createNailTechnician,
   exportLgpdData,
   getGlobalDashboard,
   getTotpStatus,
