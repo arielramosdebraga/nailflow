@@ -1,6 +1,7 @@
 import { Alert, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useClient } from '@/hooks/clients/useClient';
@@ -44,79 +45,115 @@ export default function ClientDetailsScreen() {
 
   if (clientQuery.isLoading) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando cliente...</Text>
+      <OperationalScreenShell
+        title="Cliente"
+        subtitle="Carregando os dados completos da cliente."
+        onBackPress={() => router.replace(clientsListRoute)}
+        backLabel="Voltar para clientes"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
+          <Text className="text-sm text-zinc-300">Carregando cliente...</Text>
         </Card>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   if (clientQuery.error) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
+      <OperationalScreenShell
+        title="Cliente"
+        subtitle="Não foi possível carregar os dados desta cliente."
+        onBackPress={() => router.replace(clientsListRoute)}
+        backLabel="Voltar para clientes"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
           <Text className="text-sm text-error">
             {clientQuery.error instanceof Error ? clientQuery.error.message : 'Falha ao carregar cliente.'}
           </Text>
         </Card>
-        <View className="pt-4">
-          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
-        </View>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   const client = clientQuery.data;
   if (!client) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Cliente nao encontrado.</Text>
+      <OperationalScreenShell
+        title="Cliente"
+        subtitle="Este cadastro não foi encontrado na sua base operacional."
+        onBackPress={() => router.replace(clientsListRoute)}
+        backLabel="Voltar para clientes"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
+          <Text className="text-sm text-zinc-300">Cliente não encontrada.</Text>
         </Card>
-        <View className="pt-4">
-          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
-        </View>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   return (
-    <View className="flex-1 justify-between bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
+    <OperationalScreenShell
+      title={client.name}
+      subtitle="Consulte os dados de contato, histórico textual e ações rápidas desta cliente."
+      onBackPress={() => router.replace(clientsListRoute)}
+      backLabel="Voltar para clientes"
+      contentContainerClassName="pb-10"
+      topSlot={
+        <Card className="gap-4 border-white/10 bg-white/5">
+          <View className="flex-row items-center gap-4">
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-primary/15">
+              <Text className="text-2xl font-black text-primary">{client.name.slice(0, 1).toUpperCase()}</Text>
+            </View>
+            <View className="flex-1 gap-1">
+              <Text className="text-lg font-semibold text-zinc-50">{client.phone}</Text>
+              <Text className="text-sm text-zinc-300">
+                {client.email ? client.email : 'E-mail não informado'}
+              </Text>
+            </View>
+          </View>
+        </Card>
+      }
+    >
       <View className="gap-4">
-        <View className="gap-2">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">{client.phone}</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            {client.email ? client.email : 'E-mail nao informado'}
-          </Text>
-        </View>
-
-        <Card className="gap-2">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Tags</Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+        <Card className="gap-2 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-100">Tags</Text>
+          <Text className="text-sm leading-6 text-zinc-300">
             {client.tags.length > 0 ? client.tags.join(', ') : 'Sem tags cadastradas'}
           </Text>
         </Card>
 
-        <Card className="gap-2">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Observacoes</Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            {client.notes ? client.notes : 'Sem observacoes cadastradas'}
+        <Card className="gap-2 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-100">Observações</Text>
+          <Text className="text-sm leading-6 text-zinc-300">
+            {client.notes ? client.notes : 'Sem observações cadastradas'}
           </Text>
         </Card>
-      </View>
 
-      <View className="gap-2">
-        <Button label="Editar cliente" onPress={() => router.push(getClientEditRoute(client.id))} />
-        <Button
-          label={deleteClientMutation.isPending ? 'Excluindo...' : 'Excluir cliente'}
-          variant="danger"
-          onPress={handleDelete}
-          disabled={deleteClientMutation.isPending}
-        />
-        <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
+        <View className="gap-3">
+          <Button
+            label="Editar cliente"
+            className="rounded-2xl"
+            onPress={() => router.push(getClientEditRoute(client.id))}
+          />
+          <Button
+            label={deleteClientMutation.isPending ? 'Excluindo...' : 'Excluir cliente'}
+            variant="danger"
+            className="rounded-2xl"
+            onPress={handleDelete}
+            disabled={deleteClientMutation.isPending}
+          />
+          <Button
+            label="Voltar para clientes"
+            variant="secondary"
+            className="rounded-2xl"
+            onPress={() => router.replace(clientsListRoute)}
+            disabled={deleteClientMutation.isPending}
+          />
+        </View>
       </View>
-    </View>
+    </OperationalScreenShell>
   );
 }

@@ -1,7 +1,8 @@
 import { Controller, useForm } from 'react-hook-form';
 import { useRouter, type Href } from 'expo-router';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -54,19 +55,11 @@ export default function NewClientScreen() {
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-zinc-50 dark:bg-zinc-950"
-      contentContainerClassName="p-6 pb-10 pt-10"
-      keyboardShouldPersistTaps="handled"
+    <OperationalScreenShell
+      title="Novo cliente"
+      subtitle="Preencha os dados principais para cadastrar um novo cliente no salão."
     >
-      <View className="gap-2 pb-5">
-        <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Novo cliente</Text>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Preencha os dados principais para cadastrar um novo cliente no salão.
-        </Text>
-      </View>
-
-      <Card className="gap-4">
+      <Card className="gap-4 border-white/10 bg-white/5">
         <Controller
           control={form.control}
           name="name"
@@ -79,6 +72,7 @@ export default function NewClientScreen() {
               autoCapitalize="words"
               placeholder="Nome do cliente"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -95,6 +89,7 @@ export default function NewClientScreen() {
               keyboardType="phone-pad"
               placeholder="(00) 00000-0000"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -112,6 +107,7 @@ export default function NewClientScreen() {
               keyboardType="email-address"
               placeholder="nome@cliente.com"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -127,6 +123,7 @@ export default function NewClientScreen() {
               onBlur={field.onBlur}
               placeholder="vip, alergia, recorrente"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -142,6 +139,7 @@ export default function NewClientScreen() {
               onBlur={field.onBlur}
               placeholder="Preferências, alergias ou observações importantes"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -153,17 +151,19 @@ export default function NewClientScreen() {
         <View className="gap-2">
           <Button
             label={createClientMutation.isPending ? 'Salvando...' : 'Salvar cliente'}
+            className="h-12 rounded-2xl"
             onPress={form.handleSubmit(onSubmit)}
             disabled={createClientMutation.isPending}
           />
           <Button
             label="Cancelar"
             variant="ghost"
+            className="h-12 rounded-2xl border-white/10 bg-white/5"
             onPress={() => router.replace(clientsListRoute)}
             disabled={createClientMutation.isPending}
           />
         </View>
       </Card>
-    </ScrollView>
+    </OperationalScreenShell>
   );
 }

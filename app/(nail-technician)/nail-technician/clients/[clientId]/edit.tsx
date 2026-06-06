@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Input } from '@/components/ui/Input';
 import { useClient } from '@/hooks/clients/useClient';
 import { useUpdateClientMutation } from '@/hooks/clients/useClientMutations';
@@ -65,7 +66,7 @@ export default function EditClientScreen() {
     }
 
     if (!clientId) {
-      form.setError('root', { message: 'ID do cliente invalido.' });
+      form.setError('root', { message: 'ID do cliente inválido.' });
       return;
     }
 
@@ -83,43 +84,55 @@ export default function EditClientScreen() {
 
   if (clientQuery.isLoading) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando dados do cliente...</Text>
+      <OperationalScreenShell
+        title="Editar cliente"
+        subtitle="Carregando os dados da cliente."
+        backLabel="Voltar para clientes"
+        onBackPress={() => router.replace(clientsListRoute)}
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
+          <Text className="text-sm text-zinc-300">Carregando dados da cliente...</Text>
         </Card>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   if (clientQuery.error || !clientQuery.data) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
+      <OperationalScreenShell
+        title="Editar cliente"
+        subtitle="Não foi possível carregar os dados da cliente."
+        backLabel="Voltar para clientes"
+        onBackPress={() => router.replace(clientsListRoute)}
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
           <Text className="text-sm text-error">
             {clientQuery.error instanceof Error ? clientQuery.error.message : 'Falha ao carregar cliente.'}
           </Text>
         </Card>
-        <View className="pt-4">
-          <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
-        </View>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-zinc-50 dark:bg-zinc-950"
-      contentContainerClassName="p-6 pb-10 pt-10"
-      keyboardShouldPersistTaps="handled"
-    >
-      <View className="gap-2 pb-5">
-        <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Editar cliente</Text>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Atualize os dados de contato e observacoes do cliente.
-        </Text>
-      </View>
+    <OperationalScreenShell
+      title="Editar cliente"
+      subtitle="Atualize os dados de contato e observações da cliente."
+      backLabel="Voltar para detalhes"
+      onBackPress={() => {
+        if (clientId) {
+          router.replace(getClientDetailsRoute(clientId));
+          return;
+        }
 
-      <Card className="gap-4">
+        router.replace(clientsListRoute);
+      }}
+      keyboardShouldPersistTaps="handled"
+      contentContainerClassName="pb-10"
+    >
+      <Card className="gap-4 border-white/10 bg-white/5">
         <Controller
           control={form.control}
           name="name"
@@ -132,6 +145,7 @@ export default function EditClientScreen() {
               autoCapitalize="words"
               placeholder="Nome do cliente"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -148,6 +162,7 @@ export default function EditClientScreen() {
               keyboardType="phone-pad"
               placeholder="(00) 00000-0000"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -165,6 +180,7 @@ export default function EditClientScreen() {
               keyboardType="email-address"
               placeholder="nome@cliente.com"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -180,6 +196,7 @@ export default function EditClientScreen() {
               onBlur={field.onBlur}
               placeholder="vip, alergia, recorrente"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -189,12 +206,13 @@ export default function EditClientScreen() {
           name="notes"
           render={({ field, fieldState }) => (
             <Input
-              label="Observacoes (opcional)"
+              label="Observações (opcional)"
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
-              placeholder="Preferencias, alergias ou observacoes importantes"
+              placeholder="Preferências, alergias ou observações importantes"
               error={fieldState.error?.message}
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
             />
           )}
         />
@@ -203,27 +221,27 @@ export default function EditClientScreen() {
           <Text className="text-sm text-error">{form.formState.errors.root.message}</Text>
         ) : null}
 
-        <View className="gap-2">
-          <Button
-            label={updateClientMutation.isPending ? 'Salvando...' : 'Salvar alteracoes'}
-            onPress={form.handleSubmit(onSubmit)}
-            disabled={updateClientMutation.isPending}
-          />
-          <Button
-            label="Cancelar"
-            variant="ghost"
-            onPress={() => {
-              if (clientId) {
-                router.replace(getClientDetailsRoute(clientId));
-                return;
-              }
+        <Button
+          label={updateClientMutation.isPending ? 'Salvando...' : 'Salvar alterações'}
+          className="h-12 rounded-2xl"
+          onPress={form.handleSubmit(onSubmit)}
+          disabled={updateClientMutation.isPending}
+        />
+        <Button
+          label="Cancelar"
+          variant="ghost"
+          className="h-12 rounded-2xl border-white/10 bg-white/5"
+          onPress={() => {
+            if (clientId) {
+              router.replace(getClientDetailsRoute(clientId));
+              return;
+            }
 
-              router.replace(clientsListRoute);
-            }}
-            disabled={updateClientMutation.isPending}
-          />
-        </View>
+            router.replace(clientsListRoute);
+          }}
+          disabled={updateClientMutation.isPending}
+        />
       </Card>
-    </ScrollView>
+    </OperationalScreenShell>
   );
 }

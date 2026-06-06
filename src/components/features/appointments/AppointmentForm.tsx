@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Input } from '@/components/ui/Input';
 import { formatAppointmentStatus } from '@/components/features/appointments/appointmentFormatters';
 import {
@@ -219,7 +220,7 @@ export function AppointmentForm({
     if (!parsed.success) {
       const firstIssue = parsed.error.issues[0];
       if (!firstIssue) {
-        setFormMessage('Falha ao validar o formulario.');
+        setFormMessage('Falha ao validar o formulário.');
         return;
       }
 
@@ -247,21 +248,12 @@ export function AppointmentForm({
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-zinc-50 dark:bg-zinc-950"
-      contentContainerClassName="p-6 pb-10 pt-10"
-      keyboardShouldPersistTaps="handled"
-    >
-      <View className="gap-2 pb-5">
-        <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{title}</Text>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">{description}</Text>
-      </View>
-
+    <OperationalScreenShell title={title} subtitle={description}>
       <View className="gap-4">
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Cliente</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Cliente</Text>
           {clients.length === 0 ? (
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Nenhuma cliente cadastrada para selecionar.</Text>
+            <Text className="text-sm text-zinc-300">Nenhuma cliente cadastrada para selecionar.</Text>
           ) : (
             <View className="gap-2">
               {clients.map((client) => {
@@ -270,12 +262,12 @@ export function AppointmentForm({
                 return (
                   <Pressable
                     key={client.id}
-                    className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
+                    className={`rounded-[20px] border p-4 ${isSelected ? 'border-primary bg-primary/15' : 'border-white/10 bg-zinc-900/70'}`}
                     onPress={() => form.setValue('clientId', client.id, { shouldValidate: true })}
                   >
-                    <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
+                    <Text className="text-sm font-semibold text-zinc-100">{client.name}</Text>
                     {clientPhone ? (
-                      <Text className="text-xs text-zinc-600 dark:text-zinc-300">{clientPhone}</Text>
+                      <Text className="text-xs text-zinc-400">{clientPhone}</Text>
                     ) : null}
                   </Pressable>
                 );
@@ -286,12 +278,12 @@ export function AppointmentForm({
             <Text className="text-sm text-error">{form.formState.errors.clientId.message}</Text>
           ) : null}
           {selectedClient ? (
-            <Text className="text-xs text-zinc-600 dark:text-zinc-300">Selecionada: {selectedClient.name}</Text>
+            <Text className="text-xs text-zinc-400">Selecionada: {selectedClient.name}</Text>
           ) : null}
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Horario</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Horário</Text>
 
           <Controller
             control={form.control}
@@ -304,6 +296,7 @@ export function AppointmentForm({
                 onBlur={field.onBlur}
                 autoCapitalize="none"
                 placeholder="2026-06-01"
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
@@ -319,6 +312,7 @@ export function AppointmentForm({
                 onBlur={field.onBlur}
                 autoCapitalize="none"
                 placeholder="09:00"
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
@@ -334,6 +328,7 @@ export function AppointmentForm({
                 onBlur={field.onBlur}
                 autoCapitalize="none"
                 placeholder="2026-06-01"
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
@@ -349,12 +344,13 @@ export function AppointmentForm({
                 onBlur={field.onBlur}
                 autoCapitalize="none"
                 placeholder="10:00"
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
         </Card>
 
-        <Card className="gap-3">
+        <Card className="gap-3 border-white/10 bg-white/5">
           <Controller
             control={form.control}
             name="price"
@@ -367,6 +363,7 @@ export function AppointmentForm({
                 keyboardType="decimal-pad"
                 placeholder="0,00"
                 error={fieldState.error?.message}
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
@@ -376,7 +373,7 @@ export function AppointmentForm({
             name="notes"
             render={({ field, fieldState }) => (
               <Input
-                label="Observacoes"
+                label="Observações"
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
@@ -385,13 +382,14 @@ export function AppointmentForm({
                 multiline
                 textAlignVertical="top"
                 error={fieldState.error?.message}
+                inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-900"
               />
             )}
           />
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Status</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Status</Text>
           <View className="flex-row flex-wrap gap-2">
             {appointmentStatuses.map((status) => (
               <Button
@@ -399,6 +397,7 @@ export function AppointmentForm({
                 label={formatAppointmentStatus(status)}
                 fullWidth={false}
                 variant={selectedStatus === status ? 'primary' : 'ghost'}
+                className={selectedStatus === status ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
                 onPress={() => form.setValue('status', status, { shouldValidate: true })}
               />
             ))}
@@ -412,12 +411,19 @@ export function AppointmentForm({
         <View className="gap-2">
           <Button
             label={isSubmitting ? 'Salvando...' : submitLabel}
+            className="h-12 rounded-2xl"
             onPress={form.handleSubmit(handleSubmit)}
             disabled={isSubmitting}
           />
-          <Button label="Cancelar" variant="ghost" onPress={onCancel} disabled={isSubmitting} />
+          <Button
+            label="Cancelar"
+            variant="ghost"
+            className="h-12 rounded-2xl border-white/10 bg-white/5"
+            onPress={onCancel}
+            disabled={isSubmitting}
+          />
         </View>
       </View>
-    </ScrollView>
+    </OperationalScreenShell>
   );
 }

@@ -1,18 +1,29 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
+import { Bell, CalendarDays, Search, Settings2, UsersRound } from 'lucide-react-native';
 
 import { AppointmentCard, type AppointmentCardItem } from '@/components/features/appointments';
+import {
+  OperationalBottomNav,
+  OperationalMetricCard,
+  OperationalScreenShell,
+} from '@/components/features/shared';
+import { NotificationsBellButton } from '@/components/features/notifications';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { useAppointments } from '@/hooks/appointments';
 import { useClients } from '@/hooks/clients/useClients';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import type { Appointment } from '@/schemas/appointments/appointment.schema';
 import { useSessionStore } from '@/stores/sessionStore';
 
 const appointmentsRoutes = {
   agenda: '/nail-technician/agenda',
+  clients: '/nail-technician/clients',
+  googleCalendar: '/nail-technician/google-calendar',
+  notifications: '/nail-technician/notifications',
   newAppointment: '/nail-technician/appointments/new',
 } as const satisfies Record<string, Href>;
 
@@ -51,6 +62,7 @@ export default function AppointmentsListScreen() {
   const router = useRouter();
   const role = useSessionStore((state) => state.role);
   const userId = useSessionStore((state) => state.userId);
+  const unreadNotifications = useUnreadNotificationsCount();
   const [searchTerm, setSearchTerm] = useState('');
 
   const interval = useMemo(() => buildListInterval(), []);
@@ -64,12 +76,12 @@ export default function AppointmentsListScreen() {
 
   const clientsById = useMemo(
     () => new Map((clientsQuery.data ?? []).map((client) => [client.id, client.name])),
-    [clientsQuery.data]
+    [clientsQuery.data],
   );
 
   const appointments = useMemo(
     () => (appointmentsQuery.data ?? []).map((item) => mapAppointmentToCardItem(item, clientsById)),
-    [appointmentsQuery.data, clientsById]
+    [appointmentsQuery.data, clientsById],
   );
 
   const filteredAppointments = useMemo(() => {
@@ -87,72 +99,145 @@ export default function AppointmentsListScreen() {
 
   const isLoading = appointmentsQuery.isLoading || clientsQuery.isLoading;
   const queryError = appointmentsQuery.error ?? clientsQuery.error;
+  const activeAppointments = filteredAppointments.filter((appointment) => appointment.status !== 'cancelled').length;
+  const projectedRevenue =
+    filteredAppointments.reduce((total, appointment) => total + appointment.priceCents, 0) / 100;
 
   return (
-    <View className="flex-1 bg-zinc-50 p-6 dark:bg-zinc-950">
-      <View className="gap-3 pb-4 pt-10">
-        <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Atendimentos</Text>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Consulte os atendimentos cadastrados e acesse os detalhes para atualizar informacoes.
-        </Text>
+    <OperationalScreenShell
+      title="Atendimentos"
+      subtitle="Consulte seus atendimentos, filtre por cliente ou observação e acompanhe a agenda operacional em um só lugar."
+      headerAccessory={
+        <NotificationsBellButton
+          unreadCount={unreadNotifications.unreadCount}
+          onPress={() => router.push(appointmentsRoutes.notifications)}
+        />
+      }
+      topSlot={
+        <View className="gap-3">
+          <View className="flex-row gap-3">
+            <OperationalMetricCard
+              label="Encontrados"
+              value={String(filteredAppointments.length)}
+              helper="No período operacional"
+            />
+            <OperationalMetricCard
+              label="Ativos"
+              value={String(activeAppointments)}
+              helper="Sem cancelamentos"
+              featured
+            />
+          </View>
+
+          <Card className="gap-2 border-white/10 bg-white/5">
+            <Text className="text-sm font-semibold text-zinc-100">Receita prevista</Text>
+            <Text className="text-2xl font-black text-zinc-50">
+              {projectedRevenue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              })}
+            </Text>
+            <Text className="text-sm leading-6 text-zinc-300">
+              A lista considera os últimos 30 dias e os próximos 120 dias para facilitar o acompanhamento do ciclo de atendimento.
+            </Text>
+          </Card>
+        </View>
+      }
+      footer={
+        <OperationalBottomNav
+          items={[
+            {
+              key: 'agenda',
+              label: 'Agenda',
+              icon: CalendarDays,
+              active: true,
+              onPress: () => router.replace(appointmentsRoutes.agenda),
+            },
+            {
+              key: 'clients',
+              label: 'Clientes',
+              icon: UsersRound,
+              onPress: () => router.push(appointmentsRoutes.clients),
+            },
+            {
+              key: 'notifications',
+              label: 'Alertas',
+              icon: Bell,
+              onPress: () => router.push(appointmentsRoutes.notifications),
+            },
+            {
+              key: 'google',
+              label: 'Google',
+              icon: Settings2,
+              onPress: () => router.push(appointmentsRoutes.googleCalendar),
+            },
+          ]}
+        />
+      }
+    >
+      <View className="gap-4">
         <Input
           value={searchTerm}
           onChangeText={setSearchTerm}
-          placeholder="Buscar por cliente ou observacao"
+          placeholder="Buscar por cliente ou observação"
           autoCapitalize="words"
           returnKeyType="search"
+          label="Busca rápida"
+          labelClassName="text-zinc-200"
+          inputWrapperClassName="rounded-2xl border-white/10 bg-white/5"
+          className="text-zinc-100"
+          leftAdornment={<Search size={18} color="#a1a1aa" />}
         />
 
-        <View className="flex-row gap-2">
+        <View className="flex-row gap-3">
           <Button
-            label="Criar atendimento"
-            className="flex-1"
+            label="Novo atendimento"
+            className="flex-1 rounded-2xl"
             onPress={() => router.push(appointmentsRoutes.newAppointment)}
           />
           <Button
-            label="Voltar para agenda"
-            className="flex-1"
-            variant="ghost"
+            label="Ver agenda"
+            variant="secondary"
+            className="flex-1 rounded-2xl"
             onPress={() => router.replace(appointmentsRoutes.agenda)}
           />
         </View>
+
+        {isLoading ? (
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">Carregando atendimentos...</Text>
+          </Card>
+        ) : null}
+
+        {!isLoading && queryError ? (
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-error">
+              {queryError instanceof Error ? queryError.message : 'Falha ao carregar atendimentos.'}
+            </Text>
+          </Card>
+        ) : null}
+
+        {!isLoading && !queryError && filteredAppointments.length === 0 ? (
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">
+              Nenhum atendimento encontrado para o filtro informado.
+            </Text>
+          </Card>
+        ) : null}
+
+        {!isLoading && !queryError && filteredAppointments.length > 0 ? (
+          <View className="gap-3">
+            {filteredAppointments.map((item) => (
+              <AppointmentCard
+                key={item.id}
+                appointment={item}
+                showDate
+                onPress={(appointmentId) => router.push(getAppointmentDetailsRoute(appointmentId))}
+              />
+            ))}
+          </View>
+        ) : null}
       </View>
-
-      {isLoading ? (
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando atendimentos...</Text>
-        </Card>
-      ) : null}
-
-      {!isLoading && queryError ? (
-        <Card>
-          <Text className="text-sm text-error">
-            {queryError instanceof Error ? queryError.message : 'Falha ao carregar atendimentos.'}
-          </Text>
-        </Card>
-      ) : null}
-
-      {!isLoading && !queryError && filteredAppointments.length === 0 ? (
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Nenhum atendimento encontrado para o filtro informado.
-          </Text>
-        </Card>
-      ) : null}
-
-      {!isLoading && !queryError && filteredAppointments.length > 0 ? (
-        <FlatList
-          data={filteredAppointments}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
-          renderItem={({ item }) => (
-            <AppointmentCard
-              appointment={item}
-              onPress={(appointmentId) => router.push(getAppointmentDetailsRoute(appointmentId))}
-            />
-          )}
-        />
-      ) : null}
-    </View>
+    </OperationalScreenShell>
   );
 }

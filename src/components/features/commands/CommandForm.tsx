@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Input } from '@/components/ui/Input';
 import { type Appointment } from '@/schemas/appointments/appointment.schema';
 import { type Client } from '@/schemas/clients/client.schema';
@@ -46,10 +47,10 @@ function getPaymentMethodLabel(value: CommandPaymentMethod): string {
   }
 
   if (value === 'credit') {
-    return 'Cartao de credito';
+    return 'Cartão de crédito';
   }
 
-  return 'Cartao de debito';
+  return 'Cartão de débito';
 }
 
 function getDefaultFormValues(initialCommand: Command | null | undefined): CommandFormInput {
@@ -164,22 +165,13 @@ export function CommandForm({
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-zinc-50 dark:bg-zinc-950"
-      contentContainerClassName="p-6 pb-10 pt-10"
-      keyboardShouldPersistTaps="handled"
-    >
-      <View className="gap-2 pb-5">
-        <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{title}</Text>
-        <Text className="text-base text-zinc-600 dark:text-zinc-300">{description}</Text>
-      </View>
-
+    <OperationalScreenShell title={title} subtitle={description}>
       <View className="gap-4">
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Atendimento</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Atendimento</Text>
           {appointments.length === 0 ? (
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Nenhum atendimento disponivel para vincular.
+            <Text className="text-sm text-zinc-300">
+              Nenhum atendimento disponível para vincular.
             </Text>
           ) : (
             <View className="gap-2">
@@ -188,13 +180,13 @@ export function CommandForm({
                 return (
                   <Pressable
                     key={appointment.id}
-                    className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
+                    className={`rounded-[20px] border p-4 ${isSelected ? 'border-primary bg-primary/15' : 'border-white/10 bg-zinc-900/70'}`}
                     onPress={() => applyAppointment(appointment)}
                   >
-                    <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    <Text className="text-sm font-semibold text-zinc-100">
                       {getAppointmentLabel(appointment)}
                     </Text>
-                    <Text className="text-xs text-zinc-600 dark:text-zinc-300">ID: {appointment.id}</Text>
+                    <Text className="text-xs text-zinc-400">ID: {appointment.id}</Text>
                   </Pressable>
                 );
               })}
@@ -202,85 +194,87 @@ export function CommandForm({
           )}
 
           {selectedAppointment ? (
-            <Text className="text-xs text-zinc-600 dark:text-zinc-300">
+            <Text className="text-xs text-zinc-400">
               Selecionado: {formatDateTime(selectedAppointment.startTime)}
             </Text>
           ) : null}
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Cliente</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Cliente</Text>
           <View className="gap-2">
             {clients.map((client) => {
               const isSelected = client.id === selectedClientId;
               return (
                 <Pressable
                   key={client.id}
-                  className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
+                  className={`rounded-[20px] border p-4 ${isSelected ? 'border-primary bg-primary/15' : 'border-white/10 bg-zinc-900/70'}`}
                   onPress={() => form.setValue('clientId', client.id, { shouldValidate: true })}
                 >
-                  <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
-                  <Text className="text-xs text-zinc-600 dark:text-zinc-300">{client.phone}</Text>
+                  <Text className="text-sm font-semibold text-zinc-100">{client.name}</Text>
+                  <Text className="text-xs text-zinc-400">{client.phone}</Text>
                 </Pressable>
               );
             })}
           </View>
           {selectedClient ? (
-            <Text className="text-xs text-zinc-600 dark:text-zinc-300">Selecionado: {selectedClient.name}</Text>
+            <Text className="text-xs text-zinc-400">Selecionado: {selectedClient.name}</Text>
           ) : null}
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Profissional</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Profissional</Text>
           <View className="gap-2">
             {manicures.map((manicure) => {
               const isSelected = manicure.uid === selectedManicureId;
               return (
                 <Pressable
                   key={manicure.uid}
-                  className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
+                  className={`rounded-[20px] border p-4 ${isSelected ? 'border-primary bg-primary/15' : 'border-white/10 bg-zinc-900/70'}`}
                   onPress={() => form.setValue('manicureId', manicure.uid, { shouldValidate: true })}
                 >
-                  <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  <Text className="text-sm font-semibold text-zinc-100">
                     {manicure.displayName}
                   </Text>
-                  <Text className="text-xs text-zinc-600 dark:text-zinc-300">{manicure.email}</Text>
+                  <Text className="text-xs text-zinc-400">{manicure.email}</Text>
                 </Pressable>
               );
             })}
           </View>
           {selectedManicure ? (
-            <Text className="text-xs text-zinc-600 dark:text-zinc-300">
+            <Text className="text-xs text-zinc-400">
               Selecionada: {selectedManicure.displayName}
             </Text>
           ) : null}
         </Card>
 
-        <Card className="gap-3">
+        <Card className="gap-3 border-white/10 bg-white/5">
           <View className="flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Itens da comanda</Text>
+            <Text className="text-sm font-semibold text-zinc-200">Itens da comanda</Text>
             <Button
               label="Adicionar item"
               variant="secondary"
               fullWidth={false}
+              className="rounded-2xl"
               onPress={() => append({ service: '', price: '', quantity: 1 })}
             />
           </View>
 
           <View className="gap-4">
             {fields.map((field, index) => (
-              <View key={field.id} className="gap-3 rounded-xl border border-zinc-200 p-3 dark:border-zinc-700">
+              <View key={field.id} className="gap-3 rounded-[20px] border border-white/10 bg-zinc-900/70 p-4">
                 <Controller
                   control={form.control}
                   name={`items.${index}.service`}
                   render={({ field: fieldProps, fieldState }) => (
                     <Input
-                      label={`Servico ${index + 1}`}
+                      label={`Serviço ${index + 1}`}
                       value={fieldProps.value}
                       onChangeText={fieldProps.onChange}
                       onBlur={fieldProps.onBlur}
                       placeholder="Ex: Banho de gel"
                       error={fieldState.error?.message}
+                      inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
                     />
                   )}
                 />
@@ -297,6 +291,7 @@ export function CommandForm({
                       keyboardType="decimal-pad"
                       placeholder="0,00"
                       error={fieldState.error?.message}
+                      inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
                     />
                   )}
                 />
@@ -316,31 +311,34 @@ export function CommandForm({
                       keyboardType="number-pad"
                       placeholder="1"
                       error={fieldState.error?.message}
+                      inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
                     />
                   )}
                 />
 
                 {fields.length > 1 ? (
-                  <Button label="Remover item" variant="danger" onPress={() => remove(index)} />
+                  <Button label="Remover item" variant="danger" className="rounded-2xl" onPress={() => remove(index)} />
                 ) : null}
               </View>
             ))}
           </View>
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Status</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-200">Status</Text>
           <View className="flex-row gap-2">
             <Button
               label="Aberta"
               fullWidth={false}
               variant={commandStatus === 'open' ? 'primary' : 'ghost'}
+              className={commandStatus === 'open' ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
               onPress={() => toggleStatus('open')}
             />
             <Button
               label="Fechada"
               fullWidth={false}
               variant={commandStatus === 'closed' ? 'primary' : 'ghost'}
+              className={commandStatus === 'closed' ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
               onPress={() => toggleStatus('closed')}
             />
           </View>
@@ -351,7 +349,7 @@ export function CommandForm({
               name="paymentMethod"
               render={({ field: fieldProps }) => (
                 <View className="gap-2">
-                  <Text className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Pagamento</Text>
+                  <Text className="text-sm font-medium text-zinc-200">Pagamento</Text>
                   <View className="flex-row flex-wrap gap-2">
                     {paymentMethods.map((method) => (
                       <Button
@@ -359,6 +357,7 @@ export function CommandForm({
                         label={getPaymentMethodLabel(method)}
                         fullWidth={false}
                         variant={fieldProps.value === method ? 'secondary' : 'ghost'}
+                        className={fieldProps.value === method ? 'rounded-2xl' : 'rounded-2xl border-white/10 bg-white/5'}
                         onPress={() => fieldProps.onChange(method)}
                       />
                     ))}
@@ -369,7 +368,7 @@ export function CommandForm({
           ) : null}
 
           {selectedPaymentMethod ? (
-            <Text className="text-xs text-zinc-600 dark:text-zinc-300">
+            <Text className="text-xs text-zinc-400">
               Pagamento selecionado: {getPaymentMethodLabel(selectedPaymentMethod)}
             </Text>
           ) : null}
@@ -382,12 +381,19 @@ export function CommandForm({
         <View className="gap-2">
           <Button
             label={isSubmitting ? 'Salvando...' : submitLabel}
+            className="h-12 rounded-2xl"
             onPress={form.handleSubmit(handleSubmit)}
             disabled={isSubmitting}
           />
-          <Button label="Cancelar" variant="ghost" onPress={onCancel} disabled={isSubmitting} />
+          <Button
+            label="Cancelar"
+            variant="ghost"
+            className="h-12 rounded-2xl border-white/10 bg-white/5"
+            onPress={onCancel}
+            disabled={isSubmitting}
+          />
         </View>
       </View>
-    </ScrollView>
+    </OperationalScreenShell>
   );
 }
