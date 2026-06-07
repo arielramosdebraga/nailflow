@@ -72,7 +72,7 @@ export default function ClientDetailsScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Cliente nao encontrado.</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Cliente não encontrado.</Text>
         </Card>
         <View className="pt-4">
           <Button label="Voltar para clientes" variant="ghost" onPress={() => router.replace(clientsListRoute)} />
@@ -88,7 +88,7 @@ export default function ClientDetailsScreen() {
           <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">{client.phone}</Text>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            {client.email ? client.email : 'E-mail nao informado'}
+            {client.email ? client.email : 'E-mail não informado'}
           </Text>
         </View>
 
@@ -100,9 +100,9 @@ export default function ClientDetailsScreen() {
         </Card>
 
         <Card className="gap-2">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Observacoes</Text>
+          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Observações</Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            {client.notes ? client.notes : 'Sem observacoes cadastradas'}
+            {client.notes ? client.notes : 'Sem observações cadastradas'}
           </Text>
         </Card>
       </View>

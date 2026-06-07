@@ -1,5 +1,7 @@
 import {
   collection,
+  doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -68,4 +70,25 @@ export async function listSalons(params: ListSalonsParams = {}): Promise<Salon[]
   );
   const snapshot = await getDocs(salonsQuery);
   return snapshot.docs.map((item) => mapSalonSnapshot(item));
+}
+
+export async function getSalonById(salonId: string): Promise<Salon | null> {
+  assertFirebaseConfigured();
+  if (!db) {
+    throw new Error('Banco Firestore indisponível.');
+  }
+
+  const parsedSalonId = salonId.trim();
+  if (!parsedSalonId) {
+    return null;
+  }
+
+  const salonRef = doc(db, 'salons', parsedSalonId);
+  const snapshot = await getDoc(salonRef);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return mapSalonSnapshot(snapshot);
 }

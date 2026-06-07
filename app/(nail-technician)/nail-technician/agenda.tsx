@@ -27,6 +27,8 @@ const nailTechnicianRoutes = {
   clients: '/nail-technician/clients',
   googleCalendar: '/nail-technician/google-calendar',
   notifications: '/nail-technician/notifications',
+  reports: '/nail-technician/reports',
+  profile: '/nail-technician/profile',
 } as const satisfies Record<string, Href>;
 
 const getAppointmentDetailsRoute = (appointmentId: string): Href => ({
@@ -100,7 +102,7 @@ export default function NailTechnicianAgendaScreen() {
             <View className="flex-1 gap-2">
               <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Agenda de atendimentos</Text>
               <Text className="text-base text-zinc-600 dark:text-zinc-300">
-                Acompanhe os horarios do dia e da semana com acesso rapido para criar, editar e consultar detalhes.
+                Acompanhe os horários do dia e da semana com acesso rápido para criar, editar e consultar detalhes.
               </Text>
             </View>
             <NotificationsBellButton
@@ -160,6 +162,21 @@ export default function NailTechnicianAgendaScreen() {
           />
         </View>
 
+        <View className="flex-row gap-2">
+          <Button
+            label="Ver relatórios"
+            className="flex-1"
+            variant="secondary"
+            onPress={() => router.push(nailTechnicianRoutes.reports)}
+          />
+          <Button
+            label="Meu perfil"
+            className="flex-1"
+            variant="ghost"
+            onPress={() => router.push(nailTechnicianRoutes.profile)}
+          />
+        </View>
+
         {isLoading ? (
           <Card>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando agenda...</Text>
@@ -177,7 +194,7 @@ export default function NailTechnicianAgendaScreen() {
         {!isLoading && !queryError && appointmentItems.length === 0 ? (
           <Card>
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Nenhum atendimento encontrado para o periodo selecionado.
+              Nenhum atendimento encontrado para o período selecionado.
             </Text>
           </Card>
         ) : null}

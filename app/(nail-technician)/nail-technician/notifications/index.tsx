@@ -11,8 +11,8 @@ export default function NailTechnicianNotificationsScreen() {
   return (
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <NotificationCenter
-        title="Notificacoes"
-        subtitle="Acompanhe alertas de agenda, sincronizacao e lembretes."
+        title="Notificações"
+        subtitle="Acompanhe alertas de agenda, sincronização e lembretes."
         onOpenSettings={() => router.push(notificationSettingsRoute)}
       />
       <View className="px-6 pb-6 pt-2">

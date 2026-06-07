@@ -83,7 +83,7 @@ function mapUserSnapshot(snapshot: DocumentSnapshot<DocumentData>): UserProfile 
 
   const roleResult = PersistedUserRoleSchema.safeParse(data.role);
   if (!roleResult.success) {
-    throw new Error('Perfil de usuário sem role válida.');
+    throw new Error('Perfil de usuário sem papel válido.');
   }
 
   const createdAtValue = data.createdAt;

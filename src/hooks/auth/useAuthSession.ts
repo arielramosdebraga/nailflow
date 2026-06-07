@@ -29,7 +29,7 @@ export function useAuthSession() {
           const profile = await getUserProfileById(identity.uid);
 
           if (!profile) {
-            throw new Error('Perfil do usuário não encontrado. Entre em contato com o suporte.');
+            throw new Error('Perfil da conta não encontrado. Entre em contato com o suporte.');
           }
 
           session.signIn({
