@@ -1,5 +1,7 @@
 import { Link, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 
 import { AuthScreenShell } from '@/components/features/auth/AuthScreenShell';
@@ -11,6 +13,8 @@ import { SignUpFormSchema, type SignUpFormInput } from '@/schemas/auth/signup-fo
 export default function SignUpScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const form = useForm<SignUpFormInput>({
     defaultValues: {
       displayName: '',
@@ -54,10 +58,17 @@ export default function SignUpScreen() {
 
   return (
     <AuthScreenShell
-      title="Criar nova conta"
-      subtitle="Cadastro inicial para profissional de unhas, dono do salão ou superadministrador."
+      eyebrow="Cadastro"
+      backHref="/login"
+      title="Crie sua conta"
+      subtitle="Comece seu acesso ao NailFlow com um cadastro rápido, seguro e pronto para o piloto."
+      footer={
+        <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
+          <Text className="text-center text-sm font-semibold text-sky-300 underline">Já tenho conta</Text>
+        </Pressable>
+      }
     >
-      <View className="gap-4">
+      <View className="gap-5">
         <Controller
           control={form.control}
           name="displayName"
@@ -66,6 +77,10 @@ export default function SignUpScreen() {
               autoCapitalize="words"
               autoComplete="name"
               label="Nome completo"
+              containerClassName="gap-3"
+              labelClassName="text-zinc-200"
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
+              leftAdornment={<UserRound size={18} color="#a1a1aa" />}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="Seu nome"
@@ -84,9 +99,13 @@ export default function SignUpScreen() {
               autoComplete="email"
               keyboardType="email-address"
               label="E-mail"
+              containerClassName="gap-3"
+              labelClassName="text-zinc-200"
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
+              leftAdornment={<Mail size={18} color="#a1a1aa" />}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="nome@empresa.com"
+              placeholder="seu@email.com"
               value={field.value}
               error={fieldState.error?.message}
             />
@@ -101,10 +120,24 @@ export default function SignUpScreen() {
               autoCapitalize="none"
               autoComplete="password-new"
               label="Senha"
+              description="Use pelo menos 6 caracteres para acessar sua conta com segurança."
+              containerClassName="gap-3"
+              labelClassName="text-zinc-200"
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
+              leftAdornment={<LockKeyhole size={18} color="#a1a1aa" />}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="Mínimo 6 caracteres"
-              secureTextEntry
+              placeholder="Crie uma senha forte"
+              secureTextEntry={!passwordVisible}
+              rightAdornment={
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={passwordVisible ? 'Ocultar senha' : 'Mostrar senha'}
+                  onPress={() => setPasswordVisible((current) => !current)}
+                >
+                  {passwordVisible ? <EyeOff size={18} color="#a1a1aa" /> : <Eye size={18} color="#a1a1aa" />}
+                </Pressable>
+              }
               value={field.value}
               error={fieldState.error?.message}
             />
@@ -119,10 +152,27 @@ export default function SignUpScreen() {
               autoCapitalize="none"
               autoComplete="password-new"
               label="Confirmar senha"
+              containerClassName="gap-3"
+              labelClassName="text-zinc-200"
+              inputWrapperClassName="rounded-2xl border-white/10 bg-zinc-950"
+              leftAdornment={<LockKeyhole size={18} color="#a1a1aa" />}
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="Digite a senha novamente"
-              secureTextEntry
+              secureTextEntry={!confirmPasswordVisible}
+              rightAdornment={
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={confirmPasswordVisible ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+                  onPress={() => setConfirmPasswordVisible((current) => !current)}
+                >
+                  {confirmPasswordVisible ? (
+                    <EyeOff size={18} color="#a1a1aa" />
+                  ) : (
+                    <Eye size={18} color="#a1a1aa" />
+                  )}
+                </Pressable>
+              }
               value={field.value}
               error={fieldState.error?.message}
             />
@@ -133,7 +183,7 @@ export default function SignUpScreen() {
           control={form.control}
           name="acceptedLegalTerms"
           render={({ field, fieldState }) => (
-            <View className="gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+            <View className="gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
               <Pressable
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: field.value }}
@@ -147,16 +197,16 @@ export default function SignUpScreen() {
                 }}
               >
                 <View
-                  className={`mt-0.5 h-5 w-5 items-center justify-center rounded border ${
+                  className={`mt-0.5 h-5 w-5 items-center justify-center rounded-md border ${
                     field.value
-                      ? 'border-sky-700 bg-sky-700 dark:border-sky-400 dark:bg-sky-400'
-                      : 'border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900'
+                      ? 'border-primary bg-primary'
+                      : 'border-white/15 bg-zinc-950'
                   }`}
                 >
                   {field.value ? <Text className="text-[10px] font-bold text-white">X</Text> : null}
                 </View>
-                <Text className="flex-1 text-sm leading-6 text-zinc-700 dark:text-zinc-200">
-                  Li e aceito a Politica de Privacidade e os Termos e Consentimento para tratamento dos
+                <Text className="flex-1 text-sm leading-6 text-zinc-300">
+                  Li e aceito a Política de Privacidade e os Termos e Consentimento para o tratamento dos
                   meus dados conforme a LGPD.
                 </Text>
               </Pressable>
@@ -164,14 +214,14 @@ export default function SignUpScreen() {
               <View className="gap-2">
                 <Link href="/privacy-policy" asChild>
                   <Pressable accessibilityRole="link">
-                    <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
-                      Ler Politica de Privacidade
+                    <Text className="text-sm font-semibold text-sky-300 underline">
+                      Ler Política de Privacidade
                     </Text>
                   </Pressable>
                 </Link>
                 <Link href="/terms-consent" asChild>
                   <Pressable accessibilityRole="link">
-                    <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
+                    <Text className="text-sm font-semibold text-sky-300 underline">
                       Ler Termos e Consentimento
                     </Text>
                   </Pressable>
@@ -184,20 +234,17 @@ export default function SignUpScreen() {
         />
 
         {form.formState.errors.root?.message ? (
-          <Text className="text-sm text-error">{form.formState.errors.root.message}</Text>
+          <Text className="rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+            {form.formState.errors.root.message}
+          </Text>
         ) : null}
 
         <Button
           label={authSession.isLoading ? 'Criando...' : 'Criar conta'}
+          className="h-14 rounded-2xl"
           onPress={form.handleSubmit(onSubmit)}
           disabled={authSession.isLoading}
         />
-
-        <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
-          <Text className="text-center text-sm font-semibold text-sky-700 underline dark:text-sky-300">
-            Já tenho conta
-          </Text>
-        </Pressable>
       </View>
     </AuthScreenShell>
   );

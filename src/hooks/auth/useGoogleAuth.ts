@@ -55,12 +55,12 @@ export function useGoogleAuth() {
     }
 
     const run = async () => {
-      setIsLoading(true);
-      setError(null);
+        setIsLoading(true);
+        setError(null);
       try {
         const idToken = response.params.id_token;
         if (!idToken) {
-          throw new Error('Google nao retornou id_token.');
+          throw new Error('Não foi possível concluir o login com Google. Tente novamente.');
         }
 
         const credential = GoogleAuthProvider.credential(idToken);
@@ -71,14 +71,14 @@ export function useGoogleAuth() {
           await createUserProfile({
             uid: result.user.uid,
             email: result.user.email ?? '',
-            displayName: result.user.displayName ?? 'Usuario',
+            displayName: result.user.displayName ?? 'Usuário',
             role: 'nail_technician',
           });
           profile = await getUserProfileById(result.user.uid);
         }
 
         if (!profile) {
-          throw new Error('Falha ao carregar perfil apos login Google.');
+          throw new Error('Não foi possível concluir o login com Google. Tente novamente.');
         }
 
         signIn({
@@ -104,9 +104,7 @@ export function useGoogleAuth() {
     googleLoading: isLoading,
     promptGoogleSignIn: async () => {
       if (!canSignInWithGoogle) {
-        setError(
-          'Login com Google indisponivel. Configure EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ou EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID.'
-        );
+        setError('Login com Google indisponível no momento. Tente novamente mais tarde.');
         return { type: 'dismiss' } as const;
       }
 

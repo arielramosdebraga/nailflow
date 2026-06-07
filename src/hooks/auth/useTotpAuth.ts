@@ -22,7 +22,8 @@ export function useTotpAuth() {
     try {
       return await operation();
     } catch (operationError) {
-      const message = operationError instanceof Error ? operationError.message : 'Falha no fluxo de 2FA.';
+      const message =
+        operationError instanceof Error ? operationError.message : 'Não foi possível concluir a verificação em duas etapas.';
       setError(message);
       throw new Error(message);
     } finally {
@@ -33,7 +34,7 @@ export function useTotpAuth() {
   const parseCode = useCallback((rawCode: string): string => {
     const parsed = TotpCodeSchema.safeParse(rawCode);
     if (!parsed.success) {
-      const message = parsed.error.issues[0]?.message ?? 'Codigo TOTP invalido.';
+      const message = parsed.error.issues[0]?.message ?? 'Código do autenticador inválido.';
       setError(message);
       throw new Error(message);
     }
