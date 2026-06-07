@@ -54,5 +54,14 @@ export function CommandCard({
     return content;
   }
 
-  return <Pressable onPress={onPress}>{content}</Pressable>;
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Abrir comanda de ${clientName ?? command.clientId}`}
+      accessibilityHint={`Mostra os detalhes da comanda da profissional ${manicureName ?? command.manicureId}.`}
+    >
+      {content}
+    </Pressable>
+  );
 }

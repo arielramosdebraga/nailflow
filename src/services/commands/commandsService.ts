@@ -39,6 +39,14 @@ interface ListCommandsParams {
   appointmentId?: string;
 }
 
+interface ListClosedCommandsByPeriodParams {
+  salonId: string;
+  start: Date;
+  end: Date;
+  manicureId?: string;
+  limitCount?: number;
+}
+
 interface UpdateCommandOptions {
   actorRole?: UserRole;
 }
@@ -228,6 +236,43 @@ export async function getCommandById(commandId: string): Promise<Command | null>
   }
 
   return mapCommandSnapshot(snapshot);
+}
+
+export async function listClosedCommandsByPeriod(
+  params: ListClosedCommandsByPeriodParams,
+): Promise<Command[]> {
+  assertFirebaseConfigured();
+  if (!db) {
+    throw new Error('Banco Firestore indisponivel.');
+  }
+
+  const parsedSalonId = params.salonId.trim();
+  if (!parsedSalonId) {
+    return [];
+  }
+
+  if (params.end <= params.start) {
+    throw new Error('Intervalo de fechamento invalido.');
+  }
+
+  const constraints: QueryConstraint[] = [
+    where('salonId', '==', parsedSalonId),
+    where('status', '==', 'closed'),
+    where('closedAt', '>=', params.start),
+    where('closedAt', '<', params.end),
+  ];
+
+  if (params.manicureId?.trim()) {
+    constraints.push(where('manicureId', '==', params.manicureId.trim()));
+  }
+
+  constraints.push(orderBy('closedAt', 'desc'));
+  constraints.push(limit(params.limitCount ?? 1000));
+
+  const commandsQuery = query(collection(db, 'commands'), ...constraints);
+  const snapshot = await getDocs(commandsQuery);
+
+  return snapshot.docs.map((commandDoc) => mapCommandSnapshot(commandDoc));
 }
 
 export async function createCommand(input: UpsertCommandInput): Promise<string> {

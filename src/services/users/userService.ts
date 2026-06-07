@@ -78,12 +78,12 @@ function normalizeRoleFilters(roles: UserRole[] | undefined): PersistedUserRole[
 function mapUserSnapshot(snapshot: DocumentSnapshot<DocumentData>): UserProfile {
   const data = snapshot.data();
   if (!data) {
-    throw new Error('Perfil de usuario nao encontrado.');
+    throw new Error('Perfil de usuário não encontrado.');
   }
 
   const roleResult = PersistedUserRoleSchema.safeParse(data.role);
   if (!roleResult.success) {
-    throw new Error('Perfil de usuario sem role valido.');
+    throw new Error('Perfil de usuário sem papel válido.');
   }
 
   const createdAtValue = data.createdAt;
@@ -124,7 +124,7 @@ function mapUserSnapshot(snapshot: DocumentSnapshot<DocumentData>): UserProfile 
 export async function createUserProfile(params: CreateUserProfileParams): Promise<void> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const userRef = doc(db, 'users', params.uid);
@@ -175,7 +175,7 @@ export async function createUserProfile(params: CreateUserProfileParams): Promis
 export async function getUserProfileById(uid: string): Promise<UserProfile | null> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const userRef = doc(db, 'users', uid);
@@ -191,7 +191,7 @@ export async function getUserProfileById(uid: string): Promise<UserProfile | nul
 export async function listUsers(params: ListUsersParams): Promise<UserProfile[]> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const parsedSalonId = params.salonId.trim();

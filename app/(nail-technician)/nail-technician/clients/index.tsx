@@ -76,7 +76,7 @@ export default function ClientsListScreen() {
                 <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{item.name}</Text>
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">{item.phone}</Text>
                 <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-                  {item.email ? item.email : 'E-mail nao informado'}
+                  {item.email ? item.email : 'E-mail não informado'}
                 </Text>
               </Card>
             </Pressable>

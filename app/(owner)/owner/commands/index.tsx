@@ -85,13 +85,16 @@ export default function OwnerCommandsListScreen() {
         <View className="gap-3 pb-4">
           <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Comandas</Text>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Consulte, abra, edite e feche comandas da operacao do salao.
+            Consulte, abra, edite e feche as comandas da operação do salão.
           </Text>
 
           <Input
+            label="Buscar comanda"
             value={searchTerm}
             onChangeText={setSearchTerm}
-            placeholder="Buscar por cliente, profissional ou ID"
+            placeholder="Buscar por cliente, profissional ou código"
+            accessibilityLabel="Buscar comanda"
+            accessibilityHint="Filtra a lista por cliente, profissional ou código da comanda."
             returnKeyType="search"
           />
 
@@ -116,7 +119,11 @@ export default function OwnerCommandsListScreen() {
             />
           </View>
 
-          <Button label="Abrir nova comanda" onPress={() => router.push(ownerCommandRoutes.newCommand)} />
+          <Button
+            label="Abrir nova comanda"
+            accessibilityHint="Abre o formulário para cadastrar uma nova comanda."
+            onPress={() => router.push(ownerCommandRoutes.newCommand)}
+          />
         </View>
 
         {isLoading ? (
@@ -127,7 +134,9 @@ export default function OwnerCommandsListScreen() {
 
         {error ? (
           <Card>
-            <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar.'}</Text>
+            <Text className="text-sm text-error">
+              {error instanceof Error ? error.message : 'Falha ao carregar as comandas.'}
+            </Text>
           </Card>
         ) : null}
 

@@ -34,7 +34,7 @@ const FUNCTIONS_REGION = 'southamerica-east1';
 function getFunctionsInstance(): Functions {
   assertFirebaseConfigured();
   if (!firebaseApp) {
-    throw new Error('Servico de funcoes indisponivel.');
+    throw new Error('Serviço de autenticação indisponível no momento.');
   }
 
   functionsInstance ??= getFunctions(firebaseApp, FUNCTIONS_REGION);
@@ -44,17 +44,17 @@ function getFunctionsInstance(): Functions {
 function mapCallableErrorMessage(code: string, fallbackMessage: string): string {
   switch (code) {
     case 'functions/unauthenticated':
-      return 'Sessao expirada. Entre novamente para continuar.';
+      return 'Sessão expirada. Entre novamente para continuar.';
     case 'functions/permission-denied':
-      return 'Voce nao tem permissao para esta operacao.';
+      return 'Você não tem permissão para realizar esta ação.';
     case 'functions/not-found':
-      return 'Funcao de seguranca 2FA nao encontrada no backend.';
+      return 'A verificação em duas etapas está indisponível no momento.';
     case 'functions/unavailable':
-      return 'Servico de seguranca 2FA indisponivel no momento.';
+      return 'Serviço de segurança do 2FA indisponível no momento.';
     case 'functions/deadline-exceeded':
-      return 'Tempo de resposta excedido ao validar 2FA.';
+      return 'Tempo de resposta excedido ao validar o 2FA.';
     case 'functions/invalid-argument':
-      return 'Dados invalidos enviados para validacao 2FA.';
+      return 'Os dados informados para a verificação em duas etapas são inválidos.';
     default:
       return fallbackMessage;
   }
@@ -86,12 +86,12 @@ async function callAuthFunction<TRequest, TResponse>(
     const parsed = schema.safeParse(response.data);
 
     if (!parsed.success) {
-      throw new Error('Resposta invalida recebida do backend de 2FA.');
+      throw new Error('Recebemos uma resposta inválida da verificação em duas etapas. Tente novamente.');
     }
 
     return parsed.data;
   } catch (error) {
-    throw normalizeCallableError(error, `Falha ao executar ${name}.`);
+    throw normalizeCallableError(error, 'Não foi possível concluir a verificação em duas etapas. Tente novamente.');
   }
 }
 
@@ -101,7 +101,7 @@ export async function signInWithEmailPassword(params: {
 }): Promise<AuthIdentity> {
   assertFirebaseConfigured();
   if (!auth) {
-    throw new Error('Servico de autenticacao indisponivel.');
+    throw new Error('Serviço de autenticação indisponível.');
   }
 
   const credential = await signInWithEmailAndPassword(auth, params.email, params.password);
@@ -118,7 +118,7 @@ export async function signUpWithEmailPassword(params: {
 }): Promise<AuthIdentity> {
   assertFirebaseConfigured();
   if (!auth) {
-    throw new Error('Servico de autenticacao indisponivel.');
+    throw new Error('Serviço de autenticação indisponível.');
   }
 
   const credential = await createUserWithEmailAndPassword(auth, params.email, params.password);
@@ -133,7 +133,7 @@ export async function signUpWithEmailPassword(params: {
 export async function sendRecoverPasswordEmail(email: string): Promise<void> {
   assertFirebaseConfigured();
   if (!auth) {
-    throw new Error('Servico de autenticacao indisponivel.');
+    throw new Error('Serviço de autenticação indisponível.');
   }
 
   await sendPasswordResetEmail(auth, email);
@@ -142,7 +142,7 @@ export async function sendRecoverPasswordEmail(email: string): Promise<void> {
 export async function signOut(): Promise<void> {
   assertFirebaseConfigured();
   if (!auth) {
-    throw new Error('Servico de autenticacao indisponivel.');
+    throw new Error('Serviço de autenticação indisponível.');
   }
 
   await firebaseSignOut(auth);

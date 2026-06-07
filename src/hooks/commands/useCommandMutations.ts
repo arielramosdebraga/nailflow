@@ -53,6 +53,7 @@ export function useUpdateCommandMutation() {
   const queryClient = useQueryClient();
   const sessionSalonId = useSessionStore((state) => state.salonId);
   const sessionUserId = useSessionStore((state) => state.userId);
+  const sessionRole = useSessionStore((state) => state.role);
 
   return useMutation({
     mutationFn: async (payload: { commandId: string; data: CreateCommandInput }) => {
@@ -63,6 +64,8 @@ export function useUpdateCommandMutation() {
         ...payload.data,
         salonId,
         manicureId,
+      }, {
+        actorRole: sessionRole ?? undefined,
       });
     },
     onSuccess: async (_, payload) => {
