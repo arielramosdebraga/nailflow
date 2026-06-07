@@ -1,7 +1,9 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { onAuthStateChanged } from 'firebase/auth';
+import { colorScheme } from 'nativewind';
 
 import { usePushTokenBootstrap } from '@/hooks/notifications';
 import { auth } from '@/services/firebase';
@@ -13,6 +15,10 @@ export function AppProviders({ children }: PropsWithChildren) {
   const signIn = useSessionStore((state) => state.signIn);
   const signOut = useSessionStore((state) => state.signOut);
   const bootstrapPushToken = usePushTokenBootstrap();
+  const [fontsLoaded, fontError] = useFonts({
+    NotoSerifDisplay_400Regular: require('../../assets/fonts/NotoSerifDisplay_400Regular.ttf'),
+    NotoSerifDisplay_400Regular_Italic: require('../../assets/fonts/NotoSerifDisplay_400Regular_Italic.ttf'),
+  });
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -24,6 +30,10 @@ export function AppProviders({ children }: PropsWithChildren) {
         },
       })
   );
+
+  useEffect(() => {
+    colorScheme.set('dark');
+  }, []);
 
   useEffect(() => {
     if (!auth) {
@@ -70,6 +80,10 @@ export function AppProviders({ children }: PropsWithChildren) {
 
     return unsubscribe;
   }, [bootstrapPushToken, setLoading, signIn, signOut]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
