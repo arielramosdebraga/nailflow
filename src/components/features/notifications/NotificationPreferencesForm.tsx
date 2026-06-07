@@ -34,19 +34,19 @@ const TOGGLE_ITEMS: PreferenceToggleItem[] = [
   },
   {
     key: 'syncError',
-    label: 'Erro de sincronização Google',
+    label: 'Erro de sincronização com o Google',
     description: 'Notifica quando houver falha de sincronização.',
   },
   {
     key: 'googleExpired',
-    label: 'Conexão Google expirada',
-    description: 'Avisa quando for necessário reconectar o Google Calendar.',
+    label: 'Conexão com o Google expirada',
+    description: 'Avisa quando for necessário reconectar o Google Agenda.',
   },
 ];
 
 const STATE_MESSAGES = {
-  loading: 'Carregando preferências de notificação...',
-  error: 'Não foi possível carregar ou salvar as preferências de notificação.',
+  loading: 'Carregando preferências de notificações...',
+  error: 'Não foi possível carregar ou salvar as preferências de notificações.',
 };
 
 function parseMinutes(value: string, fallback: number): number {
@@ -201,7 +201,7 @@ export function NotificationPreferencesForm({
                 onPress={() =>
                   setDraftOverride((current) => ({
                     ...current,
-                    quietHoursEnabled: !current.quietHoursEnabled,
+                    quietHoursEnabled: !draft.quietHoursEnabled,
                   }))
                 }
                 className={`rounded-full px-3 py-2 ${
@@ -224,7 +224,9 @@ export function NotificationPreferencesForm({
 
             <View className="gap-3">
               <View className="gap-1">
-                <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Horário de início (HH:mm)</Text>
+                <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                  Horário de início (HH:mm)
+                </Text>
                 <TextInput
                   value={draft.quietHoursStart}
                   editable={!isBusy}
@@ -311,7 +313,7 @@ export function NotificationPreferencesForm({
               isBusy || !hasChanges ? 'bg-zinc-300 dark:bg-zinc-700' : 'bg-primary active:opacity-90'
             }`}
             accessibilityRole="button"
-            accessibilityLabel="Salvar preferências de notificação"
+            accessibilityLabel="Salvar preferências de notificações"
             accessibilityHint="Aplica os ajustes desta tela."
             accessibilityState={{ disabled: isBusy || !hasChanges }}
           >

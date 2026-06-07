@@ -15,7 +15,7 @@ import { CommandStatusTag } from '@/components/features/commands/CommandStatusTa
 const appointmentStatusLabels = {
   scheduled: 'Agendado',
   confirmed: 'Confirmado',
-  completed: 'Concluido',
+  completed: 'Concluído',
   cancelled: 'Cancelado',
 } as const;
 const ownerDashboardRoute = '/owner/dashboard' satisfies Href;
@@ -69,7 +69,7 @@ export default function OwnerAgendaDayScreen() {
         <View className="gap-2 pb-5">
           <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Agenda consolidada</Text>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Visao do dia agrupada por manicure com status de comanda.
+            Visão do dia agrupada por profissional com status de comanda.
           </Text>
         </View>
 
@@ -81,7 +81,9 @@ export default function OwnerAgendaDayScreen() {
 
         {error ? (
           <Card>
-            <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar.'}</Text>
+            <Text className="text-sm text-error">
+              {error instanceof Error ? error.message : 'Falha ao carregar a agenda.'}
+            </Text>
           </Card>
         ) : null}
 
@@ -156,7 +158,7 @@ export default function OwnerAgendaDayScreen() {
       </ScrollView>
 
       <View className="p-6 pt-2">
-        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace(ownerDashboardRoute)} />
+        <Button label="Voltar ao painel" variant="ghost" onPress={() => router.replace(ownerDashboardRoute)} />
       </View>
     </View>
   );

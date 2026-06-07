@@ -22,7 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
   appointment_rescheduled: 'Atendimento remarcado',
   pre_reminder: 'Lembrete',
   sync_error: 'Erro de sincronização',
-  google_expired: 'Conexão Google expirada',
+  google_expired: 'Conexão do Google expirada',
 };
 
 const SWIPE_ACTION_WIDTH = 108;
@@ -181,7 +181,7 @@ function SwipeToReadContainer({
     <View className="relative overflow-hidden rounded-2xl">
       {canSwipe ? (
         <View className="absolute inset-y-0 right-0 items-center justify-center bg-primary px-4">
-          <Text className="text-xs font-semibold uppercase text-white">Marcar lida</Text>
+          <Text className="text-xs font-semibold uppercase text-white">Marcar como lida</Text>
         </View>
       ) : null}
       <Animated.View
@@ -251,7 +251,7 @@ export function NotificationCenter({
             onPress={onOpenSettings}
             className="h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white active:opacity-90 dark:border-zinc-800 dark:bg-zinc-900"
             accessibilityRole="button"
-            accessibilityLabel="Abrir configurações de notificação"
+            accessibilityLabel="Abrir configurações de notificações"
             accessibilityHint="Abre a tela para ajustar tipos de alerta e horários."
           >
             <Settings2 size={18} color="#52525b" />
@@ -380,7 +380,7 @@ export function NotificationCenter({
                         accessibilityHint="Atualiza somente esta notificação para o status de lida."
                       >
                         <Text className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
-                          Marcar lida
+                          Marcar como lida
                         </Text>
                       </Pressable>
                     ) : (

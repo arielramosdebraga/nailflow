@@ -37,7 +37,7 @@ function parseDate(value: unknown): Date | null {
 function mapSalonSnapshot(snapshot: DocumentSnapshot<DocumentData>): Salon {
   const data = snapshot.data();
   if (!data) {
-    throw new Error('Salao nao encontrado.');
+    throw new Error('Salão não encontrado.');
   }
 
   const settings =
@@ -60,7 +60,7 @@ function mapSalonSnapshot(snapshot: DocumentSnapshot<DocumentData>): Salon {
 export async function listSalons(params: ListSalonsParams = {}): Promise<Salon[]> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const salonsQuery = query(

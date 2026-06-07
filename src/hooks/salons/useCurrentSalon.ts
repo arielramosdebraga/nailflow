@@ -12,7 +12,7 @@ export function useCurrentSalon() {
     enabled: status === 'authenticated' && Boolean(salonId),
     queryFn: async () => {
       if (!salonId) {
-        throw new Error('Salão atual não identificado.');
+        return null;
       }
 
       return getSalonById(salonId);

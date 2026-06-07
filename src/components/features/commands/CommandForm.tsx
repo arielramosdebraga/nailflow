@@ -46,10 +46,10 @@ function getPaymentMethodLabel(value: CommandPaymentMethod): string {
   }
 
   if (value === 'credit') {
-    return 'Cartao de credito';
+    return 'Cartão de crédito';
   }
 
-  return 'Cartao de debito';
+  return 'Cartão de débito';
 }
 
 function getDefaultFormValues(initialCommand: Command | null | undefined): CommandFormInput {
@@ -179,7 +179,7 @@ export function CommandForm({
           <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Atendimento</Text>
           {appointments.length === 0 ? (
             <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Nenhum atendimento disponivel para vincular.
+              Nenhum atendimento disponível para vincular.
             </Text>
           ) : (
             <View className="gap-2">
@@ -190,6 +190,10 @@ export function CommandForm({
                     key={appointment.id}
                     className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
                     onPress={() => applyAppointment(appointment)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Selecionar atendimento ${getAppointmentLabel(appointment)}`}
+                    accessibilityHint="Vincula este atendimento à comanda e preenche cliente e profissional."
+                    accessibilityState={{ selected: isSelected }}
                   >
                     <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                       {getAppointmentLabel(appointment)}
@@ -218,6 +222,10 @@ export function CommandForm({
                   key={client.id}
                   className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
                   onPress={() => form.setValue('clientId', client.id, { shouldValidate: true })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Selecionar cliente ${client.name}`}
+                  accessibilityHint="Define este cliente para a comanda."
+                  accessibilityState={{ selected: isSelected }}
                 >
                   <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{client.name}</Text>
                   <Text className="text-xs text-zinc-600 dark:text-zinc-300">{client.phone}</Text>
@@ -240,6 +248,10 @@ export function CommandForm({
                   key={manicure.uid}
                   className={`rounded-xl border p-3 ${isSelected ? 'border-primary bg-primary/10' : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900'}`}
                   onPress={() => form.setValue('manicureId', manicure.uid, { shouldValidate: true })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Selecionar profissional ${manicure.displayName}`}
+                  accessibilityHint="Define esta profissional para a comanda."
+                  accessibilityState={{ selected: isSelected }}
                 >
                   <Text className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     {manicure.displayName}
@@ -275,11 +287,12 @@ export function CommandForm({
                   name={`items.${index}.service`}
                   render={({ field: fieldProps, fieldState }) => (
                     <Input
-                      label={`Servico ${index + 1}`}
+                      label={`Serviço ${index + 1}`}
                       value={fieldProps.value}
                       onChangeText={fieldProps.onChange}
                       onBlur={fieldProps.onBlur}
                       placeholder="Ex: Banho de gel"
+                      accessibilityLabel={`Serviço ${index + 1}`}
                       error={fieldState.error?.message}
                     />
                   )}
@@ -296,6 +309,7 @@ export function CommandForm({
                       onBlur={fieldProps.onBlur}
                       keyboardType="decimal-pad"
                       placeholder="0,00"
+                      accessibilityLabel={`Valor do serviço ${index + 1}`}
                       error={fieldState.error?.message}
                     />
                   )}
@@ -315,6 +329,7 @@ export function CommandForm({
                       onBlur={fieldProps.onBlur}
                       keyboardType="number-pad"
                       placeholder="1"
+                      accessibilityLabel={`Quantidade do serviço ${index + 1}`}
                       error={fieldState.error?.message}
                     />
                   )}

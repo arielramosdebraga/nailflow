@@ -65,8 +65,8 @@ export default function OwnerCommandDetailsScreen() {
     Alert.alert('Fechar comanda', 'Selecione a forma de pagamento.', [
       { text: 'Dinheiro', onPress: () => void closeCommand('cash') },
       { text: 'Pix', onPress: () => void closeCommand('pix') },
-      { text: 'Credito', onPress: () => void closeCommand('credit') },
-      { text: 'Debito', onPress: () => void closeCommand('debit') },
+      { text: 'Crédito', onPress: () => void closeCommand('credit') },
+      { text: 'Débito', onPress: () => void closeCommand('debit') },
       { text: 'Cancelar', style: 'cancel' },
     ]);
   }
@@ -91,7 +91,7 @@ export default function OwnerCommandDetailsScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
+          <Button label="Voltar para a lista" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -101,10 +101,10 @@ export default function OwnerCommandDetailsScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Comanda nao encontrada.</Text>
+          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Comanda não encontrada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
+          <Button label="Voltar para a lista" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
         </View>
       </View>
     );
@@ -140,7 +140,7 @@ export default function OwnerCommandDetailsScreen() {
         <Card className="gap-2">
           <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Atendimento</Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Horario: {appointment ? formatDateTime(appointment.startTime) : 'Nao encontrado'}
+            Horário: {appointment ? formatDateTime(appointment.startTime) : 'Não encontrado'}
           </Text>
           <Text className="text-sm text-zinc-600 dark:text-zinc-300">
             Profissional: {manicure?.displayName ?? command.manicureId}
@@ -175,12 +175,13 @@ export default function OwnerCommandDetailsScreen() {
           <Button
             label={updateCommandMutation.isPending ? 'Fechando...' : 'Fechar comanda'}
             variant="secondary"
+            accessibilityHint="Abre as opções de forma de pagamento para fechar a comanda."
             onPress={handleCloseCommand}
             disabled={updateCommandMutation.isPending}
           />
         ) : null}
 
-        <Button label="Voltar para comandas" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
+        <Button label="Voltar para a lista" variant="ghost" onPress={() => router.replace(commandsListRoute)} />
       </View>
     </View>
   );
