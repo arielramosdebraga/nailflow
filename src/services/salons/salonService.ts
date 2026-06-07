@@ -78,7 +78,13 @@ export async function getSalonById(salonId: string): Promise<Salon | null> {
     throw new Error('Banco Firestore indisponível.');
   }
 
-  const snapshot = await getDoc(doc(db, 'salons', salonId));
+  const parsedSalonId = salonId.trim();
+  if (!parsedSalonId) {
+    return null;
+  }
+
+  const salonRef = doc(db, 'salons', parsedSalonId);
+  const snapshot = await getDoc(salonRef);
 
   if (!snapshot.exists()) {
     return null;

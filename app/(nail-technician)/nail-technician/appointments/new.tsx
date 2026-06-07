@@ -32,10 +32,10 @@ export default function NailTechnicianNewAppointmentScreen() {
     return (
       <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
         <Card>
-          <Text className="text-sm text-error">Nao foi possivel identificar a profissional logada.</Text>
+          <Text className="text-sm text-error">Não foi possível identificar a profissional logada.</Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );
@@ -60,7 +60,7 @@ export default function NailTechnicianNewAppointmentScreen() {
           </Text>
         </Card>
         <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
+          <Button label="Voltar para a agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
         </View>
       </View>
     );

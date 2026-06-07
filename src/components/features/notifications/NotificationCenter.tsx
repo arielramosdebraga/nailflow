@@ -334,7 +334,7 @@ export function NotificationCenter({
             </Text>
           )}
           renderItem={({ item }) => {
-            const typeLabel = TYPE_LABELS[item.type] ?? 'Atualização';
+            const typeLabelText = TYPE_LABELS[item.type] ?? 'Atualização';
 
             return (
               <SwipeToReadContainer
@@ -348,7 +348,7 @@ export function NotificationCenter({
                       : 'border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
                   }`}
                   accessible
-                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabel}. ${item.read ? 'Notificação lida' : 'Notificação não lida'}.`}
+                  accessibilityLabel={`${item.title}. ${item.body}. Tipo: ${typeLabelText}. ${item.read ? 'Notificação lida' : 'Notificação não lida'}.`}
                   accessibilityHint={
                     item.read
                       ? undefined
@@ -360,7 +360,7 @@ export function NotificationCenter({
                       {item.title}
                     </Text>
                     <Text className="rounded-full bg-zinc-200 px-2 py-1 text-[10px] font-semibold uppercase text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
-                      {typeLabel}
+                      {typeLabelText}
                     </Text>
                   </View>
                   <Text className="text-sm text-zinc-600 dark:text-zinc-300">{item.body}</Text>
@@ -377,7 +377,7 @@ export function NotificationCenter({
                         className="rounded-lg border border-zinc-300 px-3 py-1 active:opacity-80 dark:border-zinc-700"
                         accessibilityRole="button"
                         accessibilityLabel="Marcar notificação como lida"
-                        accessibilityHint="Atualiza somente esta notificação para status de lida."
+                        accessibilityHint="Atualiza somente esta notificação para o status de lida."
                       >
                         <Text className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
                           Marcar como lida

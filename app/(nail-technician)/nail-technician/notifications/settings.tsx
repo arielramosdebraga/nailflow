@@ -9,8 +9,8 @@ export default function NailTechnicianNotificationSettingsScreen() {
   return (
     <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <NotificationPreferencesForm
-        title="Configuracoes de notificacao"
-        subtitle="Defina alertas e horarios para nao perturbe."
+        title="Configurações de notificação"
+        subtitle="Defina alertas e horários para não perturbe."
       />
       <View className="px-6 pb-6 pt-2">
         <Pressable
@@ -18,7 +18,7 @@ export default function NailTechnicianNotificationSettingsScreen() {
           className="h-12 items-center justify-center rounded-xl border border-zinc-300 bg-transparent active:opacity-90 dark:border-zinc-700"
           accessibilityRole="button"
           accessibilityLabel="Voltar para a tela anterior"
-          accessibilityHint="Retorna para a central de notificacoes da nail technician."
+          accessibilityHint="Retorna para a central de notificações da profissional."
         >
           <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Voltar</Text>
         </Pressable>
