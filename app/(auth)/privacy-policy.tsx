@@ -7,7 +7,7 @@ import { Tag } from '@/components/ui/Tag';
 const sections = [
   {
     title: 'Resumo',
-    body: 'O NailFlow trata dados pessoais para autenticar sua conta, organizar agenda, clientes e operacao do salao com base em necessidade operacional, seguranca e cumprimento da LGPD.',
+    body: 'A plataforma trata dados pessoais para autenticar sua conta, organizar agenda, clientes e operacao do salao com base em necessidade operacional, seguranca e cumprimento da LGPD.',
   },
   {
     title: 'Dados coletados',
@@ -19,7 +19,7 @@ const sections = [
   },
   {
     title: 'Compartilhamento e armazenamento',
-    body: 'Os dados ficam restritos a infraestrutura necessaria para autenticacao e operacao do NailFlow. O compartilhamento ocorre apenas quando indispensavel para prestar o servico ou cumprir obrigacoes legais.',
+    body: 'Os dados ficam restritos a infraestrutura necessaria para autenticacao e operacao da plataforma. O compartilhamento ocorre apenas quando indispensavel para prestar o servico ou cumprir obrigacoes legais.',
   },
   {
     title: 'Seus direitos pela LGPD',
@@ -27,7 +27,7 @@ const sections = [
   },
   {
     title: 'Seguranca e contato',
-    body: 'Adotamos controles tecnicos e organizacionais para reduzir riscos de acesso indevido. Para duvidas sobre privacidade ou exercicio de direitos, utilize os canais oficiais de suporte do NailFlow.',
+    body: 'Adotamos controles tecnicos e organizacionais para reduzir riscos de acesso indevido. Para duvidas sobre privacidade ou exercicio de direitos, utilize os canais oficiais de suporte da plataforma.',
   },
 ];
 
@@ -45,7 +45,7 @@ export default function PrivacyPolicyScreen() {
             Politica de Privacidade
           </Text>
           <Text className="text-base leading-7 text-zinc-600 dark:text-zinc-300">
-            Esta tela explica, de forma objetiva, como o NailFlow trata dados pessoais durante o acesso e o
+            Esta tela explica, de forma objetiva, como a plataforma trata dados pessoais durante o acesso e o
             uso das funcionalidades de autenticacao.
           </Text>
         </View>

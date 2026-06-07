@@ -47,6 +47,30 @@ describe('Auth Schemas', () => {
     expect(result.success).toBe(false);
   });
 
+  it('rejects signup when email is invalid', () => {
+    const result = SignUpFormSchema.safeParse({
+      displayName: 'Ariel Braga',
+      email: 'email-invalido',
+      password: '123456',
+      confirmPassword: '123456',
+      acceptedLegalTerms: true,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects signup when password exceeds 20 characters', () => {
+    const result = SignUpFormSchema.safeParse({
+      displayName: 'Ariel Braga',
+      email: 'ariel@example.com',
+      password: '123456789012345678901',
+      confirmPassword: '123456789012345678901',
+      acceptedLegalTerms: true,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it('accepts valid TOTP code', () => {
     const result = TotpCodeSchema.safeParse('123456');
 

@@ -25,7 +25,7 @@ export default function AdminDashboardScreen() {
     <ScrollView className="flex-1 bg-zinc-50 dark:bg-zinc-950" contentContainerClassName="p-6 pb-8">
       <AdminHeader
         title="Painel do Superadministrador"
-        subtitle="Governanca global do NailFlow com KPIs, auditoria e atalhos operacionais."
+        subtitle="Governança global da plataforma com KPIs, auditoria e atalhos operacionais."
         activeRoute="dashboard"
         accessory={
           <NotificationsBellButton

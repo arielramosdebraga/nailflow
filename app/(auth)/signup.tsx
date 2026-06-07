@@ -1,4 +1,5 @@
 import { Link, useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
 
@@ -12,6 +13,9 @@ export default function SignUpScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
   const form = useForm<SignUpFormInput>({
+    resolver: zodResolver(SignUpFormSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: {
       displayName: '',
       email: '',
@@ -22,28 +26,11 @@ export default function SignUpScreen() {
   });
 
   async function onSubmit(values: SignUpFormInput) {
-    const parsed = SignUpFormSchema.safeParse(values);
-    if (!parsed.success) {
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
-        if (
-          field === 'displayName' ||
-          field === 'email' ||
-          field === 'password' ||
-          field === 'confirmPassword' ||
-          field === 'acceptedLegalTerms'
-        ) {
-          form.setError(field, { message: issue.message });
-        }
-      }
-      return;
-    }
-
     try {
       await authSession.signUp({
-        displayName: parsed.data.displayName,
-        email: parsed.data.email,
-        password: parsed.data.password,
+        displayName: values.displayName,
+        email: values.email,
+        password: values.password,
       });
       router.replace('/');
     } catch (error) {
@@ -156,7 +143,7 @@ export default function SignUpScreen() {
                   {field.value ? <Text className="text-[10px] font-bold text-white">X</Text> : null}
                 </View>
                 <Text className="flex-1 text-sm leading-6 text-zinc-700 dark:text-zinc-200">
-                  Li e aceito a Politica de Privacidade e os Termos e Consentimento para tratamento dos
+                  Li e aceito a Política de Privacidade e os Termos e Consentimento para tratamento dos
                   meus dados conforme a LGPD.
                 </Text>
               </Pressable>
@@ -165,7 +152,7 @@ export default function SignUpScreen() {
                 <Link href="/privacy-policy" asChild>
                   <Pressable accessibilityRole="link">
                     <Text className="text-sm font-semibold text-sky-700 underline dark:text-sky-300">
-                      Ler Politica de Privacidade
+                      Ler Política de Privacidade
                     </Text>
                   </Pressable>
                 </Link>

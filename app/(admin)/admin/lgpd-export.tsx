@@ -42,7 +42,7 @@ export default function AdminLgpdExportScreen() {
     }
 
     await Share.share({
-      title: 'Exportacao LGPD - NailFlow',
+      title: 'Exportação LGPD - Plataforma',
       message: jsonPreview,
     });
   }

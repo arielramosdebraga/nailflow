@@ -24,7 +24,7 @@ export default function AdminUsersScreen() {
       <View className="gap-2 pb-4">
         <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Usuarios</Text>
         <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Visao administrativa dos perfis e papeis cadastrados no ecossistema NailFlow.
+          Visão administrativa dos perfis e papéis cadastrados no ecossistema da plataforma.
         </Text>
       </View>
 

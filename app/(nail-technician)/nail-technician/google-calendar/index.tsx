@@ -15,7 +15,7 @@ export default function GoogleCalendarScreen() {
         <View className="gap-2">
           <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Google Agenda</Text>
           <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Conecte sua conta Google para sincronizar automaticamente os atendimentos do NailFlow.
+            Conecte sua conta Google para sincronizar automaticamente os atendimentos da plataforma.
           </Text>
         </View>
 

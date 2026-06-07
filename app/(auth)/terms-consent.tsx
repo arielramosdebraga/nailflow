@@ -7,7 +7,7 @@ import { Tag } from '@/components/ui/Tag';
 const sections = [
   {
     title: 'Aceite para cadastro',
-    body: 'Ao criar uma conta, voce confirma que leu estes termos, entende a Politica de Privacidade e concorda com o tratamento dos dados estritamente necessario para autenticacao e uso do NailFlow.',
+    body: 'Ao criar uma conta, voce confirma que leu estes termos, entende a Politica de Privacidade e concorda com o tratamento dos dados estritamente necessario para autenticacao e uso da plataforma.',
   },
   {
     title: 'Uso adequado da conta',
@@ -42,7 +42,7 @@ export default function TermsConsentScreen() {
           </Text>
           <Text className="text-base leading-7 text-zinc-600 dark:text-zinc-300">
             Este resumo apresenta as condicoes de uso ligadas ao cadastro e o aceite necessario para tratar
-            seus dados no contexto de autenticacao do NailFlow.
+            seus dados no contexto de autenticacao da plataforma.
           </Text>
         </View>
 

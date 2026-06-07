@@ -1,4 +1,5 @@
 import { Link, useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
 
@@ -14,6 +15,9 @@ export default function LoginScreen() {
   const authSession = useAuthSession();
   const googleAuth = useGoogleAuth();
   const form = useForm<LoginFormInput>({
+    resolver: zodResolver(LoginFormSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: {
       email: '',
       password: '',
@@ -21,19 +25,8 @@ export default function LoginScreen() {
   });
 
   async function onSubmit(values: LoginFormInput) {
-    const parsed = LoginFormSchema.safeParse(values);
-    if (!parsed.success) {
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
-        if (field === 'email' || field === 'password') {
-          form.setError(field, { message: issue.message });
-        }
-      }
-      return;
-    }
-
     try {
-      await authSession.signIn(parsed.data);
+      await authSession.signIn(values);
       router.replace('/');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao entrar.';
@@ -44,7 +37,7 @@ export default function LoginScreen() {
   return (
     <AuthScreenShell
       title="Entrar na conta"
-      subtitle="Acesse sua agenda, clientes e o painel do salão no NailFlow."
+      subtitle="Acesse sua agenda, seus clientes e o painel do salão em um só lugar."
     >
       <View className="gap-4">
         <Controller

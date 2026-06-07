@@ -114,7 +114,7 @@ export default function TwoFactorScreen() {
   return (
     <AuthScreenShell
       title="Verificacao em duas etapas"
-      subtitle="Para proteger sua conta, confirme o codigo TOTP antes de acessar o NailFlow."
+      subtitle="Para proteger sua conta, confirme o código TOTP antes de continuar o acesso."
     >
       <View className="gap-4">
         {isBootstrapping ? (

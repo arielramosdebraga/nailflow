@@ -18,7 +18,7 @@ export default function AdminSalonsScreen() {
       <View className="gap-2 pb-4">
         <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Salões</Text>
         <Text className="text-base text-zinc-600 dark:text-zinc-300">
-          Visão global dos salões cadastrados no ecossistema NailFlow.
+          Visão global dos salões cadastrados no ecossistema da plataforma.
         </Text>
       </View>
 

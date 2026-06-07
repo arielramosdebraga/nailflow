@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
 
@@ -12,26 +13,18 @@ export default function RecoverScreen() {
   const router = useRouter();
   const authSession = useAuthSession();
   const form = useForm<RecoverFormInput>({
+    resolver: zodResolver(RecoverFormSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: {
       email: '',
     },
   });
 
   async function onSubmit(values: RecoverFormInput) {
-    const parsed = RecoverFormSchema.safeParse(values);
-    if (!parsed.success) {
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
-        if (field === 'email') {
-          form.setError(field, { message: issue.message });
-        }
-      }
-      return;
-    }
-
     try {
-      await authSession.sendRecoverEmail(parsed.data.email);
-      form.reset(parsed.data);
+      await authSession.sendRecoverEmail(values.email);
+      form.reset(values);
       form.setError('root', { message: 'Se o e-mail existir, enviaremos as instruções de recuperação.' });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao solicitar recuperação.';

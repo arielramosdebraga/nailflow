@@ -58,3 +58,6 @@ secrets/
 # local tooling metadata
 .claude/
 CLAUDE.md
+
+# local temporary bundles
+.tmp-web-bundle.js
