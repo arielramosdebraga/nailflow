@@ -124,7 +124,7 @@ function mapUserSnapshot(snapshot: DocumentSnapshot<DocumentData>): UserProfile 
 export async function createUserProfile(params: CreateUserProfileParams): Promise<void> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const userRef = doc(db, 'users', params.uid);
@@ -175,7 +175,7 @@ export async function createUserProfile(params: CreateUserProfileParams): Promis
 export async function getUserProfileById(uid: string): Promise<UserProfile | null> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const userRef = doc(db, 'users', uid);
@@ -191,7 +191,7 @@ export async function getUserProfileById(uid: string): Promise<UserProfile | nul
 export async function listUsers(params: ListUsersParams): Promise<UserProfile[]> {
   assertFirebaseConfigured();
   if (!db) {
-    throw new Error('Banco Firestore indisponivel.');
+    throw new Error('Banco Firestore indisponível.');
   }
 
   const parsedSalonId = params.salonId.trim();

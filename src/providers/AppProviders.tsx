@@ -46,14 +46,14 @@ export function AppProviders({ children }: PropsWithChildren) {
           await createUserProfile({
             uid: user.uid,
             email: user.email ?? '',
-            displayName: user.displayName ?? 'Usuario',
+            displayName: user.displayName ?? 'Usuário',
             role: 'nail_technician',
           });
           profile = await getUserProfileById(user.uid);
         }
 
         if (!profile) {
-          throw new Error('Falha ao carregar perfil do usuario.');
+          throw new Error('Falha ao carregar o perfil do usuário.');
         }
 
         signIn({
