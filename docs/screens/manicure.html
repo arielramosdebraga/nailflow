@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NailFlow — Sugestão de Layout (Manicure)</title>
+  <style>
+    :root {
+      --pink: #EC4899;
+      --pink-soft: #FCE7F3;
+      --purple: #8B5CF6;
+      --bg: #0F0F14;
+      --surface: #1B1B23;
+      --surface-2: #25252F;
+      --text: #F5F5F7;
+      --text-dim: #A1A1AA;
+      --green: #22C55E;
+      --amber: #F59E0B;
+      --red: #EF4444;
+      --blue: #3B82F6;
+      --radius: 16px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #2A2A35;
+      color: var(--text);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px 32px;
+      justify-content: center;
+      padding: 48px 16px;
+    }
+
+    /* ===== Moldura ===== */
+    .phone {
+      width: 360px;
+      height: 760px;
+      background: var(--bg);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      border: 8px solid #000;
+    }
+    .screen-title-tag {
+      position: absolute;
+      top: -30px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px; color: #fff; font-weight: 600;
+      letter-spacing: .5px; white-space: nowrap;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      padding: 20px 16px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header .back { font-size: 24px; cursor: pointer; width: 32px; }
+    .header .save { color: var(--pink); font-weight: 700; font-size: 15px; cursor: pointer; }
+    .bell {
+      position: relative; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; border-radius: 12px; background: var(--surface); cursor: pointer;
+    }
+    .badge {
+      position: absolute; top: 6px; right: 6px;
+      background: var(--pink); color: #fff; font-size: 10px; font-weight: 700;
+      min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ===== Conteúdo ===== */
+    .content { flex: 1; overflow-y: auto; padding: 0 16px 90px; }
+    .content::-webkit-scrollbar { width: 0; }
+
+    .section-label {
+      font-size: 12px; font-weight: 700; color: var(--text-dim);
+      letter-spacing: 1px; margin: 16px 0 12px;
+    }
+
+    /* ===== Segmented ===== */
+    .segmented {
+      display: flex; background: var(--surface); border-radius: 12px;
+      padding: 4px; margin-bottom: 16px;
+    }
+    .segmented button {
+      flex: 1; border: none; background: transparent; color: var(--text-dim);
+      padding: 10px; font-size: 13px; font-weight: 600; border-radius: 9px; cursor: pointer; transition: .2s;
+    }
+    .segmented button.active { background: var(--pink); color: #fff; }
+
+    /* ===== Week ===== */
+    .week-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; color: var(--text-dim); font-size: 14px; font-weight: 600;
+    }
+    .week-nav .arrow { cursor: pointer; padding: 4px 8px; }
+    .week { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .day { flex: 1; text-align: center; padding: 10px 0; border-radius: 12px; cursor: pointer; }
+    .day span { display: block; font-size: 11px; color: var(--text-dim); }
+    .day strong { font-size: 16px; }
+    .day.active { background: var(--pink); }
+    .day.active span, .day.active strong { color: #fff; }
+
+    /* ===== Summary card ===== */
+    .summary {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: var(--radius); padding: 18px; margin-bottom: 20px;
+      display: flex; justify-content: space-between;
+    }
+    .summary .item span { font-size: 12px; opacity: .85; display: block; }
+    .summary .item strong { font-size: 20px; }
+
+    /* ===== Appointment card ===== */
+    .appt {
+      background: var(--surface); border-radius: var(--radius); padding: 16px;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 14px;
+      border-left: 4px solid var(--pink);
+    }
+    .appt.done { border-left-color: var(--green); opacity: .7; }
+    .appt.blocked { border-left-color: var(--text-dim); }
+    .appt .time { font-size: 15px; font-weight: 700; color: var(--pink); min-width: 48px; }
+    .appt.done .time { color: var(--green); }
+    .appt .info strong { font-size: 15px; display: block; }
+    .appt .info span { font-size: 13px; color: var(--text-dim); }
+    .appt .price { margin-left: auto; font-weight: 700; color: var(--green); font-size: 14px; }
+
+    /* ===== FAB ===== */
+    .fab {
+      position: absolute; right: 20px; bottom: 86px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--pink); color: #fff; font-size: 28px; border: none; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(236,72,153,.5);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ===== Tabs ===== */
+    .tabs {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 72px;
+      background: var(--surface); border-top: 1px solid #2e2e38;
+      display: flex; justify-content: space-around; align-items: center; padding-bottom: 6px;
+    }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-dim); font-size: 10px; cursor: pointer; min-width: 44px;
+    }
+    .tab .ic { font-size: 20px; }
+    .tab.active { color: var(--pink); }
+
+    /* ===== Form (Criar Atendimento) ===== */
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
+    .field input, .field textarea, .field select {
+      width: 100%; background: var(--surface); border: 1px solid #2e2e38;
+      border-radius: 12px; padding: 14px; color: var(--text); font-size: 15px; font-family: inherit;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--pink); }
+    .field textarea { resize: none; height: 80px; }
+    .field-row { display: flex; gap: 12px; }
+    .field-row .field { flex: 1; }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 8px 14px; border-radius: 20px; background: var(--surface);
+      border: 1px solid #2e2e38; font-size: 13px; cursor: pointer; transition: .2s;
+    }
+    .chip.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+    .btn-primary {
+      width: 100%; padding: 16px; background: var(--pink); border: none; color: #fff;
+      border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+    .client-select {
+      display: flex; align-items: center; gap: 12px; background: var(--surface);
+      border: 1px solid #2e2e38; border-radius: 12px; padding: 12px 14px; cursor: pointer;
+    }
+    .client-select .mini-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .client-select .label { flex: 1; }
+    .client-select .label small { display: block; color: var(--text-dim); font-size: 12px; }
+
+    /* ===== Notificações ===== */
+    .notif {
+      display: flex; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px;
+      background: var(--surface); position: relative;
+    }
+    .notif.unread { background: var(--surface-2); }
+    .notif.unread::before {
+      content: ''; position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+      width: 8px; height: 8px; border-radius: 50%; background: var(--pink);
+    }
+    .notif .n-ic {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .notif .n-ic.success { background: rgba(34,197,94,.15); }
+    .notif .n-ic.warn { background: rgba(245,158,11,.15); }
+    .notif .n-ic.info { background: rgba(59,130,246,.15); }
+    .notif .n-body strong { font-size: 14px; display: block; margin-bottom: 2px; }
+    .notif .n-body span { font-size: 13px; color: var(--text-dim); }
+    .notif .n-body time { font-size: 11px; color: var(--text-dim); display: block; margin-top: 4px; }
+
+    /* ===== Relatórios ===== */
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .kpi {
+      background: var(--surface); border-radius: var(--radius); padding: 16px;
+    }
+    .kpi span { font-size: 12px; color: var(--text-dim); display: block; margin-bottom: 6px; }
+    .kpi strong { font-size: 22px; }
+    .kpi small { font-size: 12px; color: var(--green); }
+    .kpi.highlight { background: linear-gradient(135deg, var(--purple), var(--pink)); }
+    .kpi.highlight span { color: rgba(255,255,255,.85); }
+
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin: 12px 0 4px; }
+    .bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .bar .fill { width: 100%; background: var(--pink); border-radius: 6px 6px 0 0; transition: .3s; }
+    .bar small { font-size: 10px; color: var(--text-dim); }
+
+    .rank-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+      background: var(--surface); border-radius: 12px; margin-bottom: 8px;
+    }
+    .rank-item .num {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--pink-soft);
+      color: var(--pink); font-weight: 700; font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rank-item .r-label { flex: 1; font-size: 14px; }
+    .rank-item .r-val { font-size: 13px; color: var(--text-dim); }
+
+    /* ===== Clientes ===== */
+    .search-bar {
+      background: var(--surface); border: 1px solid #2e2e38; border-radius: 12px;
+      padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .search-bar input { background: none; border: none; color: var(--text); flex: 1; font-size: 15px; outline: none; }
+    .client-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid #1f1f27;
+    }
+    .client-item .mini-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .client-item .c-info { flex: 1; }
+    .client-item .c-info strong { font-size: 15px; display: block; }
+    .client-item .c-info span { font-size: 12px; color: var(--text-dim); }
+    .client-item .chev { color: var(--text-dim); }
+
+    /* ===== Perfil ===== */
+    .profile-top { text-align: center; padding: 24px 0; }
+    .avatar {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 36px; border: 3px solid var(--pink);
+    }
+    .profile-top h2 { font-size: 22px; }
+    .profile-top .rating { color: var(--amber); margin-top: 4px; font-size: 14px; }
+    .row-item {
+      background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+    }
+    .row-item .ic { font-size: 20px; width: 28px; text-align: center; }
+    .row-item .label { flex: 1; font-size: 15px; }
+    .row-item .chev { color: var(--text-dim); }
+    .status-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .status-badge.warn { background: rgba(245,158,11,.2); color: var(--amber); }
+    .status-badge.ok { background: rgba(34,197,94,.2); color: var(--green); }
+    .logout {
+      margin-top: 24px; width: 100%; padding: 16px; background: transparent;
+      border: 1px solid #3a3a44; color: var(--red); border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+
+    .tab-bar-helper {
+      width: 100%; text-align: center; color: #fff; opacity: .6;
+      font-size: 14px; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ TELA 1: AGENDA ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Agenda</div>
+    <div class="header">
+      <h1>Agenda</h1>
+      <div class="bell">🔔<span class="badge">3</span></div>
+    </div>
+    <div class="content">
+      <div class="segmented">
+        <button>Dia</button>
+        <button class="active">Semana</button>
+        <button>Mês</button>
+      </div>
+      <div class="week-nav">
+        <span class="arrow">‹</span><span>05 — 09 Jun</span><span class="arrow">›</span>
+      </div>
+      <div class="week">
+        <div class="day"><span>D</span><strong>04</strong></div>
+        <div class="day active"><span>S</span><strong>05</strong></div>
+        <div class="day"><span>T</span><strong>06</strong></div>
+        <div class="day"><span>Q</span><strong>07</strong></div>
+        <div class="day"><span>Q</span><strong>08</strong></div>
+        <div class="day"><span>S</span><strong>09</strong></div>
+      </div>
+      <div class="summary">
+        <div class="item"><span>Atendimentos</span><strong>8</strong></div>
+        <div class="item"><span>A receber</span><strong>R$ 640</strong></div>
+      </div>
+      <div class="section-label">HOJE · SEXTA</div>
+      <div class="appt done">
+        <div class="time">09:00</div>
+        <div class="info"><strong>Ana Souza</strong><span>Esmaltação · ✅ Comanda fechada</span></div>
+        <div class="price">R$ 60</div>
+      </div>
+      <div class="appt">
+        <div class="time">10:30</div>
+        <div class="info"><strong>Bia Lima</strong><span>Alongamento gel</span></div>
+        <div class="price">R$ 120</div>
+      </div>
+      <div class="appt blocked">
+        <div class="time">12:00</div>
+        <div class="info"><strong>🚫 Almoço</strong><span>Horário bloqueado</span></div>
+      </div>
+      <div class="appt">
+        <div class="time">14:00</div>
+        <div class="info"><strong>Carol Dias</strong><span>Spa dos pés</span></div>
+        <div class="price">R$ 90</div>
+      </div>
+      <div class="appt">
+        <div class="time">16:00</div>
+        <div class="info"><strong>Duda Reis</strong><span>Manutenção</span></div>
+        <div class="price">R$ 80</div>
+      </div>
+    </div>
+    <button class="fab">+</button>
+    <div class="tabs">
+      <div class="tab active"><span class="ic">📅</span>Agenda</div>
+      <div class="tab"><span class="ic">👥</span>Clientes</div>
+      <div class="tab"><span class="ic">📊</span>Relatórios</div>
+      <div class="tab"><span class="ic">👤</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- ============ TELA 2: CRIAR ATENDIMENTO ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Criar Atendimento</div>
+    <div class="header">
+      <span class="back">‹</span>
+      <h1 style="font-size:18px;">Novo atendimento</h1>
+      <span class="save">Salvar</span>
+    </div>
+    <div class="content">
+      <div class="field">
+        <label>Cliente</label>
+        <div class="client-select">
+          <div class="mini-avatar">BL</div>
+          <div class="label">Bia Lima<small>(11) 98888-7777</small></div>
+          <span class="chev" style="color:var(--text-dim)">›</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Serviço</label>
+        <input type="text" placeholder="Ex.: Alongamento em gel" value="Alongamento em gel" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Data</label>
+          <input type="date" value="2026-06-05" />
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" value="10:30" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Duração estimada</label>
+        <div class="chip-row">
+          <span class="chip">30 min</span>
+          <span class="chip">45 min</span>
+          <span class="chip active">1h</span>
+          <span class="chip">1h30</span>
+          <span class="chip">2h</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Valor (R$)</label>
+        <input type="text" inputmode="decimal" placeholder="0,00" value="120,00" />
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea placeholder="Preferências, alergias, detalhes...">Cliente prefere tons nude. Alérgica a acetona.</textarea>
+      </div>
+
+      <button class="btn-primary">Salvar atendimento</button>
+    </div>
+  </div>
+
+  <!-- ============ TELA 3: NOTIFICAÇÕES ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Notificações</div>
+    <div class="header">
+      <span class="back">‹</span>
+      <h1 style="font-size:18px;">Notificações</h1>
+      <span class="save" style="font-size:13px;">Marcar lidas</span>
+    </div>
+    <div class="content">
+      <div class="section-label">NÃO LIDAS</div>
+
+      <div class="notif unread">
+        <div class="n-ic warn">⚠️</div>
+        <div class="n-body">
+          <strong>Falha na sincronização</strong>
+          <span>Não foi possível sincronizar com o Google Agenda.</span>
+          <time>há 5 min</time>
+        </div>
+      </div>
+
+      <div class="notif unread">
+        <div class="n-ic info">📅</div>
+        <div class="n-body">
+          <strong>Próximo atendimento</strong>
+          <span>Bia Lima às 10:30 — Alongamento em gel.</span>
+          <time>há 20 min</time>
+        </div>
+      </div>
+
+      <div class="notif unread">
+        <div class="n-ic success">💰</div>
+        <div class="n-body">
+          <strong>Comanda fechada</strong>
+          <span>Ana Souza · R$ 60,00 recebido.</span>
+          <time>há 1 h</time>
+        </div>
+      </div>
+
+      <div class="section-label">ANTERIORES</div>
+
+      <div class="notif">
+        <div class="n-ic info">👤</div>
+        <div class="n-body">
+          <strong>Novo cliente cadastrado</strong>
+          <span>Carol Dias foi adicionada à sua base.</span>
+          <time>ontem</time>
+        </div>
+      </div>
+
+      <div class="notif">
+        <div class="n-ic success">✅</div>
+        <div class="n-body">
+          <strong>Google Agenda conectado</strong>
+          <span>Integração ativada com sucesso.</span>
+          <time>2 dias atrás</time>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TELA 4: RELATÓRIOS ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Relatórios</div>
+    <div class="header">
+      <h1>Relatórios</h1>
+      <div class="bell">🔔<span class="badge">3</span></div>
+    </div>
+    <div class="content">
+      <div class="segmented">
+        <button>Dia</button>
+        <button class="active">Semana</button>
+        <button>Mês</button>
+        <button>Custom</button>
+      </div>
+
+      <div class="week-nav">
+        <span class="arrow">‹</span><span>01 — 07 Jun</span><span class="arrow">›</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi highlight">
+          <span>Faturamento</span>
+          <strong>R$ 3.240</strong>
+          <small style="color:#fff;opacity:.9">↑ 12% vs. anterior</small>
+        </div>
+        <div class="kpi">
+          <span>Ticket médio</span>
+          <strong>R$ 92</strong>
+          <small>↑ 4%</small>
+        </div>
+        <div class="kpi">
+          <span>Atendimentos</span>
+          <strong>35</strong>
+        </div>
+        <div class="kpi">
+          <span>Comandas abertas</span>
+          <strong style="color:var(--amber)">2</strong>
+        </div>
+      </div>
+
+      <div class="section-label">FATURAMENTO POR DIA</div>
+      <div class="bar-chart">
+        <div class="bar"><div class="fill" style="height:50%"></div><small>S</small></div>
+        <div class="bar"><div class="fill" style="height:70%"></div><small>T</small></div>
+        <div class="bar"><div class="fill" style="height:40%"></div><small>Q</small></div>
+        <div class="bar"><div class="fill" style="height:90%"></div><small>Q</small></div>
+        <div class="bar"><div class="fill" style="height:100%"></div><small>S</small></div>
+        <div class="bar"><div class="fill" style="height:65%"></div><small>S</small></div>
+        <div class="bar"><div class="fill" style="height:20%"></div><small>D</small></div>
+      </div>
+
+      <div class="section-label">SERVIÇOS MAIS REALIZADOS</div>
+      <div class="rank-item">
+        <span class="num">1</span><span class="r-label">Alongamento em gel</span><span class="r-val">14× · R$ 1.680</span>
+      </div>
+      <div class="rank-item">
+        <span class="num">2</span><span class="r-label">Esmaltação</span><span class="r-val">11× · R$ 660</span>
+      </div>
+      <div class="rank-item">
+        <span class="num">3</span><span class="r-label">Manutenção</span><span class="r-val">7× · R$ 560</span>
+      </div>
+      <div class="rank-item">
+        <span class="num">4</span><span class="r-label">Spa dos pés</span><span class="r-val">3× · R$ 270</span>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab"><span class="ic">📅</span>Agenda</div>
+      <div class="tab"><span class="ic">👥</span>Clientes</div>
+      <div class="tab active"><span class="ic">📊</span>Relatórios</div>
+      <div class="tab"><span class="ic">👤</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- ============ TELA 5: CLIENTES ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Clientes</div>
+    <div class="header">
+      <h1>Clientes</h1>
+      <div class="bell">🔔<span class="badge">3</span></div>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        🔍 <input type="text" placeholder="Buscar cliente..." />
+      </div>
+      <div class="section-label">87 CLIENTES</div>
+
+      <div class="client-item">
+        <div class="mini-avatar">AS</div>
+        <div class="c-info"><strong>Ana Souza</strong><span>Último: hoje · 12 atendimentos</span></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="client-item">
+        <div class="mini-avatar">BL</div>
+        <div class="c-info"><strong>Bia Lima</strong><span>Último: hoje · 8 atendimentos</span></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="client-item">
+        <div class="mini-avatar">CD</div>
+        <div class="c-info"><strong>Carol Dias</strong><span>Novo cliente</span></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="client-item">
+        <div class="mini-avatar">DR</div>
+        <div class="c-info"><strong>Duda Reis</strong><span>Último: 28 mai · 5 atendimentos</span></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="client-item">
+        <div class="mini-avatar">EF</div>
+        <div class="c-info"><strong>Elen Faria</strong><span>Último: 20 mai · 3 atendimentos</span></div>
+        <span class="chev">›</span>
+      </div>
+    </div>
+    <button class="fab">+</button>
+    <div class="tabs">
+      <div class="tab"><span class="ic">📅</span>Agenda</div>
+      <div class="tab active"><span class="ic">👥</span>Clientes</div>
+      <div class="tab"><span class="ic">📊</span>Relatórios</div>
+      <div class="tab"><span class="ic">👤</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- ============ TELA 6: PERFIL ============ -->
+  <div class="phone">
+    <div class="screen-title-tag">Tela: Perfil</div>
+    <div class="header">
+      <h1>Perfil</h1>
+      <div class="bell">🔔<span class="badge">3</span></div>
+    </div>
+    <div class="content">
+      <div class="profile-top">
+        <div class="avatar">💅</div>
+        <h2>Carla Mendes</h2>
+        <div class="rating">⭐ 4.9 <small style="color:var(--text-dim)">(87 clientes)</small></div>
+      </div>
+
+      <div class="section-label">INTEGRAÇÕES</div>
+      <div class="row-item">
+        <span class="ic">📅</span>
+        <span class="label">Google Agenda</span>
+        <span class="status-badge warn">Pendente</span>
+      </div>
+
+      <div class="section-label">CONFIGURAÇÕES</div>
+      <div class="row-item">
+        <span class="ic">🔔</span>
+        <span class="label">Notificações</span>
+        <span class="status-badge ok">Ativo</span>
+      </div>
+      <div class="row-item">
+        <span class="ic">⚙️</span>
+        <span class="label">Preferências</span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row-item">
+        <span class="ic">🔒</span>
+        <span class="label">Privacidade / LGPD</span>
+        <span class="chev">›</span>
+      </div>
+      <div class="row-item">
+        <span class="ic">📋</span>
+        <span class="label">Logs de atividade</span>
+        <span class="chev">›</span>
+      </div>
+
+      <button class="logout">Sair</button>
+    </div>
+    <div class="tabs">
+      <div class="tab"><span class="ic">📅</span>Agenda</div>
+      <div class="tab"><span class="ic">👥</span>Clientes</div>
+      <div class="tab"><span class="ic">📊</span>Relatórios</div>
+      <div class="tab active"><span class="ic">👤</span>Perfil</div>
+    </div>
+  </div>
+
+</body>
+</html>

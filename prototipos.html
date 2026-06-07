@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NailFlow — Protótipo Navegável (RBAC)</title>
+<style>
+  /* ============================================================
+     DESIGN SYSTEM — variáveis globais reaproveitadas dos protótipos
+     ============================================================ */
+  :root{
+    --bg:#0a0a0b; --panel:#0f0f11; --card:#141416; --card-2:#1b1b1f;
+    --surface:#1B1B23; --surface-2:#25252F;
+    --border:#26262d; --text:#f5f5f7; --muted:#9b9ba3;
+    --pink:#ec4899; --pink-2:#f472b6; --pink-soft:#FCE7F3;
+    --purple:#7c3aed; --purple-2:#8b5cf6;
+    --link:#60a5fa; --brand-text:#d98a2b;
+    --green:#22c55e; --red:#ef4444; --amber:#f59e0b; --blue:#3b82f6;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  body{background:#000;color:var(--text);min-height:100vh;}
+
+  /* ============================================================
+     CONTÊINER DE APP (moldura mobile centralizada)
+     ============================================================ */
+  .app-frame{
+    max-width:420px;margin:0 auto;min-height:100vh;
+    background:var(--bg);position:relative;display:flex;flex-direction:column;
+    box-shadow:0 0 40px rgba(0,0,0,.6);overflow:hidden;
+  }
+  .hidden{display:none !important;}
+
+  /* status bar */
+  .statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 22px;font-size:12px;font-weight:700;flex-shrink:0;color:var(--text);}
+
+  /* ============================================================
+     TELA DE LOGIN
+     ============================================================ */
+  .login-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px 26px;}
+  .logo-big{
+    width:84px;height:84px;border-radius:24px;margin:0 auto 22px;
+    background:linear-gradient(135deg,var(--pink),var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:40px;
+    box-shadow:0 0 50px rgba(236,72,153,.4);
+  }
+  .brand-pill{display:block;margin:0 auto 20px;width:fit-content;background:#3a2410;
+    color:var(--brand-text);font-size:12px;font-weight:700;letter-spacing:1px;
+    padding:7px 16px;border-radius:20px;}
+  .login-wrap h1{font-size:26px;font-weight:800;text-align:center;margin-bottom:6px;}
+  .login-wrap .sub{color:var(--muted);font-size:14px;text-align:center;margin-bottom:26px;line-height:1.5;}
+  .login-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:22px;}
+  .login-card label{display:block;font-weight:700;font-size:14px;margin-bottom:8px;}
+  .login-card input{width:100%;background:var(--card-2);border:1px solid var(--border);
+    border-radius:12px;padding:15px;color:var(--text);font-size:15px;outline:none;transition:border .2s;}
+  .login-card input:focus{border-color:var(--pink);}
+  .btn{width:100%;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:700;
+    color:#fff;cursor:pointer;margin-top:14px;transition:transform .1s,opacity .2s;}
+  .btn:active{transform:scale(.98);}
+  .btn-pink{background:linear-gradient(90deg,var(--pink),var(--pink-2));}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .err{color:var(--red);font-size:13px;margin-top:10px;text-align:center;min-height:18px;}
+
+  .quick-title{text-align:center;color:var(--muted);font-size:12px;margin:22px 0 12px;
+    text-transform:uppercase;letter-spacing:1px;}
+  .quick{display:flex;flex-direction:column;gap:10px;}
+  .quick-btn{display:flex;align-items:center;gap:12px;background:var(--card);
+    border:1px solid var(--border);border-radius:14px;padding:12px 14px;cursor:pointer;
+    text-align:left;color:var(--text);transition:border .2s;width:100%;}
+  .quick-btn:hover{border-color:var(--pink);}
+  .quick-btn .qav{width:40px;height:40px;border-radius:12px;flex-shrink:0;font-size:18px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--purple),var(--pink));}
+  .quick-btn b{display:block;font-size:14px;}
+  .quick-btn small{color:var(--muted);font-size:11px;}
+
+  /* ============================================================
+     ESTRUTURA DO PAINEL (header + body + bottom nav)
+     ============================================================ */
+  .panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .header{padding:8px 18px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+  .header .back{font-size:22px;cursor:pointer;}
+  .header .ti{flex:1;}
+  .header h1{font-size:20px;font-weight:800;}
+  .header small{color:var(--muted);font-size:12px;}
+  .header .av{width:38px;height:38px;border-radius:50%;flex-shrink:0;cursor:pointer;
+    background:linear-gradient(135deg,var(--purple),var(--pink));
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  .role-pill{display:inline-block;background:#3a2410;color:var(--brand-text);
+    font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:10px;margin-top:3px;}
+
+  .pbody{flex:1;overflow-y:auto;padding:4px 18px 96px;}
+  .pbody::-webkit-scrollbar{width:0;}
+
+  /* ---- componentes reutilizados ---- */
+  .search{background:var(--card-2);border:1px solid var(--border);border-radius:12px;
+    padding:11px 14px;color:var(--muted);font-size:13px;display:flex;gap:9px;align-items:center;margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;}
+  .kpi .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
+  .ic.pink{background:rgba(236,72,153,.15);}.ic.purple{background:rgba(124,58,237,.15);}
+  .ic.green{background:rgba(34,197,94,.15);}.ic.amber{background:rgba(245,158,11,.15);}
+  .ic.blue{background:rgba(59,130,246,.15);}.ic.red{background:rgba(239,68,68,.15);}
+  .kpi .val{font-size:22px;font-weight:800;}
+  .kpi .lbl{color:var(--muted);font-size:11px;margin-top:2px;}
+  .kpi .trend{font-size:11px;font-weight:700;margin-top:5px;}
+  .trend.up{color:var(--green);}.trend.down{color:var(--red);}
+  .kpi small{font-size:12px;color:var(--green);}
+
+  .section-title{font-size:14px;font-weight:700;margin:18px 0 12px;display:flex;justify-content:space-between;align-items:center;}
+  .section-title a{color:var(--link);font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;}
+  .section-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;margin:16px 0 12px;display:flex;justify-content:space-between;}
+  .section-label a{color:var(--pink);font-weight:600;cursor:pointer;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;}
+
+  .chart{height:130px;display:flex;align-items:flex-end;gap:8px;padding-bottom:18px;}
+  .bar{flex:1;background:linear-gradient(180deg,var(--pink),var(--purple));border-radius:5px 5px 0 0;position:relative;min-height:14px;}
+  .bar small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted);}
+
+  .litem{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+  .litem:last-child{border:none;}
+  .litem .ico{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .litem b{display:block;font-size:13px;}
+  .litem small{color:var(--muted);font-size:11px;}
+  .litem .arrow{margin-left:auto;color:var(--muted);font-size:16px;}
+
+  .salon{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:13px;margin-bottom:11px;}
+  .salon .av{width:42px;height:42px;border-radius:12px;flex-shrink:0;color:#fff;font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:17px;}
+  .salon .info{flex:1;}
+  .salon b{font-size:14px;display:block;}
+  .salon small{color:var(--muted);font-size:11px;}
+
+  .tag{padding:3px 8px;border-radius:7px;font-size:10px;font-weight:700;display:inline-block;}
+  .tag.active{background:rgba(34,197,94,.15);color:var(--green);}
+  .tag.suspended{background:rgba(239,68,68,.15);color:var(--red);}
+  .tag.trial{background:rgba(245,158,11,.15);color:var(--amber);}
+  .tag.pro{background:rgba(124,58,237,.18);color:var(--purple-2);}
+  .tag.free{background:var(--card-2);color:var(--muted);}
+  .tag.premium{background:rgba(236,72,153,.15);color:var(--pink-2);}
+  .tag.paid{background:rgba(34,197,94,.15);color:var(--green);}
+  .tag.pending{background:rgba(245,158,11,.15);color:var(--amber);}
+  .tag.failed{background:rgba(239,68,68,.15);color:var(--red);}
+
+  .chips{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+  .chips::-webkit-scrollbar{height:0;}
+  .chip{background:var(--card-2);border:1px solid var(--border);color:var(--muted);
+    padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;}
+  .chip.active{background:rgba(236,72,153,.15);color:var(--pink-2);border-color:var(--pink);}
+
+  .plan{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;position:relative;}
+  .plan.featured{border-color:var(--pink);box-shadow:0 0 22px rgba(236,72,153,.18);}
+  .plan .ribbon{position:absolute;top:-9px;right:16px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;}
+  .plan h3{font-size:16px;margin-bottom:4px;}
+  .plan .price{font-size:26px;font-weight:800;}
+  .plan .price span{font-size:13px;color:var(--muted);font-weight:400;}
+  .plan .feat{font-size:12px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:7px;}
+  .plan .count{margin-top:12px;font-size:12px;color:var(--text);}
+
+  .irow{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .irow:last-child{border:none;}
+  .irow .k{color:var(--muted);}.irow .v{font-weight:600;}
+
+  .tabs{display:flex;gap:5px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab-h{padding:9px 12px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;}
+  .tab-h.active{color:var(--text);border-bottom-color:var(--pink);}
+
+  .btn-warn{background:transparent;border:1px solid var(--amber);color:var(--amber);}
+  .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
+  .danger-zone{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:15px;margin-top:18px;}
+  .danger-zone h4{color:var(--red);font-size:13px;margin-bottom:10px;}
+
+  .revenue{background:linear-gradient(135deg,rgba(236,72,153,.18),rgba(124,58,237,.12));
+    border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;}
+  .revenue small{color:var(--muted);font-size:12px;}
+  .revenue .big{font-size:34px;font-weight:800;margin:6px 0;}
+  .revenue .sub{font-size:12px;color:var(--green);font-weight:700;}
+
+  .log{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .log:last-child{border:none;}
+  .log .ld{width:8px;height:8px;border-radius:50%;background:var(--pink);margin-top:5px;flex-shrink:0;}
+  .log b{font-size:12px;}.log small{color:var(--muted);font-size:10px;}
+
+  /* hero / summary (owner + manicure) */
+  .hero{background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+  .hero .label{font-size:13px;opacity:.85;}
+  .hero .big{font-size:32px;font-weight:800;margin:4px 0 12px;}
+  .hero .split{display:flex;gap:16px;}
+  .hero .split div{flex:1;background:rgba(255,255,255,.15);border-radius:12px;padding:10px 12px;}
+  .hero .split span{font-size:11px;opacity:.85;display:block;}
+  .hero .split strong{font-size:17px;}
+
+  .segmented{display:flex;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:16px;}
+  .segmented button{flex:1;border:none;background:transparent;color:var(--muted);padding:10px;
+    font-size:13px;font-weight:600;border-radius:9px;cursor:pointer;transition:.2s;}
+  .segmented button.active{background:var(--pink);color:#fff;}
+
+  .week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:var(--muted);font-size:14px;font-weight:600;}
+  .week-nav .ar{cursor:pointer;padding:4px 8px;}
+  .week{display:flex;justify-content:space-between;margin-bottom:20px;}
+  .day{flex:1;text-align:center;padding:10px 0;border-radius:12px;cursor:pointer;}
+  .day span{display:block;font-size:11px;color:var(--muted);}
+  .day strong{font-size:16px;}
+  .day.active{background:var(--pink);}.day.active span,.day.active strong{color:#fff;}
+
+  .summary{background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:var(--radius);padding:18px;margin-bottom:20px;display:flex;justify-content:space-between;}
+  .summary .item span{font-size:12px;opacity:.85;display:block;}
+  .summary .item strong{font-size:20px;}
+
+  .appt{background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px;border-left:4px solid var(--pink);}
+  .appt.done{border-left-color:var(--green);opacity:.7;}
+  .appt.blocked{border-left-color:var(--muted);}
+  .appt.c2{border-left-color:var(--blue);}.appt.c3{border-left-color:var(--amber);}
+  .appt .time{font-size:14px;font-weight:700;color:var(--pink);min-width:48px;}
+  .appt.done .time{color:var(--green);}
+  .appt .info strong{font-size:14px;display:block;}
+  .appt .info span{font-size:12px;color:var(--muted);}
+  .appt .info .pro{font-size:11px;color:var(--pink);font-weight:600;}
+  .appt .price{margin-left:auto;font-weight:700;color:var(--green);font-size:14px;}
+
+  .team-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border-radius:var(--radius);margin-bottom:10px;}
+  .team-item .mini-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;position:relative;}
+  .team-item .mini-avatar .on{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);background:var(--green);}
+  .team-item .mini-avatar .off{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);background:var(--muted);}
+  .team-item .t-info{flex:1;}.team-item .t-info strong{font-size:15px;display:block;}.team-item .t-info span{font-size:12px;color:var(--muted);}
+  .team-item .t-val{text-align:right;}.team-item .t-val strong{font-size:14px;color:var(--green);display:block;}.team-item .t-val small{font-size:11px;color:var(--muted);}
+  .inactive{opacity:.55;}
+
+  .rank-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border-radius:12px;margin-bottom:8px;}
+  .rank-item .num{width:24px;height:24px;border-radius:50%;background:var(--pink-soft);color:var(--pink);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .rank-item .mini-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .rank-item .r-label{flex:1;font-size:14px;}
+  .rank-item .r-val{font-size:13px;color:var(--muted);text-align:right;}
+  .rank-item .r-val strong{display:block;color:var(--green);}
+
+  .fin-card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:10px;}
+  .fin-card .fin-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .fin-card .mini-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .fin-card .fin-head strong{font-size:15px;}.fin-card .fin-head small{font-size:12px;color:var(--muted);display:block;}
+  .fin-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;}
+  .fin-row span{color:var(--muted);}
+  .fin-row.total{border-top:1px dashed #3a3a44;margin-top:8px;padding-top:10px;font-weight:700;}
+  .fin-row.total .repasse{color:var(--amber);}
+  .fin-row .salon-v{color:var(--green);font-weight:600;}
+
+  .client-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .client-item .mini-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .client-item .c-info{flex:1;}.client-item .c-info strong{font-size:15px;display:block;}.client-item .c-info span{font-size:12px;color:var(--muted);}
+  .client-item .chev{color:var(--muted);}
+
+  .bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;margin:12px 0 4px;}
+  .bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .bc .fill{width:100%;background:var(--pink);border-radius:6px 6px 0 0;}
+  .bc small{font-size:10px;color:var(--muted);}
+
+  .profile-top{text-align:center;padding:24px 0;}
+  .avatar{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid var(--pink);}
+  .profile-top h2{font-size:22px;}
+  .profile-top .rating{color:var(--amber);margin-top:4px;font-size:14px;}
+  .row-item{background:var(--surface);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .row-item .ic2{font-size:20px;width:28px;text-align:center;}
+  .row-item .label{flex:1;font-size:15px;}
+  .row-item .chev{color:var(--muted);}
+  .status-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+  .status-badge.warn{background:rgba(245,158,11,.2);color:var(--amber);}
+  .status-badge.ok{background:rgba(34,197,94,.2);color:var(--green);}
+  .logout{margin-top:24px;width:100%;padding:16px;background:transparent;border:1px solid #3a3a44;color:var(--red);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;}
+
+  /* toast genérico de "ação simulada" */
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+    background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 18px;
+    border-radius:12px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;
+    transition:.3s;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ============================================================
+     BOTTOM NAVIGATION (montada dinamicamente)
+     ============================================================ */
+  .bottomnav{position:absolute;bottom:0;left:0;right:0;height:72px;background:var(--panel);
+    border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;padding:0 6px;}
+  .bn{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);
+    font-size:9px;font-weight:600;flex:1;cursor:pointer;background:none;border:none;}
+  .bn .bi{font-size:19px;}
+  .bn.active{color:var(--pink-2);}
+  .bn-fab{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin-top:-22px;
+    box-shadow:0 6px 18px rgba(236,72,153,.45);cursor:pointer;border:none;}
+</style>
+</head>
+<body>
+
+<div class="app-frame">
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+
+  <!-- ========================================================
+       1) TELA DE LOGIN
+       ======================================================== -->
+  <div id="loginScreen" class="login-wrap">
+    <div class="logo-big">💅</div>
+    <span class="brand-pill">NAILFLOW</span>
+    <h1>Acesse sua conta</h1>
+    <p class="sub">Protótipo navegável · login simplificado por papel</p>
+
+    <div class="login-card">
+      <label>E-mail</label>
+      <input type="email" id="emailInput" placeholder="seu@nailflow.app" autocomplete="off">
+      <button class="btn btn-pink" onclick="doLogin()">Entrar</button>
+      <div class="err" id="loginErr"></div>
+    </div>
+
+    <p class="quick-title">Acesso rápido (contas de teste)</p>
+    <div class="quick">
+      <button class="quick-btn" onclick="quickLogin('admin@nailflow.app')">
+        <div class="qav">🛡️</div>
+        <div><b>Super Admin</b><small>admin@nailflow.app</small></div>
+      </button>
+      <button class="quick-btn" onclick="quickLogin('salao@nailflow.app')">
+        <div class="qav">🏪</div>
+        <div><b>Proprietária do salão</b><small>salao@nailflow.app</small></div>
+      </button>
+      <button class="quick-btn" onclick="quickLogin('manicure@nailflow.app')">
+        <div class="qav">💅</div>
+        <div><b>Manicure</b><small>manicure@nailflow.app</small></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       2) PAINEL (header + body dinâmicos + bottom nav)
+       ======================================================== -->
+  <div id="panel" class="panel hidden">
+    <div class="header">
+      <span class="back hidden" id="backBtn" onclick="goHome()">←</span>
+      <div class="ti">
+        <h1 id="screenTitle">Painel</h1>
+        <span class="role-pill" id="rolePill">PAPEL</span>
+      </div>
+      <div class="av" id="avatarBtn" onclick="logout()" title="Sair">A</div>
+    </div>
+    <div class="pbody" id="screenBody"></div>
+    <div class="bottomnav" id="bottomNav"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   CONFIGURAÇÃO CENTRAL — usuários de teste e papéis (RBAC)
+   ================================================================ */
+const TEST_USERS = {
+  "admin@nailflow.app":    "admin",
+  "salao@nailflow.app":    "owner",
+  "manicure@nailflow.app": "manicure",
+};
+
+// Cada papel define: rótulo, avatar, e itens de navegação (com FAB no meio)
+const ROLES = {
+  admin: {
+    label: "SUPER ADMIN", avatarText: "A",
+    nav: [
+      { id:"dashboard", icon:"📊", label:"Início" },
+      { id:"saloes",    icon:"🏪", label:"Salões" },
+      { fab:true,       action:"novoSalao" },
+      { id:"financeiro",icon:"💰", label:"Financeiro" },
+      { id:"mais",      icon:"⚙️", label:"Mais" },
+    ],
+    home: "dashboard",
+  },
+  owner: {
+    label: "PROPRIETÁRIA", avatarText: "C",
+    nav: [
+      { id:"painel",     icon:"🏠", label:"Painel" },
+      { id:"agendaGeral",icon:"📅", label:"Agenda" },
+      { id:"equipe",     icon:"👯", label:"Equipe" },
+      { id:"finOwner",   icon:"💰", label:"Financeiro" },
+      { id:"salao",      icon:"⚙️", label:"Salão" },
+    ],
+    home: "painel",
+  },
+  manicure: {
+    label: "MANICURE", avatarText: "C",
+    nav: [
+      { id:"agenda",      icon:"📅", label:"Agenda" },
+      { id:"clientes",    icon:"👥", label:"Clientes" },
+      { id:"relatorios",  icon:"📊", label:"Relatórios" },
+      { id:"perfil",      icon:"👤", label:"Perfil" },
+    ],
+    home: "agenda",
+  },
+};
+
+/* ================================================================
+   ESTADO DA SESSÃO
+   ================================================================ */
+let session = { email:null, role:null, current:null };
+
+/* ================================================================
+   LOGIN / LOGOUT
+   ================================================================ */
+function doLogin(){
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
+  const role = TEST_USERS[email];
+  const err = document.getElementById("loginErr");
+  if(!role){
+    err.textContent = "E-mail não reconhecido. Use uma das contas de teste.";
+    return;
+  }
+  err.textContent = "";
+  startSession(email, role);
+}
+function quickLogin(email){
+  document.getElementById("emailInput").value = email;
+  startSession(email, TEST_USERS[email]);
+}
+function startSession(email, role){
+  session = { email, role, current: ROLES[role].home };
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("panel").classList.remove("hidden");
+  document.getElementById("rolePill").textContent = ROLES[role].label;
+  document.getElementById("avatarBtn").textContent = ROLES[role].avatarText;
+  buildNav();
+  render();
+}
+function logout(){
+  session = { email:null, role:null, current:null };
+  document.getElementById("panel").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("emailInput").value = "";
+}
+function goHome(){ navigate(ROLES[session.role].home); }
+
+/* ================================================================
+   NAVEGAÇÃO DINÂMICA — monta bottom nav conforme o papel (RBAC)
+   ================================================================ */
+function buildNav(){
+  const nav = document.getElementById("bottomNav");
+  nav.innerHTML = "";
+  ROLES[session.role].nav.forEach(item=>{
+    if(item.fab){
+      const f = document.createElement("button");
+      f.className = "bn-fab";
+      f.textContent = "+";
+      f.onclick = ()=> toast("Ação: novo registro (simulado)");
+      nav.appendChild(f);
+    } else {
+      const b = document.createElement("button");
+      b.className = "bn" + (item.id===session.current ? " active":"");
+      b.dataset.screen = item.id;
+      b.innerHTML = `<span class="bi">${item.icon}</span>${item.label}`;
+      b.onclick = ()=> navigate(item.id);
+      nav.appendChild(b);
+    }
+  });
+}
+function navigate(screenId){
+  session.current = screenId;
+  // atualiza estado ativo na navbar
+  document.querySelectorAll("#bottomNav .bn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.screen===screenId);
+  });
+  render();
+}
+
+/* ================================================================
+   RENDERIZAÇÃO — busca o template da tela do papel atual
+   ================================================================ */
+function render(){
+  const body = document.getElementById("screenBody");
+  const screens = SCREENS[session.role] || {};
+  const fn = screens[session.current];
+  body.innerHTML = fn ? fn() : "<div class='card'>Tela não encontrada.</div>";
+  body.scrollTop = 0;
+  // só mostra "voltar" em sub-telas que não sejam a home
+  document.getElementById("backBtn").classList.toggle("hidden", session.current===ROLES[session.role].home);
+}
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._tmr);
+  t._tmr = setTimeout(()=> t.classList.remove("show"), 1800);
+}
+function setTitle(txt){ document.getElementById("screenTitle").textContent = txt; }
+
+/* ================================================================
+   TEMPLATES DE TELAS POR PAPEL
+   (cada função devolve o HTML do corpo e define o título)
+   ================================================================ */
+const SCREENS = {
+  /* ---------------- ADMIN ---------------- */
+  admin: {
+    dashboard(){ setTitle("Olá, Ariel 👋"); return `
+      <div class="search">🔍 Buscar salão, usuário, fatura...</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="ic pink">🏪</div><div class="val">128</div><div class="lbl">Salões ativos</div><div class="trend up">▲ 12%</div></div>
+        <div class="kpi"><div class="ic green">💰</div><div class="val">R$42,8k</div><div class="lbl">MRR</div><div class="trend up">▲ 8,4%</div></div>
+        <div class="kpi"><div class="ic purple">📅</div><div class="val">9.341</div><div class="lbl">Agendamentos</div><div class="trend up">▲ 23%</div></div>
+        <div class="kpi"><div class="ic amber">📉</div><div class="val">2,1%</div><div class="lbl">Churn mensal</div><div class="trend down">▼ 1,2%</div></div>
+      </div>
+      <div class="section-title">Crescimento de salões</div>
+      <div class="card"><div class="chart">
+        <div class="bar" style="height:45%"><small>Dez</small></div><div class="bar" style="height:55%"><small>Jan</small></div>
+        <div class="bar" style="height:50%"><small>Fev</small></div><div class="bar" style="height:68%"><small>Mar</small></div>
+        <div class="bar" style="height:78%"><small>Abr</small></div><div class="bar" style="height:90%"><small>Mai</small></div>
+        <div class="bar" style="height:100%"><small>Jun</small></div>
+      </div></div>
+      <div class="section-title">Alertas <a onclick="toast('Ver todos os alertas')">Ver tudo</a></div>
+      <div class="card">
+        <div class="litem"><div class="ico red">⚠️</div><div><b>3 pagamentos atrasados</b><small>Suspensão em 2 dias</small></div><span class="arrow">›</span></div>
+        <div class="litem"><div class="ico amber">😴</div><div><b>5 salões inativos</b><small>Sem login há 30 dias</small></div><span class="arrow">›</span></div>
+        <div class="litem"><div class="ico blue">🎫</div><div><b>7 tickets abertos</b><small>2 sem resposta há 24h</small></div><span class="arrow">›</span></div>
+      </div>`; },
+    saloes(){ setTitle("Salões"); return `
+      <div class="search">🔍 Buscar por nome, CNPJ ou e-mail...</div>
+      <div class="chips">
+        <div class="chip active">Todos (128)</div><div class="chip">Ativos (119)</div>
+        <div class="chip">Teste (6)</div><div class="chip">Suspensos (3)</div>
+      </div>
+      <div class="salon" onclick="navigate('detalheSalao')"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed)">B</div><div class="info"><b>Bella Nails</b><small>São José · SC · 8 prof.</small></div><div style="text-align:right"><span class="tag premium">Premium</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">G</div><div class="info"><b>Glamour Studio</b><small>Floripa · SC · 5 prof.</small></div><div style="text-align:right"><span class="tag pro">Pro</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#f59e0b,#ec4899)">N</div><div class="info"><b>Nails & Co</b><small>Curitiba · PR · 3 prof.</small></div><div style="text-align:right"><span class="tag trial">Teste</span><br><span class="tag trial" style="margin-top:4px">Em teste</span></div></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ef4444,#f59e0b)">D</div><div class="info"><b>Diva Esmalteria</b><small>Joinville · SC · 4 prof.</small></div><div style="text-align:right"><span class="tag pro">Pro</span><br><span class="tag suspended" style="margin-top:4px">Suspenso</span></div></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#22c55e,#8b5cf6)">L</div><div class="info"><b>Lux Beauty</b><small>Blumenau · SC · 1 prof.</small></div><div style="text-align:right"><span class="tag free">Free</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>`; },
+    detalheSalao(){ setTitle("Bella Nails"); return `
+      <div class="salon" style="margin-bottom:16px"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed);width:50px;height:50px;font-size:20px">B</div><div class="info"><b>Bella Nails</b><small>CNPJ 12.345.678/0001-90</small></div><span class="tag active">Ativo</span></div>
+      <div class="tabs">
+        <div class="tab-h active">Visão geral</div><div class="tab-h">Equipe</div><div class="tab-h">Faturas</div><div class="tab-h">Métricas</div><div class="tab-h">Logs</div>
+      </div>
+      <div class="card">
+        <div class="irow"><span class="k">Plano</span><span class="v">Premium · R$ 499/mês</span></div>
+        <div class="irow"><span class="k">Próxima cobrança</span><span class="v">05/07/2026</span></div>
+        <div class="irow"><span class="k">Proprietária</span><span class="v">Carla Mendes</span></div>
+        <div class="irow"><span class="k">Profissionais</span><span class="v">8 de 10</span></div>
+        <div class="irow"><span class="k">Agend./mês</span><span class="v">342</span></div>
+        <div class="irow"><span class="k">Último acesso</span><span class="v">Hoje, 14:32</span></div>
+      </div>
+      <button class="btn btn-pink" onclick="toast('Impersonation iniciada (simulado)')">🔑 Acessar como salão</button>
+      <div class="danger-zone">
+        <h4>⚠️ Zona de risco</h4>
+        <button class="btn btn-warn" onclick="toast('Salão suspenso (simulado)')">Suspender salão</button>
+        <button class="btn btn-danger" style="margin-top:10px" onclick="toast('Exclusão LGPD (simulado)')">Excluir conta (LGPD)</button>
+      </div>`; },
+    financeiro(){ setTitle("Financeiro"); return `
+      <div class="revenue"><small>Receita recorrente mensal (MRR)</small><div class="big">R$ 42.840</div><div class="sub">▲ 8,4% vs. mês anterior</div></div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="ic purple">📈</div><div class="val">R$514k</div><div class="lbl">ARR projetado</div></div>
+        <div class="kpi"><div class="ic green">✅</div><div class="val">R$38,1k</div><div class="lbl">Recebido</div></div>
+        <div class="kpi"><div class="ic amber">⏳</div><div class="val">R$3,2k</div><div class="lbl">Pendente</div></div>
+        <div class="kpi"><div class="ic red">⚠️</div><div class="val">R$1,5k</div><div class="lbl">Inadimplente</div></div>
+      </div>
+      <div class="section-title">Transações recentes <a onclick="toast('Exportar CSV')">Exportar</a></div>
+      <div class="card">
+        <div class="litem"><div class="ico green">💳</div><div><b>Bella Nails</b><small>Premium · 05/06</small></div><span class="tag paid">R$499</span></div>
+        <div class="litem"><div class="ico green">💳</div><div><b>Glamour Studio</b><small>Pro · 04/06</small></div><span class="tag paid">R$249</span></div>
+        <div class="litem"><div class="ico amber">⏳</div><div><b>Nails & Co</b><small>Pro · venc. 06/06</small></div><span class="tag pending">R$249</span></div>
+        <div class="litem"><div class="ico red">✕</div><div><b>Diva Esmalteria</b><small>Falha no cartão</small></div><span class="tag failed">R$249</span></div>
+      </div>`; },
+    mais(){ setTitle("Mais"); return `
+      <div class="section-title">Gestão da plataforma</div>
+      <div class="card">
+        <div class="litem" onclick="navigate('planos')" style="cursor:pointer"><div class="ico purple">🏷️</div><div><b>Planos & Assinaturas</b><small>Catálogo e cupons</small></div><span class="arrow">›</span></div>
+        <div class="litem" onclick="navigate('usuarios')" style="cursor:pointer"><div class="ico blue">👥</div><div><b>Usuários</b><small>1.204 na plataforma</small></div><span class="arrow">›</span></div>
+        <div class="litem" onclick="navigate('suporte')" style="cursor:pointer"><div class="ico amber">🎫</div><div><b>Suporte</b><small>7 tickets abertos</small></div><span class="arrow">›</span></div>
+        <div class="litem" onclick="navigate('config')" style="cursor:pointer"><div class="ico green">⚙️</div><div><b>Configurações</b><small>Branding, integrações</small></div><span class="arrow">›</span></div>
+        <div class="litem" onclick="navigate('auditoria')" style="cursor:pointer"><div class="ico red">🛡️</div><div><b>Auditoria & Segurança</b><small>LGPD, logs, RBAC</small></div><span class="arrow">›</span></div>
+      </div>`; },
+    planos(){ setTitle("Planos"); return `
+      <div class="plan"><h3>Free</h3><div class="price">R$ 0<span>/mês</span></div><div class="feat">✓ 1 profissional</div><div class="feat">✓ Agenda básica</div><div class="count">📊 38 salões neste plano</div></div>
+      <div class="plan"><h3>Pro</h3><div class="price">R$ 249<span>/mês</span></div><div class="feat">✓ Até 5 profissionais</div><div class="feat">✓ WhatsApp + relatórios</div><div class="count">📊 64 salões neste plano</div></div>
+      <div class="plan featured"><span class="ribbon">MAIS POPULAR</span><h3>Premium</h3><div class="price">R$ 499<span>/mês</span></div><div class="feat">✓ Profissionais ilimitados</div><div class="feat">✓ Multi-unidades + API</div><div class="count">📊 26 salões neste plano</div></div>
+      <div class="section-title">Cupons ativos <a onclick="toast('Gerenciar cupons')">Gerenciar</a></div>
+      <div class="card"><div class="irow"><span class="k">BEMVINDA20</span><span class="v">-20% · 142 usos</span></div><div class="irow"><span class="k">BLACKFRIDAY</span><span class="v">-50% · expirado</span></div></div>`; },
+    usuarios(){ setTitle("Usuários"); return `
+      <div class="search">🔍 Buscar usuário por nome ou e-mail...</div>
+      <div class="chips"><div class="chip active">Todos</div><div class="chip">Owners</div><div class="chip">Gerentes</div><div class="chip">Profissionais</div><div class="chip">Bloqueados</div></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed)">C</div><div class="info"><b>Carla Mendes</b><small>carla@bellanails.com</small></div><span class="tag premium">Owner</span></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">R</div><div class="info"><b>Renata Lima</b><small>renata@glamour.com</small></div><span class="tag pro">Gerente</span></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#22c55e,#8b5cf6)">P</div><div class="info"><b>Paula Souza</b><small>paula@bellanails.com</small></div><span class="tag free">Profis.</span></div>
+      <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ef4444,#f59e0b)">M</div><div class="info"><b>Marina Dias</b><small>marina@diva.com</small></div><span class="tag suspended">Bloqueada</span></div>`; },
+    suporte(){ setTitle("Suporte"); return `
+      <div class="chips"><div class="chip active">Abertos (7)</div><div class="chip">Em andamento (3)</div><div class="chip">Resolvidos</div></div>
+      <div class="card" style="margin-bottom:12px"><div class="litem"><div class="ico red">🔴</div><div style="flex:1"><b>Não consigo emitir nota fiscal</b><small>Bella Nails · há 2h · Alta</small></div></div></div>
+      <div class="card" style="margin-bottom:12px"><div class="litem"><div class="ico amber">🟡</div><div style="flex:1"><b>Dúvida sobre integração WhatsApp</b><small>Glamour Studio · há 5h · Média</small></div></div></div>
+      <div class="card" style="margin-bottom:12px"><div class="litem"><div class="ico amber">🟡</div><div style="flex:1"><b>Como adicionar profissional?</b><small>Lux Beauty · há 1 dia · Baixa</small></div></div></div>`; },
+    config(){ setTitle("Configurações"); return `
+      <div class="section-title">Branding global</div>
+      <div class="card"><div class="irow"><span class="k">Nome da marca</span><span class="v">NailFlow</span></div><div class="irow"><span class="k">Cor primária</span><span class="v">🟣 #ec4899</span></div></div>
+      <div class="section-title">Integrações</div>
+      <div class="card">
+        <div class="litem"><div class="ico green">💳</div><div style="flex:1"><b>Stripe</b><small>Pagamentos</small></div><span class="tag paid">Conectado</span></div>
+        <div class="litem"><div class="ico green">💬</div><div style="flex:1"><b>WhatsApp API</b><small>Notificações</small></div><span class="tag paid">Conectado</span></div>
+        <div class="litem"><div class="ico blue">📧</div><div style="flex:1"><b>SendGrid</b><small>E-mails</small></div><span class="tag pending">Configurar</span></div>
+      </div>`; },
+    auditoria(){ setTitle("Auditoria"); return `
+      <div class="kpi-grid">
+        <div class="kpi"><div class="ic green">🛡️</div><div class="val">100%</div><div class="lbl">LGPD conforme</div></div>
+        <div class="kpi"><div class="ic blue">🔐</div><div class="val">2FA</div><div class="lbl">Admins protegidos</div></div>
+      </div>
+      <div class="section-title">Log de atividades</div>
+      <div class="card">
+        <div class="log"><div class="ld"></div><div><b>Ariel suspendeu Diva Esmalteria</b><br><small>Motivo: inadimplência · há 1h</small></div></div>
+        <div class="log"><div class="ld"></div><div><b>Ariel acessou como Bella Nails</b><br><small>Impersonation · há 3h</small></div></div>
+        <div class="log"><div class="ld"></div><div><b>Plano Pro editado</b><br><small>Preço R$229 → R$249 · ontem</small></div></div>
+      </div>
+      <div class="section-title">Permissões (RBAC)</div>
+      <div class="card">
+        <div class="irow"><span class="k">Super Admin</span><span class="v">Acesso total</span></div>
+        <div class="irow"><span class="k">Owner</span><span class="v">Próprio salão</span></div>
+        <div class="irow"><span class="k">Gerente</span><span class="v">Parcial</span></div>
+        <div class="irow"><span class="k">Profissional</span><span class="v">Própria agenda</span></div>
+      </div>`; },
+  },
+
+  /* ---------------- OWNER ---------------- */
+  owner: {
+    painel(){ setTitle("Painel"); return `
+      <div class="segmented"><button>Hoje</button><button class="active">Semana</button><button>Mês</button></div>
+      <div class="hero"><div class="label">Faturamento da semana</div><div class="big">R$ 8.450</div>
+        <div class="split"><div><span>Receita do salão (40%)</span><strong>R$ 3.380</strong></div><div><span>Repasses (60%)</span><strong>R$ 5.070</strong></div></div></div>
+      <div class="kpi-grid">
+        <div class="kpi"><span class="lbl">Atendimentos</span><div class="val">92</div><small>↑ 8%</small></div>
+        <div class="kpi"><span class="lbl">Ticket médio</span><div class="val">R$ 92</div><small>↑ 3%</small></div>
+        <div class="kpi"><span class="lbl">Manicures ativas</span><div class="val">4</div></div>
+        <div class="kpi"><span class="lbl">Ocupação</span><div class="val">78%</div></div>
+      </div>
+      <div class="section-label">TOP PROFISSIONAIS<a onclick="navigate('equipe')">Ver tudo</a></div>
+      <div class="rank-item"><span class="num">1</span><div class="mini-avatar">CM</div><span class="r-label">Carla Mendes</span><span class="r-val"><strong>R$ 2.760</strong>30 atend.</span></div>
+      <div class="rank-item"><span class="num">2</span><div class="mini-avatar">BS</div><span class="r-label">Bruna Silva</span><span class="r-val"><strong>R$ 2.310</strong>26 atend.</span></div>
+      <div class="rank-item"><span class="num">3</span><div class="mini-avatar">DR</div><span class="r-label">Duda Reis</span><span class="r-val"><strong>R$ 1.890</strong>21 atend.</span></div>`; },
+    agendaGeral(){ setTitle("Agenda"); return `
+      <div class="chips">
+        <div class="chip active">Todas</div><div class="chip">Carla</div><div class="chip">Bruna</div><div class="chip">Duda</div><div class="chip">Elen</div>
+      </div>
+      <div class="section-label">MANHÃ</div>
+      <div class="appt"><div class="time">09:00</div><div class="info"><span class="pro">● Carla</span><strong>Ana Souza</strong><span>Esmaltação</span></div><div class="price">R$ 60</div></div>
+      <div class="appt c2"><div class="time">09:30</div><div class="info"><span class="pro" style="color:var(--blue)">● Bruna</span><strong>Júlia M.</strong><span>Manutenção</span></div><div class="price">R$ 80</div></div>
+      <div class="appt"><div class="time">10:30</div><div class="info"><span class="pro">● Carla</span><strong>Bia Lima</strong><span>Alongamento gel</span></div><div class="price">R$ 120</div></div>
+      <div class="section-label">TARDE</div>
+      <div class="appt c3"><div class="time">14:00</div><div class="info"><span class="pro" style="color:var(--amber)">● Duda</span><strong>Carol Dias</strong><span>Spa dos pés</span></div><div class="price">R$ 90</div></div>
+      <div class="appt c2"><div class="time">15:00</div><div class="info"><span class="pro" style="color:var(--blue)">● Bruna</span><strong>Rita F.</strong><span>Alongamento gel</span></div><div class="price">R$ 120</div></div>`; },
+    equipe(){ setTitle("Equipe"); return `
+      <div class="section-label">ATIVAS</div>
+      <div class="team-item"><div class="mini-avatar">CM<span class="on"></span></div><div class="t-info"><strong>Carla Mendes</strong><span>⭐ 4.9 · 30 atend. semana</span></div><div class="t-val"><strong>R$ 2.760</strong><small>faturado</small></div></div>
+      <div class="team-item"><div class="mini-avatar">BS<span class="on"></span></div><div class="t-info"><strong>Bruna Silva</strong><span>⭐ 4.8 · 26 atend. semana</span></div><div class="t-val"><strong>R$ 2.310</strong><small>faturado</small></div></div>
+      <div class="team-item"><div class="mini-avatar">DR<span class="on"></span></div><div class="t-info"><strong>Duda Reis</strong><span>⭐ 4.7 · 21 atend. semana</span></div><div class="t-val"><strong>R$ 1.890</strong><small>faturado</small></div></div>
+      <div class="team-item"><div class="mini-avatar">EF<span class="on"></span></div><div class="t-info"><strong>Elen Faria</strong><span>⭐ 4.9 · 15 atend. semana</span></div><div class="t-val"><strong>R$ 1.490</strong><small>faturado</small></div></div>
+      <div class="section-label">INATIVAS</div>
+      <div class="team-item inactive"><div class="mini-avatar">PS<span class="off"></span></div><div class="t-info"><strong>Paula Souza</strong><span>Desativada · 20 mai</span></div><div class="t-val"><small>—</small></div></div>`; },
+    finOwner(){ setTitle("Financeiro"); return `
+      <div class="segmented"><button>Dia</button><button class="active">Semana</button><button>Mês</button></div>
+      <div class="hero"><div class="label">Receita do salão (40%)</div><div class="big">R$ 3.380</div>
+        <div class="split"><div><span>Faturamento bruto</span><strong>R$ 8.450</strong></div><div><span>Total a repassar</span><strong>R$ 5.070</strong></div></div></div>
+      <div class="section-label">REPASSES POR PROFISSIONAL</div>
+      <div class="fin-card"><div class="fin-head"><div class="mini-avatar">CM</div><div><strong>Carla Mendes</strong><small>30 atendimentos · 60%</small></div></div>
+        <div class="fin-row"><span>Faturamento bruto</span><span>R$ 2.760</span></div><div class="fin-row"><span>Salão (40%)</span><span class="salon-v">R$ 1.104</span></div><div class="fin-row total"><span>A repassar (60%)</span><span class="repasse">R$ 1.656</span></div></div>
+      <div class="fin-card"><div class="fin-head"><div class="mini-avatar">BS</div><div><strong>Bruna Silva</strong><small>26 atendimentos · 60%</small></div></div>
+        <div class="fin-row"><span>Faturamento bruto</span><span>R$ 2.310</span></div><div class="fin-row"><span>Salão (40%)</span><span class="salon-v">R$ 924</span></div><div class="fin-row total"><span>A repassar (60%)</span><span class="repasse">R$ 1.386</span></div></div>`; },
+    salao(){ setTitle("Salão"); return `
+      <div class="profile-top"><div class="avatar">💅</div><h2>Studio Bella Nails</h2><div style="color:var(--muted);font-size:13px;margin-top:4px">Carla Mendes · Proprietária</div></div>
+      <div class="section-label">DADOS DO SALÃO</div>
+      <div class="row-item"><span class="ic2">🏪</span><span class="label">Informações do salão</span><span class="chev">›</span></div>
+      <div class="row-item"><span class="ic2">🕐</span><span class="label">Horário de funcionamento</span><span class="chev">›</span></div>
+      <div class="row-item"><span class="ic2">💰</span><span class="label">Comissão padrão</span><span class="status-badge ok">60 / 40</span></div>
+      <div class="section-label">INTEGRAÇÕES</div>
+      <div class="row-item"><span class="ic2">📅</span><span class="label">Google Agenda</span><span class="status-badge warn">1 falha</span></div>
+      <div class="section-label">CONTA</div>
+      <div class="row-item"><span class="ic2">🔒</span><span class="label">Privacidade / LGPD</span><span class="chev">›</span></div>
+      <button class="logout" onclick="logout()">Sair</button>`; },
+  },
+
+  /* ---------------- MANICURE ---------------- */
+  manicure: {
+    agenda(){ setTitle("Agenda"); return `
+      <div class="segmented"><button>Dia</button><button class="active">Semana</button><button>Mês</button></div>
+      <div class="week-nav"><span class="ar">‹</span><span>05 — 09 Jun</span><span class="ar">›</span></div>
+      <div class="week">
+        <div class="day"><span>D</span><strong>04</strong></div><div class="day active"><span>S</span><strong>05</strong></div>
+        <div class="day"><span>T</span><strong>06</strong></div><div class="day"><span>Q</span><strong>07</strong></div>
+        <div class="day"><span>Q</span><strong>08</strong></div><div class="day"><span>S</span><strong>09</strong></div>
+      </div>
+      <div class="summary"><div class="item"><span>Atendimentos</span><strong>8</strong></div><div class="item"><span>A receber</span><strong>R$ 640</strong></div></div>
+      <div class="section-label">HOJE · SEXTA</div>
+      <div class="appt done"><div class="time">09:00</div><div class="info"><strong>Ana Souza</strong><span>Esmaltação · ✅ Comanda fechada</span></div><div class="price">R$ 60</div></div>
+      <div class="appt"><div class="time">10:30</div><div class="info"><strong>Bia Lima</strong><span>Alongamento gel</span></div><div class="price">R$ 120</div></div>
+      <div class="appt blocked"><div class="time">12:00</div><div class="info"><strong>🚫 Almoço</strong><span>Horário bloqueado</span></div></div>
+      <div class="appt"><div class="time">14:00</div><div class="info"><strong>Carol Dias</strong><span>Spa dos pés</span></div><div class="price">R$ 90</div></div>
+      <div class="appt"><div class="time">16:00</div><div class="info"><strong>Duda Reis</strong><span>Manutenção</span></div><div class="price">R$ 80</div></div>`; },
+    clientes(){ setTitle("Clientes"); return `
+      <div class="search">🔍 Buscar cliente...</div>
+      <div class="section-label">87 CLIENTES</div>
+      <div class="client-item"><div class="mini-avatar">AS</div><div class="c-info"><strong>Ana Souza</strong><span>Último: hoje · 12 atendimentos</span></div><span class="chev">›</span></div>
+      <div class="client-item"><div class="mini-avatar">BL</div><div class="c-info"><strong>Bia Lima</strong><span>Último: hoje · 8 atendimentos</span></div><span class="chev">›</span></div>
+      <div class="client-item"><div class="mini-avatar">CD</div><div class="c-info"><strong>Carol Dias</strong><span>Novo cliente</span></div><span class="chev">›</span></div>
+      <div class="client-item"><div class="mini-avatar">DR</div><div class="c-info"><strong>Duda Reis</strong><span>Último: 28 mai · 5 atendimentos</span></div><span class="chev">›</span></div>
+      <div class="client-item"><div class="mini-avatar">EF</div><div class="c-info"><strong>Elen Faria</strong><span>Último: 20 mai · 3 atendimentos</span></div><span class="chev">›</span></div>`; },
+    relatorios(){ setTitle("Relatórios"); return `
+      <div class="segmented"><button>Dia</button><button class="active">Semana</button><button>Mês</button><button>Custom</button></div>
+      <div class="week-nav"><span class="ar">‹</span><span>01 — 07 Jun</span><span class="ar">›</span></div>
+      <div class="kpi-grid">
+        <div class="kpi" style="background:linear-gradient(135deg,var(--purple),var(--pink))"><span class="lbl" style="color:rgba(255,255,255,.85)">Faturamento</span><div class="val">R$ 3.240</div><small style="color:#fff">↑ 12%</small></div>
+        <div class="kpi"><span class="lbl">Ticket médio</span><div class="val">R$ 92</div><small>↑ 4%</small></div>
+        <div class="kpi"><span class="lbl">Atendimentos</span><div class="val">35</div></div>
+        <div class="kpi"><span class="lbl">Comandas abertas</span><div class="val" style="color:var(--amber)">2</div></div>
+      </div>
+      <div class="section-label">FATURAMENTO POR DIA</div>
+      <div class="bar-chart">
+        <div class="bc"><div class="fill" style="height:50%"></div><small>S</small></div>
+        <div class="bc"><div class="fill" style="height:70%"></div><small>T</small></div>
+        <div class="bc"><div class="fill" style="height:40%"></div><small>Q</small></div>
+        <div class="bc"><div class="fill" style="height:90%"></div><small>Q</small></div>
+        <div class="bc"><div class="fill" style="height:100%"></div><small>S</small></div>
+        <div class="bc"><div class="fill" style="height:65%"></div><small>S</small></div>
+        <div class="bc"><div class="fill" style="height:20%"></div><small>D</small></div>
+      </div>
+      <div class="section-label">SERVIÇOS MAIS REALIZADOS</div>
+      <div class="rank-item"><span class="num">1</span><span class="r-label">Alongamento em gel</span><span class="r-val">14× · R$ 1.680</span></div>
+      <div class="rank-item"><span class="num">2</span><span class="r-label">Esmaltação</span><span class="r-val">11× · R$ 660</span></div>
+      <div class="rank-item"><span class="num">3</span><span class="r-label">Manutenção</span><span class="r-val">7× · R$ 560</span></div>`; },
+    perfil(){ setTitle("Perfil"); return `
+      <div class="profile-top"><div class="avatar">💅</div><h2>Carla Mendes</h2><div class="rating">⭐ 4.9 <small style="color:var(--muted)">(87 clientes)</small></div></div>
+      <div class="section-label">INTEGRAÇÕES</div>
+      <div class="row-item"><span class="ic2">📅</span><span class="label">Google Agenda</span><span class="status-badge warn">Pendente</span></div>
+      <div class="section-label">CONFIGURAÇÕES</div>
+      <div class="row-item"><span class="ic2">🔔</span><span class="label">Notificações</span><span class="status-badge ok">Ativo</span></div>
+      <div class="row-item"><span class="ic2">⚙️</span><span class="label">Preferências</span><span class="chev">›</span></div>
+      <div class="row-item"><span class="ic2">🔒</span><span class="label">Privacidade / LGPD</span><span class="chev">›</span></div>
+      <button class="logout" onclick="logout()">Sair</button>`; },
+  },
+};
+</script>
+</body>
+</html>

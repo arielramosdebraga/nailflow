@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NailFlow — Fluxo Completo de Autenticação</title>
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --card:#141416;
+    --card-2:#1b1b1f;
+    --border:#2a2a30;
+    --text:#f5f5f7;
+    --muted:#9b9ba3;
+    --pink:#ec4899;
+    --pink-2:#f472b6;
+    --purple:#7c3aed;
+    --purple-2:#8b5cf6;
+    --link:#60a5fa;
+    --brand-bg:#3a2410;
+    --brand-text:#d98a2b;
+    --green:#22c55e;
+    --red:#ef4444;
+    --amber:#f59e0b;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  body{background:#000;display:flex;justify-content:center;gap:30px;flex-wrap:wrap;padding:30px;}
+
+  .screen{
+    width:380px;background:var(--bg);border-radius:32px;
+    min-height:780px;padding:40px 28px;color:var(--text);
+    box-shadow:0 0 0 1px #1d1d22;display:flex;flex-direction:column;
+  }
+
+  .brand{
+    display:inline-block;background:var(--brand-bg);color:var(--brand-text);
+    font-weight:700;font-size:13px;letter-spacing:1px;
+    padding:8px 16px;border-radius:20px;margin-bottom:22px;width:fit-content;
+  }
+
+  h1{font-size:32px;font-weight:800;margin-bottom:14px;line-height:1.1;}
+  .subtitle{color:var(--muted);font-size:16px;line-height:1.5;margin-bottom:28px;}
+  .subtitle strong{color:var(--text);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:24px;padding:26px 22px;
+  }
+
+  label{display:block;font-weight:700;font-size:15px;margin:18px 0 8px;}
+  label:first-child{margin-top:0;}
+
+  .pwd-wrap{position:relative;}
+  input{
+    width:100%;background:var(--card-2);border:1px solid var(--border);
+    border-radius:12px;padding:16px 16px;color:var(--text);font-size:15px;
+    outline:none;transition:border .2s;
+  }
+  input::placeholder{color:#6b6b73;}
+  input:focus{border-color:var(--pink);}
+  .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    cursor:pointer;font-size:18px;opacity:.7;}
+
+  .btn{
+    width:100%;border:none;border-radius:14px;padding:17px;
+    font-size:16px;font-weight:700;cursor:pointer;margin-top:18px;
+    transition:transform .1s, opacity .2s;color:#fff;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:linear-gradient(90deg,var(--pink),var(--pink-2));}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+
+  .links{text-align:center;margin-top:24px;}
+  .links a{display:block;color:var(--link);font-weight:600;text-decoration:underline;margin:12px 0;font-size:16px;}
+
+  .back{color:var(--muted);font-size:14px;text-decoration:none;margin-bottom:18px;display:inline-block;}
+  .back:hover{color:var(--text);}
+
+  .screen-title{font-size:13px;color:var(--brand-text);text-align:center;
+    text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;}
+
+  /* Divisor */
+  .divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--muted);font-size:13px;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  /* Social */
+  .social{display:flex;gap:12px;}
+  .social .btn{margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;}
+
+  /* Força da senha */
+  .strength{display:flex;gap:6px;margin-top:12px;}
+  .strength span{flex:1;height:6px;border-radius:3px;background:var(--border);}
+  .strength span.on-weak{background:var(--red);}
+  .strength span.on-med{background:var(--amber);}
+  .strength span.on-strong{background:var(--green);}
+  .strength-label{font-size:13px;color:var(--muted);margin-top:8px;}
+
+  /* Requisitos */
+  .reqs{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .req{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+  .req .dot{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+  .req.ok{color:var(--text);}
+  .req.ok .dot{background:var(--green);border-color:var(--green);color:#000;}
+
+  /* OTP */
+  .otp-row{display:flex;gap:10px;justify-content:space-between;margin:8px 0 4px;}
+  .otp-box{
+    width:50px;height:62px;background:var(--card-2);border:1px solid var(--border);
+    border-radius:14px;text-align:center;font-size:26px;font-weight:700;color:var(--text);outline:none;
+  }
+  .otp-box.filled{border-color:var(--pink);}
+  .otp-box:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(236,72,153,.2);}
+  .resend{text-align:center;color:var(--muted);font-size:15px;margin-top:24px;}
+  .resend a{color:var(--link);font-weight:600;text-decoration:none;}
+  .resend .timer{color:var(--brand-text);font-weight:700;}
+
+  /* Sucesso */
+  .center{justify-content:center;align-items:center;text-align:center;}
+  .success-icon{
+    width:100px;height:100px;border-radius:50%;
+    background:rgba(34,197,94,.12);border:2px solid var(--green);
+    display:flex;align-items:center;justify-content:center;
+    font-size:50px;color:var(--green);margin:0 auto 28px;
+    box-shadow:0 0 50px rgba(34,197,94,.25);
+  }
+  .center h1{font-size:30px;}
+  .center .subtitle{margin-bottom:34px;}
+
+  .hint{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+  /* Logo splash */
+  .logo-big{
+    width:90px;height:90px;border-radius:24px;margin:0 auto 26px;
+    background:linear-gradient(135deg,var(--pink),var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:44px;
+    box-shadow:0 0 60px rgba(236,72,153,.4);
+  }
+
+  /* Checkbox LGPD */
+  .check-row{display:flex;align-items:flex-start;gap:10px;margin-top:18px;font-size:13px;color:var(--muted);line-height:1.5;}
+  .check-row input{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--pink);}
+  .check-row a{color:var(--link);}
+</style>
+</head>
+<body>
+
+<!-- ===================== TELA 1: SPLASH / BOAS-VINDAS ===================== -->
+<div class="screen center">
+  <div>
+    <div class="logo-big">💅</div>
+    <span class="brand" style="margin:0 auto 22px;">NAILFLOW</span>
+    <h1>Bem-vinda ao<br>seu salão digital</h1>
+    <p class="subtitle">Gerencie agendamentos, equipe e clientes em um só lugar.</p>
+    <button class="btn btn-primary">Criar conta do salão</button>
+    <button class="btn btn-outline">Já tenho conta</button>
+  </div>
+</div>
+
+<!-- ===================== TELA 2: LOGIN ===================== -->
+<div class="screen">
+  <span class="screen-title">Entrar</span>
+  <span class="brand">NAILFLOW</span>
+  <h1>Acesse sua conta</h1>
+  <p class="subtitle">Bom te ver de novo! Entre para continuar.</p>
+
+  <div class="card">
+    <label>E-mail</label>
+    <input type="email" placeholder="seu@email.com">
+
+    <label>Senha</label>
+    <div class="pwd-wrap">
+      <input type="password" placeholder="Sua senha">
+      <span class="eye">👁️</span>
+    </div>
+
+    <button class="btn btn-primary">Entrar</button>
+
+    <div class="divider">ou continue com</div>
+    <div class="social">
+      <button class="btn btn-outline">🔵 Google</button>
+      <button class="btn btn-outline"> Apple</button>
+    </div>
+  </div>
+
+  <div class="links">
+    <a href="#">Esqueci minha senha</a>
+    <a href="#">Criar conta do salão</a>
+  </div>
+</div>
+
+<!-- ===================== TELA 3: CRIAR CONTA DO SALÃO ===================== -->
+<div class="screen">
+  <a href="#" class="back">← Voltar</a>
+  <span class="screen-title">Cadastro</span>
+  <span class="brand">NAILFLOW</span>
+  <h1>Crie seu salão</h1>
+  <p class="subtitle">Preencha os dados para começar.</p>
+
+  <div class="card">
+    <label>Nome do salão</label>
+    <input type="text" placeholder="Ex: Bella Nails">
+
+    <label>Seu nome</label>
+    <input type="text" placeholder="Nome da proprietária">
+
+    <label>E-mail</label>
+    <input type="email" placeholder="seu@email.com">
+
+    <label>Senha</label>
+    <div class="pwd-wrap">
+      <input type="password" placeholder="Crie uma senha forte">
+      <span class="eye">👁️</span>
+    </div>
+
+    <div class="check-row">
+      <input type="checkbox" id="lgpd">
+      <label for="lgpd" style="margin:0;font-weight:400;">Li e aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a>.</label>
+    </div>
+
+    <button class="btn btn-primary">Criar conta</button>
+  </div>
+
+  <div class="links">
+    <a href="#">Já tenho conta</a>
+  </div>
+</div>
+
+<!-- ===================== TELA 4: VERIFICAÇÃO POR CÓDIGO (OTP) ===================== -->
+<div class="screen">
+  <a href="#" class="back">← Voltar</a>
+  <span class="screen-title">Verificação</span>
+  <span class="brand">NAILFLOW</span>
+  <h1>Confirme seu e-mail</h1>
+  <p class="subtitle">Enviamos um código de 6 dígitos para<br><strong>carla@bellanails.com</strong></p>
+
+  <div class="card">
+    <label style="text-align:center;">Digite o código</label>
+    <div class="otp-row">
+      <input class="otp-box filled" maxlength="1" value="4">
+      <input class="otp-box filled" maxlength="1" value="8">
+      <input class="otp-box filled" maxlength="1" value="2">
+      <input class="otp-box" maxlength="1">
+      <input class="otp-box" maxlength="1">
+      <input class="otp-box" maxlength="1">
+    </div>
+
+    <button class="btn btn-primary">Verificar código</button>
+
+    <p class="resend">Não recebeu o código?<br>
+      Reenviar em <span class="timer">0:42</span>
+    </p>
+  </div>
+
+  <div class="links">
+    <a href="#">Usar outro e-mail</a>
+  </div>
+</div>
+
+<!-- ===================== TELA 5: REDEFINIR NOVA SENHA ===================== -->
+<div class="screen">
+  <a href="#" class="back">← Voltar para login</a>
+  <span class="screen-title">Recuperação</span>
+  <span class="brand">NAILFLOW</span>
+  <h1>Criar nova senha</h1>
+  <p class="subtitle">Sua nova senha deve ser diferente da anterior e atender aos requisitos abaixo.</p>
+
+  <div class="card">
+    <label>Nova senha</label>
+    <div class="pwd-wrap">
+      <input type="password" placeholder="Digite a nova senha" value="••••••••••">
+      <span class="eye">👁️</span>
+    </div>
+
+    <div class="strength">
+      <span class="on-strong"></span>
+      <span class="on-strong"></span>
+      <span class="on-strong"></span>
+      <span></span>
+    </div>
+    <p class="strength-label">Força da senha: <strong style="color:var(--green);">Forte</strong></p>
+
+    <div class="reqs">
+      <div class="req ok"><span class="dot">✓</span> Mínimo de 8 caracteres</div>
+      <div class="req ok"><span class="dot">✓</span> Uma letra maiúscula</div>
+      <div class="req ok"><span class="dot">✓</span> Um número</div>
+      <div class="req"><span class="dot"></span> Um caractere especial (!@#$)</div>
+    </div>
+
+    <label style="margin-top:22px;">Confirmar nova senha</label>
+    <div class="pwd-wrap">
+      <input type="password" placeholder="Repita a nova senha">
+      <span class="eye">👁️</span>
+    </div>
+
+    <button class="btn btn-primary">Redefinir senha</button>
+  </div>
+</div>
+
+<!-- ===================== TELA 6: SUCESSO ===================== -->
+<div class="screen center">
+  <div>
+    <div class="success-icon">✓</div>
+    <h1>Tudo pronto!</h1>
+    <p class="subtitle">Sua conta foi configurada com sucesso.<br>Agora é só começar a usar o NailFlow.</p>
+    <button class="btn btn-primary">Ir para o painel</button>
+  </div>
+</div>
+
+</body>
+</html>

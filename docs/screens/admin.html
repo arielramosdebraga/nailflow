@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NailFlow — Painel Admin Mobile</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --panel:#0f0f11; --card:#141416; --card-2:#1b1b1f;
+    --border:#26262d; --text:#f5f5f7; --muted:#9b9ba3;
+    --pink:#ec4899; --pink-2:#f472b6; --purple:#7c3aed; --purple-2:#8b5cf6;
+    --link:#60a5fa; --brand-text:#d98a2b; --green:#22c55e; --red:#ef4444;
+    --amber:#f59e0b; --blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  body{background:#000;display:flex;flex-wrap:wrap;gap:34px;padding:30px;justify-content:center;}
+
+  .phone{
+    width:340px;height:720px;background:var(--bg);border-radius:36px;
+    overflow:hidden;position:relative;color:var(--text);
+    box-shadow:0 0 0 9px #18181c,0 0 0 10px #2a2a30;display:flex;flex-direction:column;
+  }
+  .phone-label{position:absolute;top:-26px;left:0;color:var(--brand-text);
+    font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+
+  /* status bar */
+  .statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px;font-size:12px;font-weight:700;flex-shrink:0;color:var(--text);}
+
+  /* header */
+  .header{padding:8px 18px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+  .header .back{font-size:20px;cursor:pointer;}
+  .header .ti{flex:1;}
+  .header h1{font-size:20px;font-weight:800;}
+  .header small{color:var(--muted);font-size:12px;}
+  .header .av{width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--pink));
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  .brand-pill{display:inline-block;background:#3a2410;color:var(--brand-text);
+    font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:10px;margin-top:3px;}
+
+  /* body */
+  .body{flex:1;overflow-y:auto;padding:4px 18px 90px;}
+  .body::-webkit-scrollbar{width:0;}
+
+  /* search */
+  .search{background:var(--card-2);border:1px solid var(--border);border-radius:12px;
+    padding:11px 14px;color:var(--muted);font-size:13px;display:flex;gap:9px;align-items:center;margin-bottom:16px;}
+
+  /* KPI mini */
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;}
+  .kpi .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
+  .ic.pink{background:rgba(236,72,153,.15);} .ic.purple{background:rgba(124,58,237,.15);}
+  .ic.green{background:rgba(34,197,94,.15);} .ic.amber{background:rgba(245,158,11,.15);}
+  .ic.blue{background:rgba(59,130,246,.15);} .ic.red{background:rgba(239,68,68,.15);}
+  .kpi .val{font-size:22px;font-weight:800;}
+  .kpi .lbl{color:var(--muted);font-size:11px;margin-top:2px;}
+  .kpi .trend{font-size:11px;font-weight:700;margin-top:5px;}
+  .trend.up{color:var(--green);} .trend.down{color:var(--red);}
+
+  .section-title{font-size:14px;font-weight:700;margin:18px 0 12px;display:flex;justify-content:space-between;align-items:center;}
+  .section-title a{color:var(--link);font-size:12px;font-weight:600;text-decoration:none;}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;}
+
+  /* chart */
+  .chart{height:130px;display:flex;align-items:flex-end;gap:8px;padding-bottom:18px;}
+  .bar{flex:1;background:linear-gradient(180deg,var(--pink),var(--purple));border-radius:5px 5px 0 0;position:relative;min-height:14px;}
+  .bar small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted);}
+
+  /* alert/list item */
+  .litem{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+  .litem:last-child{border:none;}
+  .litem .ico{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .litem b{display:block;font-size:13px;}
+  .litem small{color:var(--muted);font-size:11px;}
+  .litem .arrow{margin-left:auto;color:var(--muted);font-size:16px;}
+
+  /* salon card */
+  .salon{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:13px;margin-bottom:11px;}
+  .salon .av{width:42px;height:42px;border-radius:12px;flex-shrink:0;color:#fff;font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:17px;}
+  .salon .info{flex:1;}
+  .salon b{font-size:14px;display:block;}
+  .salon small{color:var(--muted);font-size:11px;}
+
+  .tag{padding:3px 8px;border-radius:7px;font-size:10px;font-weight:700;display:inline-block;}
+  .tag.active{background:rgba(34,197,94,.15);color:var(--green);}
+  .tag.suspended{background:rgba(239,68,68,.15);color:var(--red);}
+  .tag.trial{background:rgba(245,158,11,.15);color:var(--amber);}
+  .tag.pro{background:rgba(124,58,237,.18);color:var(--purple-2);}
+  .tag.free{background:var(--card-2);color:var(--muted);}
+  .tag.premium{background:rgba(236,72,153,.15);color:var(--pink-2);}
+  .tag.paid{background:rgba(34,197,94,.15);color:var(--green);}
+  .tag.pending{background:rgba(245,158,11,.15);color:var(--amber);}
+  .tag.failed{background:rgba(239,68,68,.15);color:var(--red);}
+
+  /* filters */
+  .chips{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+  .chips::-webkit-scrollbar{height:0;}
+  .chip{background:var(--card-2);border:1px solid var(--border);color:var(--muted);
+    padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;}
+  .chip.active{background:rgba(236,72,153,.15);color:var(--pink-2);border-color:var(--pink);}
+
+  /* plan card */
+  .plan{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;position:relative;}
+  .plan.featured{border-color:var(--pink);box-shadow:0 0 22px rgba(236,72,153,.18);}
+  .plan .ribbon{position:absolute;top:-9px;right:16px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;}
+  .plan h3{font-size:16px;margin-bottom:4px;}
+  .plan .price{font-size:26px;font-weight:800;}
+  .plan .price span{font-size:13px;color:var(--muted);font-weight:400;}
+  .plan .feat{font-size:12px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:7px;}
+  .plan .count{margin-top:12px;font-size:12px;color:var(--text);}
+
+  /* info rows */
+  .irow{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .irow:last-child{border:none;}
+  .irow .k{color:var(--muted);}
+  .irow .v{font-weight:600;}
+
+  /* toggle */
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+  .toggle-row:last-child{border:none;}
+  .toggle-row b{font-size:13px;display:block;}
+  .toggle-row small{color:var(--muted);font-size:11px;}
+  .sw{width:42px;height:24px;border-radius:12px;background:var(--card-2);border:1px solid var(--border);position:relative;flex-shrink:0;}
+  .sw::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--muted);top:2px;left:2px;transition:.2s;}
+  .sw.on{background:linear-gradient(90deg,var(--pink),var(--purple));border-color:transparent;}
+  .sw.on::after{left:21px;background:#fff;}
+
+  /* tabs */
+  .tabs{display:flex;gap:5px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{padding:9px 12px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
+  .tab.active{color:var(--text);border-bottom-color:var(--pink);}
+
+  /* buttons */
+  .btn{width:100%;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;color:#fff;margin-top:8px;cursor:pointer;}
+  .btn-pink{background:linear-gradient(90deg,var(--pink),var(--pink-2));}
+  .btn-warn{background:transparent;border:1px solid var(--amber);color:var(--amber);}
+  .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
+
+  .danger-zone{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:15px;margin-top:18px;}
+  .danger-zone h4{color:var(--red);font-size:13px;margin-bottom:10px;}
+
+  /* big revenue */
+  .revenue{background:linear-gradient(135deg,rgba(236,72,153,.18),rgba(124,58,237,.12));
+    border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;}
+  .revenue small{color:var(--muted);font-size:12px;}
+  .revenue .big{font-size:34px;font-weight:800;margin:6px 0;}
+  .revenue .sub{font-size:12px;color:var(--green);font-weight:700;}
+
+  /* log */
+  .log{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .log:last-child{border:none;}
+  .log .ld{width:8px;height:8px;border-radius:50%;background:var(--pink);margin-top:5px;flex-shrink:0;}
+  .log b{font-size:12px;} .log small{color:var(--muted);font-size:10px;}
+
+  /* bottom nav */
+  .bottomnav{position:absolute;bottom:0;left:0;right:0;height:72px;background:var(--panel);
+    border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;padding:0 6px;}
+  .bn{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:9px;font-weight:600;flex:1;}
+  .bn .bi{font-size:19px;}
+  .bn.active{color:var(--pink-2);}
+  .bn-fab{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin-top:-22px;box-shadow:0 6px 18px rgba(236,72,153,.45);}
+</style>
+</head>
+<body>
+
+<!-- ===== helper de navbar reaproveitado em cada phone ===== -->
+
+<!-- TELA 1 — DASHBOARD -->
+<div class="phone">
+  <span class="phone-label">1 · Dashboard</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Olá, Ariel 👋</h1><span class="brand-pill">SUPER ADMIN</span></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="search">🔍 Buscar salão, usuário, fatura...</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="ic pink">🏪</div><div class="val">128</div><div class="lbl">Salões ativos</div><div class="trend up">▲ 12%</div></div>
+      <div class="kpi"><div class="ic green">💰</div><div class="val">R$42,8k</div><div class="lbl">MRR</div><div class="trend up">▲ 8,4%</div></div>
+      <div class="kpi"><div class="ic purple">📅</div><div class="val">9.341</div><div class="lbl">Agendamentos</div><div class="trend up">▲ 23%</div></div>
+      <div class="kpi"><div class="ic amber">📉</div><div class="val">2,1%</div><div class="lbl">Churn mensal</div><div class="trend down">▼ 1,2%</div></div>
+    </div>
+    <div class="section-title">Crescimento de salões</div>
+    <div class="card"><div class="chart">
+      <div class="bar" style="height:45%"><small>Dez</small></div>
+      <div class="bar" style="height:55%"><small>Jan</small></div>
+      <div class="bar" style="height:50%"><small>Fev</small></div>
+      <div class="bar" style="height:68%"><small>Mar</small></div>
+      <div class="bar" style="height:78%"><small>Abr</small></div>
+      <div class="bar" style="height:90%"><small>Mai</small></div>
+      <div class="bar" style="height:100%"><small>Jun</small></div>
+    </div></div>
+    <div class="section-title">Alertas <a href="#">Ver tudo</a></div>
+    <div class="card">
+      <div class="litem"><div class="ico red">⚠️</div><div><b>3 pagamentos atrasados</b><small>Suspensão em 2 dias</small></div><span class="arrow">›</span></div>
+      <div class="litem"><div class="ico amber">😴</div><div><b>5 salões inativos</b><small>Sem login há 30 dias</small></div><span class="arrow">›</span></div>
+      <div class="litem"><div class="ico blue">🎫</div><div><b>7 tickets abertos</b><small>2 sem resposta há 24h</small></div><span class="arrow">›</span></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn active"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 2 — SALÕES (LISTA) -->
+<div class="phone">
+  <span class="phone-label">2 · Salões</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Salões</h1><small>128 cadastrados</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="search">🔍 Buscar por nome, CNPJ ou e-mail...</div>
+    <div class="chips">
+      <div class="chip active">Todos (128)</div>
+      <div class="chip">Ativos (119)</div>
+      <div class="chip">Teste (6)</div>
+      <div class="chip">Suspensos (3)</div>
+    </div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed)">B</div><div class="info"><b>Bella Nails</b><small>São José · SC · 8 prof.</small></div><div style="text-align:right"><span class="tag premium">Premium</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">G</div><div class="info"><b>Glamour Studio</b><small>Floripa · SC · 5 prof.</small></div><div style="text-align:right"><span class="tag pro">Pro</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#f59e0b,#ec4899)">N</div><div class="info"><b>Nails &amp; Co</b><small>Curitiba · PR · 3 prof.</small></div><div style="text-align:right"><span class="tag trial">Teste</span><br><span class="tag trial" style="margin-top:4px">Em teste</span></div></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ef4444,#f59e0b)">D</div><div class="info"><b>Diva Esmalteria</b><small>Joinville · SC · 4 prof.</small></div><div style="text-align:right"><span class="tag pro">Pro</span><br><span class="tag suspended" style="margin-top:4px">Suspenso</span></div></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#22c55e,#8b5cf6)">L</div><div class="info"><b>Lux Beauty</b><small>Blumenau · SC · 1 prof.</small></div><div style="text-align:right"><span class="tag free">Free</span><br><span class="tag active" style="margin-top:4px">Ativo</span></div></div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn active"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 3 — DETALHE DO SALÃO -->
+<div class="phone">
+  <span class="phone-label">3 · Detalhe do Salão</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="back">←</div>
+    <div class="ti"><h1>Bella Nails</h1><small>Cliente desde Jan/2025</small></div>
+  </div>
+  <div class="body">
+    <div class="salon" style="margin-bottom:16px"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed);width:50px;height:50px;font-size:20px">B</div><div class="info"><b>Bella Nails</b><small>CNPJ 12.345.678/0001-90</small></div><span class="tag active">Ativo</span></div>
+    <div class="tabs">
+      <div class="tab active">Visão geral</div>
+      <div class="tab">Equipe</div>
+      <div class="tab">Faturas</div>
+      <div class="tab">Métricas</div>
+      <div class="tab">Logs</div>
+    </div>
+    <div class="card">
+      <div class="irow"><span class="k">Plano</span><span class="v">Premium · R$ 499/mês</span></div>
+      <div class="irow"><span class="k">Próxima cobrança</span><span class="v">05/07/2026</span></div>
+      <div class="irow"><span class="k">Proprietária</span><span class="v">Carla Mendes</span></div>
+      <div class="irow"><span class="k">Profissionais</span><span class="v">8 de 10</span></div>
+      <div class="irow"><span class="k">Agend./mês</span><span class="v">342</span></div>
+      <div class="irow"><span class="k">Último acesso</span><span class="v">Hoje, 14:32</span></div>
+    </div>
+    <button class="btn btn-pink">🔑 Acessar como salão</button>
+    <div class="danger-zone">
+      <h4>⚠️ Zona de risco</h4>
+      <button class="btn btn-warn">Suspender salão</button>
+      <button class="btn btn-danger" style="margin-top:10px">Excluir conta (LGPD)</button>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn active"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 4 — USUÁRIOS -->
+<div class="phone">
+  <span class="phone-label">4 · Usuários</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Usuários</h1><small>1.204 na plataforma</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="search">🔍 Buscar usuário por nome ou e-mail...</div>
+    <div class="chips">
+      <div class="chip active">Todos</div>
+      <div class="chip">Owners</div>
+      <div class="chip">Gerentes</div>
+      <div class="chip">Profissionais</div>
+      <div class="chip">Bloqueados</div>
+    </div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ec4899,#7c3aed)">C</div><div class="info"><b>Carla Mendes</b><small>carla@bellanails.com</small></div><span class="tag premium">Owner</span></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">R</div><div class="info"><b>Renata Lima</b><small>renata@glamour.com</small></div><span class="tag pro">Gerente</span></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#22c55e,#8b5cf6)">P</div><div class="info"><b>Paula Souza</b><small>paula@bellanails.com</small></div><span class="tag free">Profis.</span></div>
+    <div class="salon"><div class="av" style="background:linear-gradient(135deg,#ef4444,#f59e0b)">M</div><div class="info"><b>Marina Dias</b><small>marina@diva.com</small></div><span class="tag suspended">Bloqueada</span></div>
+    <div class="section-title">Ações rápidas</div>
+    <div class="card">
+      <div class="litem"><div class="ico blue">🔑</div><div><b>Resetar senha</b><small>Enviar link de redefinição</small></div><span class="arrow">›</span></div>
+      <div class="litem"><div class="ico amber">🛡️</div><div><b>Alterar papel (role)</b><small>Gerenciar permissões</small></div><span class="arrow">›</span></div>
+      <div class="litem"><div class="ico red">🚫</div><div><b>Bloquear acesso</b><small>Suspender usuário</small></div><span class="arrow">›</span></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn active"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 5 — PLANOS & ASSINATURAS -->
+<div class="phone">
+  <span class="phone-label">5 · Planos & Assinaturas</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Planos</h1><small>Catálogo da plataforma</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="plan">
+      <h3>Free</h3>
+      <div class="price">R$ 0<span>/mês</span></div>
+      <div class="feat">✓ 1 profissional</div>
+      <div class="feat">✓ Agenda básica</div>
+      <div class="count">📊 38 salões neste plano</div>
+    </div>
+    <div class="plan">
+      <h3>Pro</h3>
+      <div class="price">R$ 249<span>/mês</span></div>
+      <div class="feat">✓ Até 5 profissionais</div>
+      <div class="feat">✓ WhatsApp + relatórios</div>
+      <div class="count">📊 64 salões neste plano</div>
+    </div>
+    <div class="plan featured">
+      <span class="ribbon">MAIS POPULAR</span>
+      <h3>Premium</h3>
+      <div class="price">R$ 499<span>/mês</span></div>
+      <div class="feat">✓ Profissionais ilimitados</div>
+      <div class="feat">✓ Multi-unidades + API</div>
+      <div class="count">📊 26 salões neste plano</div>
+    </div>
+    <div class="section-title">Cupons ativos <a href="#">Gerenciar</a></div>
+    <div class="card">
+      <div class="irow"><span class="k">BEMVINDA20</span><span class="v">-20% · 142 usos</span></div>
+      <div class="irow"><span class="k">BLACKFRIDAY</span><span class="v">-50% · expirado</span></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn active"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 6 — FINANCEIRO -->
+<div class="phone">
+  <span class="phone-label">6 · Financeiro</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Financeiro</h1><small>Junho de 2026</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="revenue">
+      <small>Receita recorrente mensal (MRR)</small>
+      <div class="big">R$ 42.840</div>
+      <div class="sub">▲ 8,4% vs. mês anterior</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="ic purple">📈</div><div class="val">R$514k</div><div class="lbl">ARR projetado</div></div>
+      <div class="kpi"><div class="ic green">✅</div><div class="val">R$38,1k</div><div class="lbl">Recebido</div></div>
+      <div class="kpi"><div class="ic amber">⏳</div><div class="val">R$3,2k</div><div class="lbl">Pendente</div></div>
+      <div class="kpi"><div class="ic red">⚠️</div><div class="val">R$1,5k</div><div class="lbl">Inadimplente</div></div>
+    </div>
+    <div class="section-title">Transações recentes <a href="#">Exportar</a></div>
+    <div class="card">
+      <div class="litem"><div class="ico green">💳</div><div><b>Bella Nails</b><small>Premium · 05/06</small></div><span class="tag paid">R$499</span></div>
+      <div class="litem"><div class="ico green">💳</div><div><b>Glamour Studio</b><small>Pro · 04/06</small></div><span class="tag paid">R$249</span></div>
+      <div class="litem"><div class="ico amber">⏳</div><div><b>Nails &amp; Co</b><small>Pro · venc. 06/06</small></div><span class="tag pending">R$249</span></div>
+      <div class="litem"><div class="ico red">✕</div><div><b>Diva Esmalteria</b><small>Falha no cartão</small></div><span class="tag failed">R$249</span></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn active"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 7 — SUPORTE -->
+<div class="phone">
+  <span class="phone-label">7 · Suporte</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Suporte</h1><small>7 tickets abertos</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="chips">
+      <div class="chip active">Abertos (7)</div>
+      <div class="chip">Em andamento (3)</div>
+      <div class="chip">Resolvidos</div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="litem"><div class="ico red">🔴</div><div style="flex:1"><b>Não consigo emitir nota fiscal</b><small>Bella Nails · há 2h · Alta</small></div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="litem"><div class="ico amber">🟡</div><div style="flex:1"><b>Dúvida sobre integração WhatsApp</b><small>Glamour Studio · há 5h · Média</small></div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="litem"><div class="ico amber">🟡</div><div style="flex:1"><b>Como adicionar profissional?</b><small>Lux Beauty · há 1 dia · Baixa</small></div></div>
+    </div>
+    <div class="section-title">Logs de acesso recentes</div>
+    <div class="card">
+      <div class="log"><div class="ld"></div><div><b>Login · Bella Nails</b><br><small>São José, SC · IP 187.x · há 12 min</small></div></div>
+      <div class="log"><div class="ld"></div><div><b>Login · Glamour Studio</b><br><small>Floripa, SC · IP 201.x · há 38 min</small></div></div>
+      <div class="log"><div class="ld"></div><div><b>Tentativa falha · Diva</b><br><small>IP desconhecido · há 1h</small></div></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn active"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 8 — CONFIGURAÇÕES -->
+<div class="phone">
+  <span class="phone-label">8 · Configurações</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Configurações</h1><small>Plataforma</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="section-title">Branding global</div>
+    <div class="card">
+      <div class="irow"><span class="k">Nome da marca</span><span class="v">NailFlow</span></div>
+      <div class="irow"><span class="k">Cor primária</span><span class="v">🟣 #ec4899</span></div>
+      <div class="irow"><span class="k">Logo</span><span class="v">💅 Atualizar</span></div>
+    </div>
+    <div class="section-title">Notificações & e-mails</div>
+    <div class="card">
+      <div class="toggle-row"><div><b>E-mail de boas-vindas</b><small>Ao criar novo salão</small></div><div class="sw on"></div></div>
+      <div class="toggle-row"><div><b>Aviso de inadimplência</b><small>3 dias antes da suspensão</small></div><div class="sw on"></div></div>
+      <div class="toggle-row"><div><b>Resumo semanal</b><small>Métricas por e-mail</small></div><div class="sw"></div></div>
+    </div>
+    <div class="section-title">Integrações</div>
+    <div class="card">
+      <div class="litem"><div class="ico green">💳</div><div style="flex:1"><b>Stripe</b><small>Pagamentos</small></div><span class="tag paid">Conectado</span></div>
+      <div class="litem"><div class="ico green">💬</div><div style="flex:1"><b>WhatsApp API</b><small>Notificações</small></div><span class="tag paid">Conectado</span></div>
+      <div class="litem"><div class="ico blue">📧</div><div style="flex:1"><b>SendGrid</b><small>E-mails</small></div><span class="tag pending">Configurar</span></div>
+    </div>
+    <div class="section-title">Feature Flags</div>
+    <div class="card">
+      <div class="toggle-row"><div><b>Multi-unidades</b><small>Beta · planos Premium</small></div><div class="sw on"></div></div>
+      <div class="toggle-row"><div><b>App do cliente</b><small>Em desenvolvimento</small></div><div class="sw"></div></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn active"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+<!-- TELA 9 — AUDITORIA & SEGURANÇA -->
+<div class="phone">
+  <span class="phone-label">9 · Auditoria & Segurança</span>
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header">
+    <div class="ti"><h1>Auditoria</h1><small>Segurança & LGPD</small></div>
+    <div class="av">A</div>
+  </div>
+  <div class="body">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="ic green">🛡️</div><div class="val">100%</div><div class="lbl">LGPD conforme</div></div>
+      <div class="kpi"><div class="ic blue">🔐</div><div class="val">2FA</div><div class="lbl">Admins protegidos</div></div>
+    </div>
+    <div class="section-title">Log de atividades</div>
+    <div class="card">
+      <div class="log"><div class="ld"></div><div><b>Ariel suspendeu Diva Esmalteria</b><br><small>Motivo: inadimplência · há 1h</small></div></div>
+      <div class="log"><div class="ld"></div><div><b>Ariel acessou como Bella Nails</b><br><small>Impersonation · há 3h</small></div></div>
+      <div class="log"><div class="ld"></div><div><b>Plano Pro editado</b><br><small>Preço R$229 → R$249 · ontem</small></div></div>
+      <div class="log"><div class="ld"></div><div><b>Novo salão criado: Lux Beauty</b><br><small>Onboarding manual · ontem</small></div></div>
+    </div>
+    <div class="section-title">Permissões (RBAC)</div>
+    <div class="card">
+      <div class="irow"><span class="k">Super Admin</span><span class="v">Acesso total</span></div>
+      <div class="irow"><span class="k">Owner</span><span class="v">Próprio salão</span></div>
+      <div class="irow"><span class="k">Gerente</span><span class="v">Parcial</span></div>
+      <div class="irow"><span class="k">Profissional</span><span class="v">Própria agenda</span></div>
+    </div>
+    <div class="section-title">Conformidade LGPD</div>
+    <div class="card">
+      <div class="litem"><div class="ico blue">📤</div><div style="flex:1"><b>Exportar dados de tenant</b><small>Portabilidade de dados</small></div><span class="arrow">›</span></div>
+      <div class="litem"><div class="ico red">🗑️</div><div style="flex:1"><b>Exclusão de dados</b><small>Direito ao esquecimento</small></div><span class="arrow">›</span></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <div class="bn"><span class="bi">📊</span>Início</div>
+    <div class="bn"><span class="bi">🏪</span>Salões</div>
+    <div class="bn-fab">+</div>
+    <div class="bn"><span class="bi">💰</span>Financeiro</div>
+    <div class="bn active"><span class="bi">⚙️</span>Mais</div>
+  </div>
+</div>
+
+</body>
+</html>
