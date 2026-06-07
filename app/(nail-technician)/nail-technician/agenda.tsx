@@ -1,7 +1,14 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
+import { Bell, CalendarDays, Settings2, UsersRound } from 'lucide-react-native';
 
+import {
+  OperationalBottomNav,
+  OperationalHeroCard,
+  OperationalMetricCard,
+  OperationalScreenShell,
+} from '@/components/features/shared';
 import { NotificationsBellButton } from '@/components/features/notifications';
 import { GoogleCalendarSyncStatusTag } from '@/components/features/google';
 import {
@@ -12,7 +19,6 @@ import {
 } from '@/components/features/appointments';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useGoogleCalendarConnection } from '@/hooks/google';
 import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { useAppointments } from '@/hooks/appointments';
@@ -61,7 +67,6 @@ function getGoogleStatusDescription(syncIndicator: ReturnType<typeof useGoogleCa
 
 export default function NailTechnicianAgendaScreen() {
   const router = useRouter();
-  const authSession = useAuthSession();
   const googleConnection = useGoogleCalendarConnection();
   const unreadNotifications = useUnreadNotificationsCount();
   const role = useSessionStore((state) => state.role);
@@ -88,38 +93,94 @@ export default function NailTechnicianAgendaScreen() {
     () => (appointmentsQuery.data ?? []).map((item) => mapAppointmentToCardItem(item, clientsById)),
     [appointmentsQuery.data, clientsById]
   );
+  const scheduledCount = appointmentItems.filter((item) => item.status !== 'cancelled').length;
+  const expectedRevenue = appointmentItems.reduce((total, item) => total + item.priceCents, 0) / 100;
 
   const isLoading = appointmentsQuery.isLoading || clientsQuery.isLoading;
   const queryError = appointmentsQuery.error ?? clientsQuery.error;
 
   return (
-    <View className="flex-1 justify-between bg-zinc-50 p-6 dark:bg-zinc-950">
-      <View className="flex-1 gap-4 pt-10">
-        <View className="gap-2">
-          <View className="flex-row items-center justify-between gap-3">
-            <View className="flex-1 gap-2">
-              <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Agenda de atendimentos</Text>
-              <Text className="text-base text-zinc-600 dark:text-zinc-300">
-                Acompanhe os horarios do dia e da semana com acesso rapido para criar, editar e consultar detalhes.
-              </Text>
+    <OperationalScreenShell
+      title="Agenda"
+      subtitle="Acompanhe seus horários, os próximos atendimentos e os atalhos mais importantes do dia."
+      headerAccessory={
+        <NotificationsBellButton
+          unreadCount={unreadNotifications.unreadCount}
+          onPress={() => router.push(nailTechnicianRoutes.notifications)}
+        />
+      }
+      topSlot={
+        <View className="gap-4">
+          <OperationalHeroCard eyebrow="Resumo do dia" title={`${scheduledCount} atendimento(s)`}>
+            <View className="flex-row gap-3">
+              <View className="flex-1 rounded-2xl bg-white/15 px-4 py-3">
+                <Text className="text-xs text-zinc-100/80">A receber</Text>
+                <Text className="pt-1 text-lg font-black text-white">
+                  {expectedRevenue.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </Text>
+              </View>
+              <View className="flex-1 rounded-2xl bg-white/15 px-4 py-3">
+                <Text className="text-xs text-zinc-100/80">Clientes visíveis</Text>
+                <Text className="pt-1 text-lg font-black text-white">{clientsById.size}</Text>
+              </View>
             </View>
-            <NotificationsBellButton
-              unreadCount={unreadNotifications.unreadCount}
-              onPress={() => router.push(nailTechnicianRoutes.notifications)}
+          </OperationalHeroCard>
+
+          <View className="flex-row gap-3">
+            <OperationalMetricCard label="Hoje" value={String(scheduledCount)} helper="Atendimentos ativos" />
+            <OperationalMetricCard
+              label="Google Agenda"
+              value={googleConnection.syncIndicator === 'connected' ? 'OK' : googleConnection.syncIndicator === 'error' ? 'Erro' : 'Pendente'}
+              helper="Sincronização"
+              featured
             />
           </View>
         </View>
-
+      }
+      footer={
+        <OperationalBottomNav
+          items={[
+            {
+              key: 'agenda',
+              label: 'Agenda',
+              icon: CalendarDays,
+              active: true,
+              onPress: () => router.replace('/nail-technician/agenda'),
+            },
+            {
+              key: 'clients',
+              label: 'Clientes',
+              icon: UsersRound,
+              onPress: () => router.push(nailTechnicianRoutes.clients),
+            },
+            {
+              key: 'notifications',
+              label: 'Alertas',
+              icon: Bell,
+              onPress: () => router.push(nailTechnicianRoutes.notifications),
+            },
+            {
+              key: 'google',
+              label: 'Google',
+              icon: Settings2,
+              onPress: () => router.push(nailTechnicianRoutes.googleCalendar),
+            },
+          ]}
+        />
+      }
+    >
+      <View className="gap-4">
         <AgendaViewToggle mode={mode} onChangeMode={setMode} />
         <AgendaCalendar referenceDate={referenceDate} mode={mode} onChangeReferenceDate={setReferenceDate} />
 
-        <Card className="gap-3">
+        <View className="gap-3 rounded-[24px] border border-white/10 bg-white/5 p-4">
           <View className="flex-row items-center justify-between gap-3">
             <View className="flex-1 gap-1">
-              <Text className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-                Sincronização Google Agenda
-              </Text>
-              <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+              <Text className="text-sm font-semibold text-zinc-100">Google Agenda</Text>
+              <Text className="text-sm leading-6 text-zinc-300">
                 {getGoogleStatusDescription(googleConnection.syncIndicator)}
               </Text>
             </View>
@@ -133,11 +194,12 @@ export default function NailTechnicianAgendaScreen() {
           <Button
             label="Gerenciar Google Agenda"
             variant="secondary"
+            className="h-12 rounded-2xl"
             onPress={() => router.push(nailTechnicianRoutes.googleCalendar)}
           />
-        </Card>
+        </View>
 
-        <View className="flex-row gap-2">
+        <View className="flex-row gap-3">
           <Button
             label="Criar atendimento"
             className="flex-1"
@@ -151,23 +213,14 @@ export default function NailTechnicianAgendaScreen() {
           />
         </View>
 
-        <View className="flex-row gap-2">
-          <Button
-            label="Gerenciar clientes"
-            className="flex-1"
-            variant="ghost"
-            onPress={() => router.push(nailTechnicianRoutes.clients)}
-          />
-        </View>
-
         {isLoading ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando agenda...</Text>
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">Carregando agenda...</Text>
           </Card>
         ) : null}
 
         {!isLoading && queryError ? (
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <Text className="text-sm text-error">
               {queryError instanceof Error ? queryError.message : 'Falha ao carregar atendimentos.'}
             </Text>
@@ -175,36 +228,25 @@ export default function NailTechnicianAgendaScreen() {
         ) : null}
 
         {!isLoading && !queryError && appointmentItems.length === 0 ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Nenhum atendimento encontrado para o periodo selecionado.
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">
+              Nenhum atendimento encontrado para o período selecionado.
             </Text>
           </Card>
         ) : null}
 
         {!isLoading && !queryError && appointmentItems.length > 0 ? (
-          <FlatList
-            data={appointmentItems}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
-            renderItem={({ item }) => (
+          <View className="gap-3">
+            {appointmentItems.map((item) => (
               <AppointmentCard
+                key={item.id}
                 appointment={item}
                 onPress={(appointmentId) => router.push(getAppointmentDetailsRoute(appointmentId))}
               />
-            )}
-          />
+            ))}
+          </View>
         ) : null}
       </View>
-
-      <Button
-        label={authSession.isLoading ? 'Saindo...' : 'Sair'}
-        variant="ghost"
-        onPress={async () => {
-          await authSession.signOut();
-          router.replace('/login');
-        }}
-      />
-    </View>
+    </OperationalScreenShell>
   );
 }

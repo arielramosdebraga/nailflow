@@ -1,19 +1,24 @@
 import { useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Bell, CalendarDays, LayoutGrid, ReceiptText, UsersRound } from 'lucide-react-native';
+import { Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { endOfDay, startOfDay } from 'date-fns';
 
+import { NotificationsBellButton } from '@/components/features/notifications';
+import { OperationalBottomNav, OperationalMetricCard, OperationalScreenShell } from '@/components/features/shared';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAppointments } from '@/hooks/appointments/useAppointments';
 import { useCommands } from '@/hooks/commands/useCommands';
 import { useManicures } from '@/hooks/users/useManicures';
+import { useUnreadNotificationsCount } from '@/hooks/notifications';
 import { formatCurrency } from '@/components/features/commands/commandFormatters';
 
 const ownerDashboardRoute = '/owner/dashboard' satisfies Href;
 
 export default function OwnerManicuresListScreen() {
   const router = useRouter();
+  const unreadNotifications = useUnreadNotificationsCount();
 
   const manicuresQuery = useManicures({ limitCount: 60 });
   const appointmentsTodayQuery = useAppointments({
@@ -60,62 +65,121 @@ export default function OwnerManicuresListScreen() {
 
   const isLoading = manicuresQuery.isLoading || appointmentsTodayQuery.isLoading || commandsQuery.isLoading;
   const error = manicuresQuery.error ?? appointmentsTodayQuery.error ?? commandsQuery.error ?? null;
+  const activeCount = (manicuresQuery.data ?? []).length;
+  const totalOpenCommands = Array.from(openCommandsByManicure.values()).reduce((total, value) => total + value, 0);
 
   return (
-    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
-      <ScrollView className="flex-1" contentContainerClassName="p-6 pb-10 pt-10">
-        <View className="gap-2 pb-5">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Manicures</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Acompanhe indicadores operacionais e financeiros por profissional.
-          </Text>
+    <OperationalScreenShell
+      title="Equipe"
+      subtitle="Acompanhe os indicadores operacionais e financeiros por profissional."
+      headerAccessory={
+        <NotificationsBellButton
+          unreadCount={unreadNotifications.unreadCount}
+          onPress={() => router.push('/owner/notifications')}
+        />
+      }
+      topSlot={
+        <View className="flex-row gap-3">
+          <OperationalMetricCard label="Profissionais" value={String(activeCount)} helper="Equipe ativa" />
+          <OperationalMetricCard label="Comandas abertas" value={String(totalOpenCommands)} helper="Em acompanhamento" />
         </View>
+      }
+      footer={
+        <OperationalBottomNav
+          items={[
+            {
+              key: 'dashboard',
+              label: 'Painel',
+              icon: LayoutGrid,
+              onPress: () => router.push('/owner/dashboard'),
+            },
+            {
+              key: 'agenda',
+              label: 'Agenda',
+              icon: CalendarDays,
+              onPress: () => router.push('/owner/agenda'),
+            },
+            {
+              key: 'manicures',
+              label: 'Equipe',
+              icon: UsersRound,
+              active: true,
+              onPress: () => router.replace('/owner/manicures'),
+            },
+            {
+              key: 'commands',
+              label: 'Comandas',
+              icon: ReceiptText,
+              onPress: () => router.push('/owner/commands'),
+            },
+            {
+              key: 'notifications',
+              label: 'Alertas',
+              icon: Bell,
+              onPress: () => router.push('/owner/notifications'),
+            },
+          ]}
+        />
+      }
+    >
+      <View className="gap-4">
+        <Button
+          label="Voltar ao painel"
+          variant="ghost"
+          className="h-12 rounded-2xl border-white/10 bg-white/5"
+          onPress={() => router.replace(ownerDashboardRoute)}
+        />
 
         {isLoading ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando equipe...</Text>
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">Carregando equipe...</Text>
           </Card>
         ) : null}
 
         {error ? (
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <Text className="text-sm text-error">{error instanceof Error ? error.message : 'Falha ao carregar.'}</Text>
           </Card>
         ) : null}
 
         {!isLoading && !error && (manicuresQuery.data ?? []).length === 0 ? (
-          <Card>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Nenhuma manicure cadastrada.</Text>
+          <Card className="border-white/10 bg-white/5">
+            <Text className="text-sm text-zinc-300">Nenhuma manicure cadastrada.</Text>
           </Card>
         ) : null}
 
         {!isLoading && !error && (manicuresQuery.data ?? []).length > 0 ? (
           <View className="gap-3">
             {(manicuresQuery.data ?? []).map((manicure) => (
-              <Card key={manicure.uid} className="gap-2">
-                <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{manicure.displayName}</Text>
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">{manicure.email}</Text>
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+              <Card key={manicure.uid} className="gap-3 rounded-[24px] border-white/10 bg-white/5">
+                <View className="flex-row items-center gap-3">
+                  <View className="h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+                    <Text className="text-base font-black text-primary">
+                      {manicure.displayName.slice(0, 1).toUpperCase()}
+                    </Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-zinc-50">{manicure.displayName}</Text>
+                    <Text className="text-sm text-zinc-300">{manicure.email}</Text>
+                  </View>
+                </View>
+                <Text className="text-sm text-zinc-300">
                   Agenda hoje: {appointmentsByManicure.get(manicure.uid) ?? 0} atendimento(s)
                 </Text>
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+                <Text className="text-sm text-zinc-300">
                   Comandas abertas: {openCommandsByManicure.get(manicure.uid) ?? 0}
                 </Text>
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+                <Text className="text-sm text-zinc-300">
                   Faturamento em comandas fechadas: {formatCurrency(closedRevenueByManicure.get(manicure.uid) ?? 0)}
                 </Text>
-                <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-                  Google Calendar: {manicure.googleCalendarConnected ? 'Conectado' : 'Nao conectado'}
+                <Text className="text-sm text-zinc-300">
+                  Google Agenda: {manicure.googleCalendarConnected ? 'Conectado' : 'Não conectado'}
                 </Text>
               </Card>
             ))}
           </View>
         ) : null}
-      </ScrollView>
-
-      <View className="p-6 pt-2">
-        <Button label="Voltar ao dashboard" variant="ghost" onPress={() => router.replace(ownerDashboardRoute)} />
       </View>
-    </View>
+    </OperationalScreenShell>
   );
 }

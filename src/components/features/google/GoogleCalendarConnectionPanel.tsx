@@ -58,29 +58,29 @@ export function GoogleCalendarConnectionPanel({
   const formattedLastSync = formatDateTime(lastSyncedAt);
 
   return (
-    <Card className="gap-4">
+    <Card className="gap-4 border-white/10 bg-white/5">
       <View className="gap-2">
         <GoogleCalendarSyncStatusTag status={syncIndicator} />
-        <Text className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Conectar Google Agenda</Text>
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">{getStatusDescription(syncIndicator)}</Text>
+        <Text className="text-xl font-semibold text-zinc-50">Conectar Google Agenda</Text>
+        <Text className="text-sm leading-6 text-zinc-300">{getStatusDescription(syncIndicator)}</Text>
       </View>
 
-      <View className="gap-1">
-        <Text className="text-sm text-zinc-700 dark:text-zinc-200">
+      <View className="gap-2 rounded-[20px] border border-white/10 bg-zinc-900/70 p-4">
+        <Text className="text-sm text-zinc-200">
           Conta conectada: {connected ? 'sim' : 'não'}
         </Text>
         {formattedLastSync ? (
-          <Text className="text-sm text-zinc-700 dark:text-zinc-200">Última sincronização: {formattedLastSync}</Text>
+          <Text className="text-sm text-zinc-200">Última sincronização: {formattedLastSync}</Text>
         ) : null}
         {lastErrorMessage ? <Text className="text-sm text-error">Último erro: {lastErrorMessage}</Text> : null}
       </View>
 
       {isLoadingStatus ? (
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando status da sincronização...</Text>
+        <Text className="text-sm text-zinc-300">Carregando status da sincronização...</Text>
       ) : null}
 
       {errorMessage ? <Text className="text-sm text-error">{errorMessage}</Text> : null}
-      {feedbackMessage ? <Text className="text-sm text-zinc-700 dark:text-zinc-200">{feedbackMessage}</Text> : null}
+      {feedbackMessage ? <Text className="text-sm text-zinc-200">{feedbackMessage}</Text> : null}
 
       <View className="gap-2">
         <Button
@@ -93,6 +93,7 @@ export function GoogleCalendarConnectionPanel({
         <Button
           label="Atualizar status"
           variant="ghost"
+          className="border-white/10 bg-white/5"
           onPress={() => {
             void onRefresh();
           }}

@@ -1,13 +1,14 @@
-import { Alert, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 
 import {
   AppointmentCard,
   formatAppointmentDate,
+  formatAppointmentStatus,
   formatAppointmentSyncStatus,
   formatAppointmentTimeRange,
-  formatAppointmentStatus,
 } from '@/components/features/appointments';
+import { OperationalScreenShell } from '@/components/features/shared';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAppointment, useDeleteAppointmentMutation, useUpdateAppointmentStatusMutation } from '@/hooks/appointments';
@@ -74,40 +75,52 @@ export default function NailTechnicianAppointmentDetailsScreen() {
 
   if (appointmentQuery.isLoading || clientQuery.isLoading) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">Carregando atendimento...</Text>
+      <OperationalScreenShell
+        title="Atendimento"
+        subtitle="Carregando os detalhes operacionais do atendimento."
+        onBackPress={() => router.replace(agendaRoute)}
+        backLabel="Voltar para agenda"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
+          <Text className="text-sm text-zinc-300">Carregando atendimento...</Text>
         </Card>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   const error = appointmentQuery.error ?? clientQuery.error ?? null;
   if (error || !appointment) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
+      <OperationalScreenShell
+        title="Atendimento"
+        subtitle="Não foi possível abrir os detalhes deste atendimento."
+        onBackPress={() => router.replace(agendaRoute)}
+        backLabel="Voltar para agenda"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
           <Text className="text-sm text-error">
-            {error instanceof Error ? error.message : 'Atendimento nao encontrado.'}
+            {error instanceof Error ? error.message : 'Atendimento não encontrado.'}
           </Text>
         </Card>
-        <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
-        </View>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
   if (!userId || appointment.manicureId !== userId) {
     return (
-      <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-        <Card>
-          <Text className="text-sm text-error">Este atendimento nao pertence a profissional logada.</Text>
+      <OperationalScreenShell
+        title="Atendimento"
+        subtitle="Este registro não está disponível para a profissional atual."
+        onBackPress={() => router.replace(agendaRoute)}
+        backLabel="Voltar para agenda"
+        contentContainerClassName="pb-10"
+      >
+        <Card className="border-white/10 bg-white/5">
+          <Text className="text-sm text-error">Este atendimento não pertence à profissional logada.</Text>
         </Card>
-        <View className="pt-4">
-          <Button label="Voltar para agenda" variant="ghost" onPress={() => router.replace(agendaRoute)} />
-        </View>
-      </View>
+      </OperationalScreenShell>
     );
   }
 
@@ -115,69 +128,78 @@ export default function NailTechnicianAppointmentDetailsScreen() {
   const isMutating = updateStatusMutation.isPending || deleteAppointmentMutation.isPending;
 
   return (
-    <View className="flex-1 justify-between bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
+    <OperationalScreenShell
+      title={clientName}
+      subtitle={formatAppointmentDate(appointment.startTime)}
+      onBackPress={() => router.replace(agendaRoute)}
+      backLabel="Voltar para agenda"
+      contentContainerClassName="pb-10"
+      topSlot={<AppointmentCard appointment={appointment} clientName={clientName} />}
+    >
       <View className="gap-4">
-        <View className="gap-2">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{clientName}</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            {formatAppointmentDate(appointment.startTime)}
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-100">Resumo</Text>
+          <Text className="text-sm text-zinc-300">
+            Horário: {formatAppointmentTimeRange(appointment.startTime, appointment.endTime)}
           </Text>
-        </View>
-
-        <AppointmentCard appointment={appointment} clientName={clientName} />
-
-        <Card className="gap-2">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Resumo</Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Horario: {formatAppointmentTimeRange(appointment.startTime, appointment.endTime)}
-          </Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+          <Text className="text-sm text-zinc-300">
             Status atual: {formatAppointmentStatus(appointment.status)}
           </Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Sincronizacao: {formatAppointmentSyncStatus(appointment.syncStatus)}
+          <Text className="text-sm text-zinc-300">
+            Sincronização: {formatAppointmentSyncStatus(appointment.syncStatus)}
           </Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Observacoes: {appointment.notes || 'Sem observacoes'}
+          <Text className="text-sm text-zinc-300">
+            Observações: {appointment.notes || 'Sem observações'}
           </Text>
         </Card>
 
-        <Card className="gap-3">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Atualizar status</Text>
+        <Card className="gap-3 border-white/10 bg-white/5">
+          <Text className="text-sm font-semibold text-zinc-100">Atualizar status</Text>
           <View className="flex-row flex-wrap gap-2">
-            {statusOptions.map((status) => (
-              <Button
-                key={status}
-                label={formatAppointmentStatus(status)}
-                fullWidth={false}
-                variant={status === appointment.status ? 'secondary' : 'ghost'}
-                onPress={() => void handleUpdateStatus(status)}
-                disabled={isMutating || status === appointment.status}
-              />
-            ))}
+            {statusOptions.map((status) => {
+              const isSelected = status === appointment.status;
+
+              return (
+                <Pressable
+                  key={status}
+                  onPress={() => void handleUpdateStatus(status)}
+                  disabled={isMutating || isSelected}
+                  className={`rounded-full border px-4 py-2 ${
+                    isSelected ? 'border-primary bg-primary/15' : 'border-white/10 bg-black/20'
+                  } ${isMutating || isSelected ? 'opacity-60' : 'active:opacity-90'}`}
+                >
+                  <Text className={`text-sm font-semibold ${isSelected ? 'text-primary' : 'text-zinc-200'}`}>
+                    {formatAppointmentStatus(status)}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         </Card>
-      </View>
 
-      <View className="gap-2 pt-4">
-        <Button
-          label="Editar atendimento"
-          onPress={() => router.push(getAppointmentEditRoute(appointment.id))}
-          disabled={isMutating}
-        />
-        <Button
-          label={deleteAppointmentMutation.isPending ? 'Excluindo...' : 'Excluir atendimento'}
-          variant="danger"
-          onPress={handleDeleteAppointment}
-          disabled={isMutating}
-        />
-        <Button
-          label="Voltar para agenda"
-          variant="ghost"
-          onPress={() => router.replace(agendaRoute)}
-          disabled={isMutating}
-        />
+        <View className="gap-3">
+          <Button
+            label="Editar atendimento"
+            className="rounded-2xl"
+            onPress={() => router.push(getAppointmentEditRoute(appointment.id))}
+            disabled={isMutating}
+          />
+          <Button
+            label={deleteAppointmentMutation.isPending ? 'Excluindo...' : 'Excluir atendimento'}
+            variant="danger"
+            className="rounded-2xl"
+            onPress={handleDeleteAppointment}
+            disabled={isMutating}
+          />
+          <Button
+            label="Voltar para agenda"
+            variant="secondary"
+            className="rounded-2xl"
+            onPress={() => router.replace(agendaRoute)}
+            disabled={isMutating}
+          />
+        </View>
       </View>
-    </View>
+    </OperationalScreenShell>
   );
 }
