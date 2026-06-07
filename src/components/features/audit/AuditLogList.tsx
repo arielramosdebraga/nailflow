@@ -12,7 +12,7 @@ interface AuditLogListProps {
 function formatDateTime(value: string): string {
   const parsed = Date.parse(value);
   if (!Number.isFinite(parsed)) {
-    return 'Data invalida';
+    return 'Data inválida';
   }
 
   return new Intl.DateTimeFormat('pt-BR', {
@@ -54,8 +54,8 @@ export function AuditLogList({ logs, isLoading, error }: AuditLogListProps) {
 
   if (logs.length === 0) {
     return (
-      <Card>
-        <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+      <Card className="border-white/10 bg-white/5">
+        <Text className="text-sm text-zinc-300">
           Nenhum log encontrado para os filtros informados.
         </Text>
       </Card>
@@ -68,23 +68,23 @@ export function AuditLogList({ logs, isLoading, error }: AuditLogListProps) {
       keyExtractor={(item) => item.id}
       contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
       renderItem={({ item }) => (
-        <Card className="gap-2">
+        <Card className="gap-2 rounded-[24px] border-white/10 bg-white/5">
           <View className="flex-row items-start justify-between gap-3">
-            <Text className="flex-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <Text className="flex-1 text-sm font-semibold text-zinc-100">
               {item.action}
             </Text>
-            <Text className="text-xs text-zinc-500 dark:text-zinc-400">{formatDateTime(item.timestamp)}</Text>
+            <Text className="text-xs text-zinc-500">{formatDateTime(item.timestamp)}</Text>
           </View>
 
-          <Text className="text-xs text-zinc-600 dark:text-zinc-300">
-            Usuario: {item.userId} ({item.userRole})
+          <Text className="text-xs text-zinc-300">
+            Usuário: {item.userId} ({item.userRole})
           </Text>
-          <Text className="text-xs text-zinc-600 dark:text-zinc-300">
+          <Text className="text-xs text-zinc-300">
             Alvo: {item.targetType} / {item.targetId}
           </Text>
-          <Text className="text-xs text-zinc-500 dark:text-zinc-400">{formatMetadata(item)}</Text>
+          <Text className="text-xs text-zinc-400">{formatMetadata(item)}</Text>
           {item.requestId ? (
-            <Text className="text-[11px] text-zinc-400 dark:text-zinc-500">requestId: {item.requestId}</Text>
+            <Text className="text-[11px] text-zinc-500">requestId: {item.requestId}</Text>
           ) : null}
         </Card>
       )}

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, Share, Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 
+import { AdminHeader } from '@/components/features/admin';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { buildLgpdExportPackageAsync, type LgpdExportPackage } from '@/services/admin/lgpdExportService';
@@ -30,7 +31,7 @@ export default function AdminLgpdExportScreen() {
       const payload = await buildLgpdExportPackageAsync();
       setExportPackage(payload);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Falha ao gerar exportacao.');
+      setErrorMessage(error instanceof Error ? error.message : 'Falha ao gerar exportação.');
     } finally {
       setLoading(false);
     }
@@ -42,61 +43,59 @@ export default function AdminLgpdExportScreen() {
     }
 
     await Share.share({
-      title: 'Exportacao LGPD - NailFlow',
+      title: 'Exportação LGPD - NailFlow',
       message: jsonPreview,
     });
   }
 
   return (
-    <View className="flex-1 bg-zinc-50 p-6 pt-10 dark:bg-zinc-950">
-      <ScrollView className="flex-1" contentContainerClassName="gap-3 pb-6">
-        <View className="gap-2">
-          <Text className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Exportacao LGPD</Text>
-          <Text className="text-base text-zinc-600 dark:text-zinc-300">
-            Gere um pacote JSON com saloes, usuarios e trilha de auditoria para uso operacional no piloto.
-          </Text>
-        </View>
+    <View className="flex-1 bg-zinc-950 px-6 pb-8">
+      <AdminHeader
+        title="Exportação LGPD"
+        subtitle="Gere um pacote administrativo do piloto com dados consolidados para governança e atendimento inicial de solicitações."
+        activeRoute="settings"
+      />
 
-        <Card className="gap-2">
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Este pacote e uma exportacao administrativa para governanca e atendimento inicial de solicitacoes.
+      <ScrollView className="flex-1 pt-6" contentContainerClassName="gap-4 pb-6">
+        <Card className="gap-2 rounded-[24px] border-white/10 bg-white/5">
+          <Text className="text-sm text-zinc-300">
+            Este pacote é uma exportação administrativa para governança e atendimento inicial de solicitações.
           </Text>
-          <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-            Pendencias futuras: arquivo dedicado, filtros por titular e automacao completa de solicitacoes LGPD.
+          <Text className="text-sm text-zinc-300">
+            Pendências futuras: arquivo dedicado, filtros por titular e automação completa de solicitações LGPD.
           </Text>
         </Card>
 
         {errorMessage ? (
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <Text className="text-sm text-error">{errorMessage}</Text>
           </Card>
         ) : null}
 
         {exportPackage ? (
-          <Card className="gap-2">
-            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Resumo</Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
+          <Card className="gap-2 rounded-[24px] border-white/10 bg-primary/15">
+            <Text className="text-base font-semibold text-zinc-50">Resumo</Text>
+            <Text className="text-sm text-zinc-100/85">
               Gerado em: {new Date(exportPackage.generatedAt).toLocaleString('pt-BR')}
             </Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Usuarios: {exportPackage.summary.users}</Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">Saloes: {exportPackage.summary.salons}</Text>
-            <Text className="text-sm text-zinc-600 dark:text-zinc-300">
-              Logs de auditoria: {exportPackage.summary.auditLogs}
-            </Text>
+            <Text className="text-sm text-zinc-100/85">Usuários: {exportPackage.summary.users}</Text>
+            <Text className="text-sm text-zinc-100/85">Salões: {exportPackage.summary.salons}</Text>
+            <Text className="text-sm text-zinc-100/85">Logs de auditoria: {exportPackage.summary.auditLogs}</Text>
           </Card>
         ) : null}
 
         {jsonPreview ? (
-          <Card className="gap-2">
-            <Text className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Preview JSON</Text>
-            <Text className="font-mono text-xs leading-5 text-zinc-600 dark:text-zinc-300">{jsonPreview}</Text>
+          <Card className="gap-2 rounded-[24px] border-white/10 bg-white/5">
+            <Text className="text-base font-semibold text-zinc-50">Prévia JSON</Text>
+            <Text className="font-mono text-xs leading-5 text-zinc-300">{jsonPreview}</Text>
           </Card>
         ) : null}
       </ScrollView>
 
       <View className="gap-2 pt-2">
         <Button
-          label={loading ? 'Gerando exportacao...' : 'Gerar exportacao'}
+          label={loading ? 'Gerando exportação...' : 'Gerar exportação'}
+          className="h-12 rounded-2xl"
           onPress={() => {
             void handleGenerateExport();
           }}
@@ -105,12 +104,18 @@ export default function AdminLgpdExportScreen() {
         <Button
           label="Compartilhar JSON"
           variant="secondary"
+          className="h-12 rounded-2xl"
           onPress={() => {
             void handleShareExport();
           }}
           disabled={!jsonPreview || loading}
         />
-        <Button label="Voltar as configuracoes" variant="ghost" onPress={() => router.replace(adminSettingsRoute)} />
+        <Button
+          label="Voltar às configurações"
+          variant="ghost"
+          className="h-12 rounded-2xl border-white/10 bg-white/5"
+          onPress={() => router.replace(adminSettingsRoute)}
+        />
       </View>
     </View>
   );

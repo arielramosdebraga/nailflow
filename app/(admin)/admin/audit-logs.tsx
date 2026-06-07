@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 
 import { AdminHeader } from '@/components/features/admin';
 import { AuditLogFilters, AuditLogList, type AuditLogFilterValues } from '@/components/features/audit';
+import { Card } from '@/components/ui/Card';
 import { useAdminSessionGuard } from '@/hooks/admin';
 import { useAuditLogs } from '@/hooks/audit';
 import { type ListAuditLogsParams } from '@/services/audit';
@@ -53,14 +54,27 @@ export default function AuditLogsScreen() {
   const totalResults = useMemo(() => auditLogsQuery.data?.length ?? 0, [auditLogsQuery.data]);
 
   return (
-    <View className="flex-1 bg-zinc-50 p-6 dark:bg-zinc-950">
+    <View className="flex-1 bg-zinc-950 px-6 pb-8">
       <AdminHeader
-        title="Auditoria administrativa"
-        subtitle="Consulta de logs com filtros basicos para rastrear operacoes sensiveis."
+        title="Auditoria"
+        subtitle="Cruze filtros, monitore acessos sensíveis e acompanhe a trilha operacional do ambiente."
         activeRoute="audit-logs"
       />
 
-      <View className="gap-3 pb-3 pt-6">
+      <View className="gap-4 pt-6">
+        <View className="flex-row gap-3">
+          <Card className="flex-1 rounded-[24px] border-white/10 bg-primary/15">
+            <Text className="text-xs uppercase tracking-[0.22em] text-zinc-100/80">Resultados</Text>
+            <Text className="pt-2 text-2xl font-black text-zinc-50">
+              {auditLogsQuery.isFetching ? '...' : totalResults}
+            </Text>
+          </Card>
+          <Card className="flex-1 rounded-[24px] border-white/10 bg-white/5">
+            <Text className="text-xs uppercase tracking-[0.22em] text-zinc-400">Limite</Text>
+            <Text className="pt-2 text-2xl font-black text-zinc-50">{normalizeLimit(filterValues.limit)}</Text>
+          </Card>
+        </View>
+
         <AuditLogFilters
           values={filterValues}
           isApplying={auditLogsQuery.isFetching}
@@ -81,15 +95,14 @@ export default function AuditLogsScreen() {
             });
           }}
         />
+
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Resultados</Text>
-          <Text className="text-xs text-zinc-500 dark:text-zinc-400">
+          <Text className="text-sm font-semibold text-zinc-200">Resultados</Text>
+          <Text className="text-xs text-zinc-500">
             {auditLogsQuery.isFetching ? 'Atualizando...' : `${totalResults} registro(s)`}
           </Text>
         </View>
-      </View>
 
-      <View className="flex-1">
         <AuditLogList
           logs={auditLogsQuery.data ?? []}
           isLoading={auditLogsQuery.isLoading}
